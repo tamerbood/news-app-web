@@ -146,23 +146,35 @@ export default function AdminDashboard() {
         setUser(currentUser);
 
         setArticles(
-          articlesData.value ??
-            articlesData,
+          Array.isArray(articlesData)
+            ? articlesData
+            : articlesData.items ??
+              articlesData.value ??
+              [],
         );
 
         setSources(
-          sourcesData.value ??
-            sourcesData,
+          Array.isArray(sourcesData)
+            ? sourcesData
+            : sourcesData.items ??
+              sourcesData.value ??
+              [],
         );
 
         setCategories(
-          categoriesData.value ??
-            categoriesData,
+          Array.isArray(categoriesData)
+            ? categoriesData
+            : categoriesData.items ??
+              categoriesData.value ??
+              [],
         );
 
         setUsers(
-          usersData.value ??
-            usersData,
+          Array.isArray(usersData)
+            ? usersData
+            : usersData.items ??
+              usersData.value ??
+              [],
         );
       } catch (err) {
         setError(
@@ -538,6 +550,3 @@ function QuickLink({
 function formatDate(value: string) {
   return new Date(value).toLocaleString();
 }
-
-
-
