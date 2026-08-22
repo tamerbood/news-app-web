@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 interface Category {
@@ -24,76 +24,24 @@ interface Article {
   };
 }
 
-export default function CategoriesPage() {
+function CategoriesContent() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
   const [selectedCategory, setSelectedCategory] =
     useState<string>('');
   const [loadingCategories, setLoadingCategories] =
     useState(true);
-  const searchParams = useSearchParams();
   const [loadingArticles, setLoadingArticles] =
     useState(false);
   const [error, setError] = useState('');
 
+  const searchParams = useSearchParams();
+
+  const categoryFromUrl =
+    searchParams.get('category');
+
   const apiUrl =
     process.env.NEXT_PUBLIC_API_URL;
-
-  useEffect(() => {
-    async function loadCategories() {
-      try {
-        if (!apiUrl) {
-          throw new Error(
-            'NEXT_PUBLIC_API_URL is not configured.',
-          );
-        }
-
-        const response = await fetch(
-          `${apiUrl}/categories`,
-        );
-
-        if (!response.ok) {
-          throw new Error(
-            `Failed to load categories (${response.status})`,
-          );
-        }
-
-        const data = await response.json();
-
-const loadedCategories = Array.isArray(data)
-  ? data
-  : data.categories ?? [];
-
-setCategories(loadedCategories);
-
-const categoryFromUrl =
-  searchParams.get('category');
-
-if (categoryFromUrl) {
-  const matchingCategory =
-    loadedCategories.find(
-      (category: Category) =>
-        category.name.toLowerCase() ===
-        categoryFromUrl.toLowerCase(),
-    );
-
-  if (matchingCategory) {
-    loadArticles(matchingCategory.id);
-  }
-}
-      } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : 'Failed to load categories.',
-        );
-      } finally {
-        setLoadingCategories(false);
-      }
-    }
-
-    loadCategories();
-}, [apiUrl, searchParams]);
 
   async function loadArticles(
     categoryId: string,
@@ -139,6 +87,60 @@ if (categoryFromUrl) {
       setLoadingArticles(false);
     }
   }
+
+  useEffect(() => {
+    async function loadCategories() {
+      try {
+        if (!apiUrl) {
+          throw new Error(
+            'NEXT_PUBLIC_API_URL is not configured.',
+          );
+        }
+
+        const response = await fetch(
+          `${apiUrl}/categories`,
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            `Failed to load categories (${response.status})`,
+          );
+        }
+
+        const data = await response.json();
+
+        const loadedCategories: Category[] =
+          Array.isArray(data)
+            ? data
+            : data.categories ?? [];
+
+        setCategories(loadedCategories);
+
+        if (categoryFromUrl) {
+          const matchingCategory =
+            loadedCategories.find(
+              (category: Category) =>
+                category.name.toLowerCase() ===
+                categoryFromUrl.toLowerCase(),
+            );
+
+          if (matchingCategory) {
+            loadArticles(matchingCategory.id);
+          }
+        }
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : 'Failed to load categories.',
+        );
+      } finally {
+        setLoadingCategories(false);
+      }
+    }
+
+    loadCategories();
+  }, [apiUrl, categoryFromUrl]);
 
   return (
     <main className="min-h-screen bg-gray-100">
@@ -278,5 +280,23 @@ if (categoryFromUrl) {
         )}
       </section>
     </main>
+  );
+}
+
+export default function CategoriesPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-gray-100">
+          <section className="mx-auto max-w-7xl px-6 py-10">
+            <p className="text-gray-500">
+              Loading categories...
+            </p>
+          </section>
+        </main>
+      }
+    >
+      <CategoriesContent />
+    </Suspense>
   );
 }
