@@ -364,7 +364,7 @@ const data = await response.json();
             href="/"
             className="text-sm font-semibold text-blue-600 hover:text-blue-800"
           >
-            ← Back to News
+            â† Back to News
           </Link>
 
           <h1 className="mt-4 text-3xl font-bold text-gray-900">
@@ -506,8 +506,8 @@ const data = await response.json();
                   }
                 >
                   {showEmailPassword
-                    ? '🙈'
-                    : '👁️'}
+                    ? 'ðŸ™ˆ'
+                    : 'ðŸ‘ï¸'}
                 </button>
               </div>
             </div>
@@ -589,8 +589,8 @@ const data = await response.json();
                   }
                 >
                   {showCurrentPassword
-                    ? '🙈'
-                    : '👁️'}
+                    ? 'ðŸ™ˆ'
+                    : 'ðŸ‘ï¸'}
                 </button>
               </div>
             </div>
@@ -638,8 +638,8 @@ const data = await response.json();
                   }
                 >
                   {showNewPassword
-                    ? '🙈'
-                    : '👁️'}
+                    ? 'ðŸ™ˆ'
+                    : 'ðŸ‘ï¸'}
                 </button>
               </div>
             </div>
@@ -687,8 +687,8 @@ const data = await response.json();
                   }
                 >
                   {showConfirmPassword
-                    ? '🙈'
-                    : '👁️'}
+                    ? 'ðŸ™ˆ'
+                    : 'ðŸ‘ï¸'}
                 </button>
               </div>
             </div>
@@ -784,8 +784,8 @@ const data = await response.json();
                 }
               >
                 {showDeletePassword
-                  ? '🙈'
-                  : '👁️'}
+                  ? 'ðŸ™ˆ'
+                  : 'ðŸ‘ï¸'}
               </button>
             </div>
 

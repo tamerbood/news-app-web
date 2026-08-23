@@ -18,7 +18,7 @@ export default function TermsOfServicePage() {
               </h2>
 
               <p className="mt-3 leading-7">
-                By accessing or using News App, you agree
+                By accessing or using Mada Alalam, you agree
                 to these Terms of Service. If you do not
                 agree with these terms, please do not use
                 the service.
@@ -27,17 +27,17 @@ export default function TermsOfServicePage() {
 
             <section>
               <h2 className="text-xl font-bold text-gray-900">
-                2. About News App
+                2. About Mada Alalam
               </h2>
 
               <p className="mt-3 leading-7">
-                News App is a news aggregation service that
+                Mada Alalam is a news aggregation service that
                 collects and displays news information from
                 third-party sources and RSS feeds.
               </p>
 
               <p className="mt-3 leading-7">
-                News App does not necessarily create or
+                Mada Alalam does not necessarily create or
                 publish the original news content displayed
                 through the service.
               </p>
@@ -71,7 +71,7 @@ export default function TermsOfServicePage() {
               </h2>
 
               <p className="mt-3 leading-7">
-                You agree to use News App only for lawful
+                You agree to use Mada Alalam only for lawful
                 purposes.
               </p>
 
@@ -120,7 +120,7 @@ export default function TermsOfServicePage() {
               </p>
 
               <p className="mt-3 leading-7">
-                News App provides links to original
+                Mada Alalam provides links to original
                 publishers where available.
               </p>
 
@@ -131,7 +131,7 @@ export default function TermsOfServicePage() {
 
               <p className="mt-3 leading-7">
                 Third-party websites are subject to their
-                own terms and privacy policies. News App is
+                own terms and privacy policies. Mada Alalam is
                 not responsible for the content, availability,
                 or policies of external websites.
               </p>
@@ -145,7 +145,7 @@ export default function TermsOfServicePage() {
               <p className="mt-3 leading-7">
                 We aim to provide useful and timely news
                 information, but we cannot guarantee that
-                all information displayed through News App
+                all information displayed through Mada Alalam
                 is complete, accurate, current, or error-free.
               </p>
 
@@ -162,7 +162,7 @@ export default function TermsOfServicePage() {
               </h2>
 
               <p className="mt-3 leading-7">
-                News App may allow registered users to save
+                Mada Alalam may allow registered users to save
                 articles to favorites and follow news sources.
               </p>
 
@@ -181,7 +181,7 @@ export default function TermsOfServicePage() {
               <p className="mt-3 leading-7">
                 Users may delete their accounts using the
                 account deletion functionality provided by
-                News App.
+                Mada Alalam.
               </p>
 
               <p className="mt-3 leading-7">
@@ -200,7 +200,7 @@ export default function TermsOfServicePage() {
 
               <p className="mt-3 leading-7">
                 We may modify, suspend, or discontinue parts
-                of News App at any time.
+                of Mada Alalam at any time.
               </p>
 
               <p className="mt-3 leading-7">
@@ -216,7 +216,7 @@ export default function TermsOfServicePage() {
               </h2>
 
               <p className="mt-3 leading-7">
-                News App is provided on an "as available"
+                Mada Alalam is provided on an "as available"
                 basis.
               </p>
 
@@ -236,7 +236,7 @@ export default function TermsOfServicePage() {
 
               <p className="mt-3 leading-7">
                 To the extent permitted by applicable law,
-                News App and its operators will not be liable
+                Mada Alalam and its operators will not be liable
                 for indirect, incidental, special, or
                 consequential damages arising from the use
                 of the service or third-party content.
@@ -267,7 +267,7 @@ export default function TermsOfServicePage() {
               <p className="mt-3 leading-7">
                 If you have questions about these Terms of
                 Service, please contact us through the
-                contact information provided by News App.
+                contact information provided by Mada Alalam.
               </p>
             </section>
           </div>

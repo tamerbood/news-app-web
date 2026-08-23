@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "News App",
+  title: "Mada Alalam",
   description: "Latest news from BBC",
 };
 
@@ -38,7 +38,7 @@ export default function RootLayout({
           <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-8 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="font-semibold text-gray-900">
-                News App
+                Mada Alalam
               </p>
 
               <p className="mt-1 text-sm text-gray-500">
@@ -83,7 +83,7 @@ export default function RootLayout({
           <div className="border-t border-gray-100">
             <div className="mx-auto max-w-7xl px-6 py-4">
               <p className="text-center text-xs text-gray-500">
-                © {new Date().getFullYear()} News App. All rights reserved.
+                © {new Date().getFullYear()} Mada Alalam. All rights reserved.
               </p>
             </div>
           </div>

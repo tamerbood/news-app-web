@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -55,7 +55,7 @@ export default function Navbar() {
           href="/"
           className="text-2xl font-bold text-gray-900"
         >
-          News App
+          Mada Alalam
         </Link>
 
         <div className="flex items-center gap-6">

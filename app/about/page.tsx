@@ -4,7 +4,7 @@ export default function AboutPage() {
       <div className="mx-auto max-w-4xl px-6 py-10">
         <div className="rounded-2xl bg-white p-8 shadow-sm md:p-10">
           <h1 className="text-3xl font-bold text-gray-900">
-            About News App
+            About Mada Alalam
           </h1>
 
           <p className="mt-3 text-sm text-gray-500">
@@ -14,11 +14,11 @@ export default function AboutPage() {
           <div className="mt-8 space-y-8 text-gray-700">
             <section>
               <h2 className="text-xl font-bold text-gray-900">
-                What is News App?
+                What is Mada Alalam?
               </h2>
 
               <p className="mt-3 leading-7">
-                News App is a news aggregation platform designed
+                Mada Alalam is a news aggregation platform designed
                 to help users discover the latest stories from
                 trusted news sources in one convenient place.
               </p>
@@ -53,7 +53,7 @@ export default function AboutPage() {
               </h2>
 
               <p className="mt-3 leading-7">
-                News App retrieves news information from
+                Mada Alalam retrieves news information from
                 third-party publishers and RSS feeds.
               </p>
 
@@ -108,7 +108,7 @@ export default function AboutPage() {
 
               <p className="mt-3 leading-7">
                 If you have questions, suggestions, or feedback
-                about News App, please visit our Contact page.
+                about Mada Alalam, please visit our Contact page.
               </p>
             </section>
           </div>

@@ -87,7 +87,7 @@ export default function UserLoginPage() {
       <div className="mx-auto w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
         <div className="mb-8">
           <p className="text-sm font-semibold text-gray-500">
-            News App
+            Mada Alalam
           </p>
 
           <h1 className="mt-2 text-3xl font-bold text-gray-900">
@@ -143,7 +143,7 @@ export default function UserLoginPage() {
               required
               autoComplete="current-password"
               className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-black"
-              placeholder="••••••••"
+              placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
             />
           </div>
 
@@ -179,7 +179,7 @@ export default function UserLoginPage() {
             href="/"
             className="text-sm font-medium text-blue-600 hover:text-blue-800"
           >
-            ← Back to News
+            â† Back to News
           </Link>
         </div>
       </div>

@@ -18,7 +18,7 @@ export default function PrivacyPolicyPage() {
               </h2>
 
               <p className="mt-3 leading-7">
-                Welcome to News App. We respect your privacy
+                Welcome to Mada Alalam. We respect your privacy
                 and are committed to protecting the information
                 you provide when using our website and application.
               </p>
@@ -95,7 +95,7 @@ export default function PrivacyPolicyPage() {
               </h2>
 
               <p className="mt-3 leading-7">
-                News App aggregates news information from
+                Mada Alalam aggregates news information from
                 third-party news sources and RSS feeds.
               </p>
 
@@ -106,7 +106,7 @@ export default function PrivacyPolicyPage() {
               </p>
 
               <p className="mt-3 leading-7">
-                Where available, News App provides a link to
+                Where available, Mada Alalam provides a link to
                 the original article so that users can access
                 the original publisher's website.
               </p>
@@ -118,7 +118,7 @@ export default function PrivacyPolicyPage() {
               </h2>
 
               <p className="mt-3 leading-7">
-                News App may retrieve news content from
+                Mada Alalam may retrieve news content from
                 third-party websites and RSS feeds.
               </p>
 
@@ -179,7 +179,7 @@ export default function PrivacyPolicyPage() {
               </h2>
 
               <p className="mt-3 leading-7">
-                News App is not intended to knowingly collect
+                Mada Alalam is not intended to knowingly collect
                 personal information from children.
               </p>
 
@@ -216,7 +216,7 @@ export default function PrivacyPolicyPage() {
                 If you have questions about this Privacy
                 Policy or how your information is handled,
                 please contact us through the contact
-                information provided by News App.
+                information provided by Mada Alalam.
               </p>
             </section>
           </div>

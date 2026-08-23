@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 
@@ -252,7 +252,7 @@ export default function AdminDashboard() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
           <div>
             <p className="text-sm font-semibold text-blue-600">
-              News App
+              Mada Alalam
             </p>
 
             <h1 className="mt-1 text-2xl font-bold text-gray-900">

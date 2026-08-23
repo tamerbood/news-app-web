@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { FormEvent, useState } from 'react';
 
@@ -72,7 +72,7 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
         <div className="mb-8">
           <p className="text-sm font-semibold text-gray-500">
-            News App
+            Mada Alalam
           </p>
 
           <h1 className="mt-2 text-3xl font-bold text-gray-900">
