@@ -19,7 +19,7 @@ export default function ContactPage() {
 
               <p className="mt-3 leading-7">
                 If you have questions, suggestions, feedback,
-                or need help with News App, you can contact
+                or need help with Mada Alalam, you can contact
                 us using the information provided below.
               </p>
             </section>
@@ -41,10 +41,10 @@ export default function ContactPage() {
                 </p>
 
                 <a
-                  href="mailto:support@example.com"
+                  href="mailto:tamerxothman@gmail.com"
                   className="mt-1 inline-block font-semibold text-blue-600 hover:text-blue-800"
                 >
-                  support@example.com
+                  tamerxothman@gmail.com
                 </a>
               </div>
             </section>
@@ -56,7 +56,7 @@ export default function ContactPage() {
 
               <p className="mt-3 leading-7">
                 We welcome feedback that can help us improve
-                News App, including suggestions for new
+                Mada Alalam, including suggestions for new
                 features, categories, news sources, and
                 improvements to the user experience.
               </p>
@@ -69,7 +69,7 @@ export default function ContactPage() {
 
               <p className="mt-3 leading-7">
                 If you believe that information or content
-                displayed through News App requires attention,
+                displayed through Mada Alalam requires attention,
                 please contact us with the relevant article
                 or source information.
               </p>
