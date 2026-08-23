@@ -76,14 +76,10 @@ export default function AccountPage() {
 const response = await fetch(
   `${apiUrl}/auth/me`,
   {
-    method: 'DELETE',
+    method: 'GET',
     headers: {
       Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      password: deletePassword,
-    }),
   },
 );
 
