@@ -77,6 +77,54 @@ export default function ContactPage() {
 
             <section>
               <h2 className="text-xl font-bold text-gray-900">
+                Delete Your Account
+              </h2>
+
+              <p className="mt-3 leading-7">
+                If you would like to delete your Mada Alalam
+                account and the personal data associated with it,
+                you can request account deletion at any time.
+              </p>
+
+              <p className="mt-3 leading-7">
+                If you can access your account, sign in to Mada
+                Alalam, open your Account page, go to the Danger
+                Zone section, select Delete My Account, enter
+                your password, and confirm the deletion.
+              </p>
+
+              <p className="mt-3 leading-7">
+                If you cannot access your account, you can request
+                deletion by contacting our support team using the
+                email address below. Please use the email address
+                associated with your account and include
+                &quot;Account Deletion Request&quot; in the subject
+                line.
+              </p>
+
+              <div className="mt-4 rounded-xl bg-gray-50 p-5">
+                <p className="text-sm font-medium text-gray-500">
+                  Account Deletion Requests
+                </p>
+
+                <a
+                  href="mailto:tamerxothman@gmail.com?subject=Account%20Deletion%20Request"
+                  className="mt-1 inline-block font-semibold text-blue-600 hover:text-blue-800"
+                >
+                  tamerxothman@gmail.com
+                </a>
+              </div>
+
+              <p className="mt-3 leading-7">
+                When an account is deleted, the account and
+                associated personal data are deleted, subject to
+                any information that we may be required to retain
+                by law.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-xl font-bold text-gray-900">
                 Account and Privacy Requests
               </h2>
 
