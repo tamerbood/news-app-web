@@ -7,6 +7,14 @@ type Category = {
   name: string;
 };
 
+type Country = {
+  id: string;
+  name: string;
+  nameEn: string;
+  code: string;
+  flag: string;
+};
+
 type Source = {
   id: string;
   name: string;
@@ -16,6 +24,8 @@ type Source = {
   isActive: boolean;
   categoryId: string | null;
   category?: Category | null;
+  countryId: string | null;
+  country?: Country | null;
 };
 
 type SourceForm = {
@@ -24,6 +34,7 @@ type SourceForm = {
   rssUrl: string;
   logoUrl: string;
   categoryId: string;
+  countryId: string;
   isActive: boolean;
 };
 
@@ -33,12 +44,14 @@ const emptyForm: SourceForm = {
   rssUrl: '',
   logoUrl: '',
   categoryId: '',
+  countryId: '',
   isActive: true,
 };
 
 export default function SourcesPage() {
   const [sources, setSources] = useState<Source[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [countries, setCountries] = useState<Country[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -50,7 +63,8 @@ export default function SourcesPage() {
   const [editingSource, setEditingSource] =
     useState<Source | null>(null);
 
-  const [form, setForm] = useState<SourceForm>(emptyForm);
+  const [form, setForm] =
+    useState<SourceForm>(emptyForm);
 
   useEffect(() => {
     loadData();
@@ -61,7 +75,8 @@ export default function SourcesPage() {
       setLoading(true);
       setError('');
 
-      const token = localStorage.getItem('admin_token');
+      const token =
+          localStorage.getItem('admin_token');
 
       if (!token) {
         window.location.href = '/admin/login';
@@ -75,6 +90,7 @@ export default function SourcesPage() {
       const [
         sourcesResponse,
         categoriesResponse,
+        countriesResponse,
       ] = await Promise.all([
         fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/sources`,
@@ -85,6 +101,13 @@ export default function SourcesPage() {
 
         fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/categories`,
+          {
+            headers,
+          },
+        ),
+
+        fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/countries`,
           {
             headers,
           },
@@ -103,11 +126,20 @@ export default function SourcesPage() {
         );
       }
 
+      if (!countriesResponse.ok) {
+        throw new Error(
+          `Failed to load countries: ${countriesResponse.status}`,
+        );
+      }
+
       const sourcesData =
-        await sourcesResponse.json();
+          await sourcesResponse.json();
 
       const categoriesData =
-        await categoriesResponse.json();
+          await categoriesResponse.json();
+
+      const countriesData =
+          await countriesResponse.json();
 
       setSources(
         sourcesData.value ?? sourcesData,
@@ -115,6 +147,10 @@ export default function SourcesPage() {
 
       setCategories(
         categoriesData.value ?? categoriesData,
+      );
+
+      setCountries(
+        countriesData.value ?? countriesData,
       );
     } catch (err) {
       setError(
@@ -144,6 +180,7 @@ export default function SourcesPage() {
       rssUrl: source.rssUrl,
       logoUrl: source.logoUrl ?? '',
       categoryId: source.categoryId ?? '',
+      countryId: source.countryId ?? '',
       isActive: source.isActive,
     });
 
@@ -180,11 +217,18 @@ export default function SourcesPage() {
       setError('');
       setMessage('');
 
-      const token = localStorage.getItem('admin_token');
+      const token =
+          localStorage.getItem('admin_token');
 
       if (!token) {
         window.location.href = '/admin/login';
         return;
+      }
+
+      if (!form.countryId) {
+        throw new Error(
+          'Please select a country.',
+        );
       }
 
       const payload = {
@@ -195,6 +239,8 @@ export default function SourcesPage() {
           form.logoUrl.trim() || undefined,
         categoryId:
           form.categoryId || undefined,
+        countryId:
+          form.countryId,
         isActive: form.isActive,
       };
 
@@ -256,7 +302,8 @@ export default function SourcesPage() {
       setError('');
       setMessage('');
 
-      const token = localStorage.getItem('admin_token');
+      const token =
+          localStorage.getItem('admin_token');
 
       if (!token) {
         window.location.href = '/admin/login';
@@ -300,7 +347,8 @@ export default function SourcesPage() {
       setError('');
       setMessage('');
 
-      const token = localStorage.getItem('admin_token');
+      const token =
+          localStorage.getItem('admin_token');
 
       if (!token) {
         window.location.href = '/admin/login';
@@ -357,6 +405,17 @@ export default function SourcesPage() {
     );
 
     return category?.name ?? 'Uncategorized';
+  }
+
+  function getCountry(source: Source) {
+    if (source.country) {
+      return source.country;
+    }
+
+    return countries.find(
+      (country) =>
+        country.id === source.countryId,
+    );
   }
 
   return (
@@ -448,6 +507,37 @@ export default function SourcesPage() {
                   placeholder="BBC News"
                   className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-blue-500"
                 />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">
+                  Country
+                </label>
+
+                <select
+                  required
+                  value={form.countryId}
+                  onChange={(event) =>
+                    updateForm(
+                      'countryId',
+                      event.target.value,
+                    )
+                  }
+                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 outline-none focus:border-blue-500"
+                >
+                  <option value="">
+                    Select country
+                  </option>
+
+                  {countries.map((country) => (
+                    <option
+                      key={country.id}
+                      value={country.id}
+                    >
+                      {country.flag} {country.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
@@ -620,71 +710,85 @@ export default function SourcesPage() {
             </div>
           ) : (
             <div className="divide-y divide-gray-100">
-              {sources.map((source) => (
-                <div
-                  key={source.id}
-                  className="flex flex-col gap-4 px-6 py-5 lg:flex-row lg:items-center lg:justify-between"
-                >
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <h3 className="font-semibold text-gray-900">
-                        {source.name}
-                      </h3>
+              {sources.map((source) => {
+                const country =
+                  getCountry(source);
 
-                      <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-600">
-                        {getCategoryName(source)}
-                      </span>
+                return (
+                  <div
+                    key={source.id}
+                    className="flex flex-col gap-4 px-6 py-5 lg:flex-row lg:items-center lg:justify-between"
+                  >
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-3">
+                        <h3 className="font-semibold text-gray-900">
+                          {source.name}
+                        </h3>
 
-                      <span
-                        className={
-                          source.isActive
-                            ? 'rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-600'
-                            : 'rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-500'
-                        }
-                      >
-                        {source.isActive
-                          ? 'Active'
-                          : 'Inactive'}
-                      </span>
+                        {country && (
+                          <span className="rounded-full bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700">
+                            {country.flag}{' '}
+                            {country.name}
+                          </span>
+                        )}
+
+                        <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-600">
+                          {getCategoryName(
+                            source,
+                          )}
+                        </span>
+
+                        <span
+                          className={
+                            source.isActive
+                              ? 'rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-600'
+                              : 'rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-500'
+                          }
+                        >
+                          {source.isActive
+                            ? 'Active'
+                            : 'Inactive'}
+                        </span>
+                      </div>
+
+                      <p className="mt-2 truncate text-sm text-gray-500">
+                        {source.rssUrl}
+                      </p>
                     </div>
 
-                    <p className="mt-2 truncate text-sm text-gray-500">
-                      {source.rssUrl}
-                    </p>
+                    <div className="flex shrink-0 flex-wrap gap-2">
+                      <button
+                        onClick={() =>
+                          toggleActive(source)
+                        }
+                        className="rounded-lg border border-gray-300 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                      >
+                        {source.isActive
+                          ? 'Disable'
+                          : 'Enable'}
+                      </button>
+
+                      <button
+                        onClick={() =>
+                          openEditForm(source)
+                        }
+                        className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 hover:bg-blue-100"
+                      >
+                        Edit
+                      </button>
+
+                      <button
+                        onClick={() =>
+                          deleteSource(source)
+                        }
+                        className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-100"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
-
-                  <div className="flex shrink-0 flex-wrap gap-2">
-                    <button
-                      onClick={() =>
-                        toggleActive(source)
-                      }
-                      className="rounded-lg border border-gray-300 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50"
-                    >
-                      {source.isActive
-                        ? 'Disable'
-                        : 'Enable'}
-                    </button>
-
-                    <button
-                      onClick={() =>
-                        openEditForm(source)
-                      }
-                      className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 hover:bg-blue-100"
-                    >
-                      Edit
-                    </button>
-
-                    <button
-                      onClick={() =>
-                        deleteSource(source)
-                      }
-                      className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-100"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </section>
@@ -692,5 +796,3 @@ export default function SourcesPage() {
     </main>
   );
 }
-
-

@@ -806,18 +806,16 @@ export default function HomePage() {
                         className="overflow-hidden rounded-2xl bg-white shadow-sm transition hover:shadow-md"
                       >
 
-                        {/* Image */}
-                        {article.imageUrl && (
-                          <img
-                            src={
-                              article.imageUrl
-                            }
-                            alt={
-                              article.title
-                            }
-                            className="h-52 w-full object-cover"
-                          />
-                        )}
+{/* Image */}
+<img
+  src={
+    article.imageUrl?.trim()
+      ? article.imageUrl
+      : `${process.env.NEXT_PUBLIC_API_URL}/assets/images/news-placeholder.png`
+  }
+  alt={article.title}
+  className="h-52 w-full object-cover"
+/>
 
                         <div className="p-5">
 
