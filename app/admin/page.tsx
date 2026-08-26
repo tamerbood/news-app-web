@@ -27,6 +27,14 @@ type Category = {
   id: string;
   name: string;
 };
+type YouTubeChannel = {
+  id: string;
+  channelId: string;
+  name: string;
+  handle: string | null;
+  thumbnailUrl: string | null;
+  isActive: boolean;
+};
 
 export default function AdminDashboard() {
   const [user, setUser] = useState<User | null>(null);
@@ -34,7 +42,8 @@ export default function AdminDashboard() {
   const [sources, setSources] = useState<Source[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [users, setUsers] = useState<User[]>([]);
-
+const [youtubeChannels, setYouTubeChannels] =
+  useState<YouTubeChannel[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -60,6 +69,7 @@ export default function AdminDashboard() {
           sourcesResponse,
           categoriesResponse,
           usersResponse,
+          youtubeChannelsResponse,
         ] = await Promise.all([
           fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/auth/me`,
@@ -85,6 +95,10 @@ export default function AdminDashboard() {
             `${process.env.NEXT_PUBLIC_API_URL}/users`,
             { headers },
           ),
+          fetch(
+  `${process.env.NEXT_PUBLIC_API_URL}/youtube/managed-channels`,
+  { headers },
+),
         ]);
 
         if (!userResponse.ok) {
@@ -124,7 +138,8 @@ export default function AdminDashboard() {
           !articlesResponse.ok ||
           !sourcesResponse.ok ||
           !categoriesResponse.ok ||
-          !usersResponse.ok
+          !usersResponse.ok||
+          !youtubeChannelsResponse.ok
         ) {
           throw new Error(
             'Failed to load dashboard data',
@@ -142,7 +157,8 @@ export default function AdminDashboard() {
 
         const usersData =
           await usersResponse.json();
-
+const youtubeChannelsData =
+  await youtubeChannelsResponse.json();
         setUser(currentUser);
 
         setArticles(
@@ -176,6 +192,13 @@ export default function AdminDashboard() {
               usersData.value ??
               [],
         );
+        setYouTubeChannels(
+  Array.isArray(youtubeChannelsData)
+    ? youtubeChannelsData
+    : youtubeChannelsData.items ??
+      youtubeChannelsData.value ??
+      [],
+);
       } catch (err) {
         setError(
           err instanceof Error
@@ -293,19 +316,21 @@ export default function AdminDashboard() {
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          <DashboardCard
-            title="Articles"
-            value={articles.length}
-            description="News articles"
-            href="/admin/articles"
-          />
+<DashboardCard
+  title="YouTube"
+  value={youtubeChannels.length}
+  description="YouTube Shorts channels"
+  href="/admin/youtube"
+/>
 
-          <DashboardCard
-            title="Sources"
-            value={sources.length}
-            description="RSS news sources"
-            href="/admin/sources"
-          />
+
+
+<DashboardCard
+  title="Sources"
+  value={sources.length}
+  description="RSS news sources"
+  href="/admin/sources"
+/>
 
           <DashboardCard
             title="Categories"
@@ -468,7 +493,10 @@ export default function AdminDashboard() {
                 label="Articles"
                 href="/admin/articles"
               />
-
+<QuickLink
+  label="YouTube Channels"
+  href="/admin/youtube"
+/>
               <QuickLink
                 label="Sources"
                 href="/admin/sources"

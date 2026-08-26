@@ -225,11 +225,7 @@ export default function SourcesPage() {
         return;
       }
 
-      if (!form.countryId) {
-        throw new Error(
-          'Please select a country.',
-        );
-      }
+
 
       const payload = {
         name: form.name.trim(),
@@ -240,8 +236,7 @@ export default function SourcesPage() {
         categoryId:
           form.categoryId || undefined,
         countryId:
-          form.countryId,
-        isActive: form.isActive,
+  form.countryId || null,
       };
 
       const url = editingSource
@@ -515,7 +510,7 @@ export default function SourcesPage() {
                 </label>
 
                 <select
-                  required
+
                   value={form.countryId}
                   onChange={(event) =>
                     updateForm(
@@ -526,7 +521,7 @@ export default function SourcesPage() {
                   className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 outline-none focus:border-blue-500"
                 >
                   <option value="">
-                    Select country
+                    No country
                   </option>
 
                   {countries.map((country) => (

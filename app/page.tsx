@@ -12,6 +12,14 @@ type Category = {
   name: string;
 };
 
+type Country = {
+  id: string;
+  name: string;
+  nameEn: string;
+  code: string;
+  flag: string;
+};
+
 type Source = {
   id: string;
   name: string;
@@ -39,8 +47,14 @@ export default function HomePage() {
   const [articles, setArticles] =
     useState<Article[]>([]);
 
-  const [categories, setCategories] =
-    useState<Category[]>([]);
+const [categories, setCategories] =
+  useState<Category[]>([]);
+
+const [countries, setCountries] =
+  useState<Country[]>([]);
+
+const [countryCode, setCountryCode] =
+  useState('');
 
   const [sources, setSources] =
     useState<Source[]>([]);
@@ -86,6 +100,7 @@ export default function HomePage() {
     const apiUrl =
       process.env.NEXT_PUBLIC_API_URL;
 
+
     if (!apiUrl) {
       setError(
         'NEXT_PUBLIC_API_URL is not configured.',
@@ -97,18 +112,23 @@ export default function HomePage() {
 
     async function loadFilters() {
       try {
-        const [
-          categoriesResponse,
-          sourcesResponse,
-        ] = await Promise.all([
-          fetch(`${apiUrl}/categories`, {
-            cache: 'no-store',
-          }),
+const [
+  categoriesResponse,
+  sourcesResponse,
+  countriesResponse,
+] = await Promise.all([
+  fetch(`${apiUrl}/categories`, {
+    cache: 'no-store',
+  }),
 
-          fetch(`${apiUrl}/sources`, {
-            cache: 'no-store',
-          }),
-        ]);
+  fetch(`${apiUrl}/sources`, {
+    cache: 'no-store',
+  }),
+
+  fetch(`${apiUrl}/countries`, {
+    cache: 'no-store',
+  }),
+]);
 
         if (!categoriesResponse.ok) {
           throw new Error(
@@ -122,11 +142,20 @@ export default function HomePage() {
           );
         }
 
+        if (!countriesResponse.ok) {
+          throw new Error(
+            'Failed to load countries',
+          );
+        }
+
         const categoriesData =
           await categoriesResponse.json();
 
         const sourcesData =
           await sourcesResponse.json();
+
+        const countriesData =
+          await countriesResponse.json();
 
         setCategories(
           categoriesData.value ??
@@ -136,6 +165,39 @@ export default function HomePage() {
         setSources(
           sourcesData.value ??
             sourcesData,
+        );
+
+        const loadedCountries =
+          countriesData.value ??
+          countriesData;
+
+        const countryOrder = [
+          'JO',
+          'SY',
+          'EG',
+          'SA',
+          'AE',
+          'QA',
+          'KW',
+          'BH',
+          'OM',
+          'YE',
+          'IQ',
+          'LB',
+          'PS',
+          'LY',
+          'TN',
+          'DZ',
+          'MA',
+          'SD',
+        ];
+
+        setCountries(
+          [...loadedCountries].sort(
+            (a: Country, b: Country) =>
+              countryOrder.indexOf(a.code) -
+              countryOrder.indexOf(b.code),
+          ),
         );
       } catch (err) {
         setError(
@@ -154,6 +216,7 @@ export default function HomePage() {
    *
    * Supports:
    * - Search
+   * - Country
    * - Category
    * - Source
    * - Pagination
@@ -204,6 +267,13 @@ export default function HomePage() {
           params.set(
             'sourceIds',
             sourceId,
+          );
+        }
+
+        if (countryCode) {
+          params.set(
+            'countryCode',
+            countryCode,
           );
         }
 
@@ -285,6 +355,7 @@ export default function HomePage() {
     activeSearch,
     categoryId,
     sourceId,
+    countryCode,
     page,
   ]);
 
@@ -402,6 +473,7 @@ export default function HomePage() {
     setActiveSearch('');
     setCategoryId('');
     setSourceId('');
+    setCountryCode('');
     setPage(1);
   }
 
@@ -622,6 +694,7 @@ export default function HomePage() {
 
           <p className="mt-1 text-sm text-gray-500">
             {activeSearch ||
+            countryCode ||
             categoryId ||
             sourceId
               ? `${totalArticles} filtered articles`
@@ -668,7 +741,35 @@ export default function HomePage() {
         </form>
 
         {/* Filters */}
-        <div className="mb-8 grid gap-3 sm:grid-cols-2">
+        <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+
+          {/* Country */}
+          <select
+            value={countryCode}
+            onChange={(event) => {
+              setCountryCode(
+                event.target.value,
+              );
+
+              setPage(1);
+            }}
+            className="rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700 outline-none focus:border-black"
+          >
+            <option value="">
+              All Countries
+            </option>
+
+            {countries.map(
+              (country) => (
+                <option
+                  key={country.id}
+                  value={country.code}
+                >
+                  {country.flag} {country.name}
+                </option>
+              ),
+            )}
+          </select>
 
           {/* Category */}
           <select
@@ -729,6 +830,7 @@ export default function HomePage() {
 
         {/* Clear Filters */}
         {(activeSearch ||
+          countryCode ||
           categoryId ||
           sourceId) && (
           <div className="mb-6">
@@ -767,6 +869,7 @@ export default function HomePage() {
               </p>
 
               {(activeSearch ||
+                countryCode ||
                 categoryId ||
                 sourceId) && (
                 <button
