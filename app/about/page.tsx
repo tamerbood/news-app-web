@@ -18,15 +18,16 @@ export default function AboutPage() {
               </h2>
 
               <p className="mt-3 leading-7">
-                Mada Alalam is a news aggregation platform designed
-                to help users discover the latest stories from
-                trusted news sources in one convenient place.
+                Mada Alalam is a news aggregation platform designed to help
+                users discover the latest stories from different news sources
+                in one convenient place.
               </p>
 
               <p className="mt-3 leading-7">
-                The application organizes news into categories
-                and provides a simple interface for browsing,
-                searching, and reading articles.
+                The application organizes news into categories and provides
+                features for browsing, searching, saving favorites, following
+                sources, receiving notifications, checking weather information,
+                and accessing available YouTube content.
               </p>
             </section>
 
@@ -43,7 +44,11 @@ export default function AboutPage() {
                 <li>Open the original news article.</li>
                 <li>Save articles to your favorites.</li>
                 <li>Follow news sources.</li>
+                <li>Receive news notifications.</li>
+                <li>Check weather information using your approximate location.</li>
+                <li>Watch available YouTube content.</li>
                 <li>Manage your personal account.</li>
+                <li>Request account deletion.</li>
               </ul>
             </section>
 
@@ -53,21 +58,19 @@ export default function AboutPage() {
               </h2>
 
               <p className="mt-3 leading-7">
-                Mada Alalam retrieves news information from
-                third-party publishers and RSS feeds.
+                Mada Alalam retrieves news information from third-party
+                publishers and RSS feeds.
               </p>
 
               <p className="mt-3 leading-7">
-                The application provides links to original
-                publishers whenever available so that users
-                can access the complete article from its
-                original source.
+                The application provides links to original publishers whenever
+                available so that users can access the complete article from
+                its original source.
               </p>
 
               <p className="mt-3 leading-7">
-                News content, images, logos, trademarks, and
-                other publisher materials remain the property
-                of their respective owners.
+                News content, images, logos, trademarks, and other publisher
+                materials remain the property of their respective owners.
               </p>
             </section>
 
@@ -77,10 +80,9 @@ export default function AboutPage() {
               </h2>
 
               <p className="mt-3 leading-7">
-                Our goal is to make discovering news simple,
-                organized, and convenient while helping users
-                find stories from different categories and
-                sources in one place.
+                Our goal is to make discovering news simple, organized, and
+                convenient while helping users find stories from different
+                categories and sources in one place.
               </p>
             </section>
 
@@ -90,14 +92,13 @@ export default function AboutPage() {
               </h2>
 
               <p className="mt-3 leading-7">
-                Users can create an account to access additional
-                features such as favorites and followed news
-                sources.
+                Users can create an account to access additional features such
+                as favorites and followed news sources.
               </p>
 
               <p className="mt-3 leading-7">
-                Account-related information is handled according
-                to our Privacy Policy.
+                Account-related information is handled according to our
+                Privacy Policy.
               </p>
             </section>
 
@@ -107,9 +108,16 @@ export default function AboutPage() {
               </h2>
 
               <p className="mt-3 leading-7">
-                If you have questions, suggestions, or feedback
-                about Mada Alalam, please visit our Contact page.
+                If you have questions, suggestions, or feedback about Mada
+                Alalam, please visit our Contact page:
               </p>
+
+              <a
+                href="https://news-app-web-veru.onrender.com/contact"
+                className="mt-3 inline-block font-semibold text-blue-600 hover:text-blue-800"
+              >
+                https://news-app-web-veru.onrender.com/contact
+              </a>
             </section>
           </div>
         </div>

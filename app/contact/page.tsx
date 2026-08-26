@@ -18,9 +18,9 @@ export default function ContactPage() {
               </h2>
 
               <p className="mt-3 leading-7">
-                If you have questions, suggestions, feedback,
-                or need help with Mada Alalam, you can contact
-                us using the information provided below.
+                If you have questions, suggestions, feedback, or need help
+                with Mada Alalam, you can contact us using the information
+                provided below.
               </p>
             </section>
 
@@ -30,9 +30,8 @@ export default function ContactPage() {
               </h2>
 
               <p className="mt-3 leading-7">
-                For account-related questions or problems
-                with the application, please contact our
-                support team.
+                For account-related questions or problems with the application,
+                please contact our support team.
               </p>
 
               <div className="mt-4 rounded-xl bg-gray-50 p-5">
@@ -55,10 +54,9 @@ export default function ContactPage() {
               </h2>
 
               <p className="mt-3 leading-7">
-                We welcome feedback that can help us improve
-                Mada Alalam, including suggestions for new
-                features, categories, news sources, and
-                improvements to the user experience.
+                We welcome feedback that can help us improve Mada Alalam,
+                including suggestions for new features, categories, news
+                sources, and improvements to the user experience.
               </p>
             </section>
 
@@ -68,10 +66,27 @@ export default function ContactPage() {
               </h2>
 
               <p className="mt-3 leading-7">
-                If you believe that information or content
-                displayed through Mada Alalam requires attention,
-                please contact us with the relevant article
-                or source information.
+                If you believe that information or content displayed through
+                Mada Alalam requires attention, please contact us with the
+                relevant article or source information.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-xl font-bold text-gray-900">
+                Third-Party Services
+              </h2>
+
+              <p className="mt-3 leading-7">
+                Mada Alalam may use third-party services to provide certain
+                features, including Firebase Cloud Messaging for notifications,
+                weather services, and YouTube content.
+              </p>
+
+              <p className="mt-3 leading-7">
+                When you access third-party content, websites, or services
+                through Mada Alalam, those services may have their own terms
+                of service and privacy policies.
               </p>
             </section>
 
@@ -81,24 +96,22 @@ export default function ContactPage() {
               </h2>
 
               <p className="mt-3 leading-7">
-                If you would like to delete your Mada Alalam
-                account and the personal data associated with it,
-                you can request account deletion at any time.
+                If you would like to delete your Mada Alalam account and the
+                personal data associated with it, you can request account
+                deletion at any time.
               </p>
 
               <p className="mt-3 leading-7">
-                If you can access your account, sign in to Mada
-                Alalam, open your Account page, go to the Danger
-                Zone section, select Delete My Account, enter
-                your password, and confirm the deletion.
+                If you can access your account, sign in to Mada Alalam, open
+                your Account page, go to the Danger Zone section, select Delete
+                My Account, enter your password, and confirm the deletion.
               </p>
 
               <p className="mt-3 leading-7">
-                If you cannot access your account, you can request
-                deletion by contacting our support team using the
-                email address below. Please use the email address
-                associated with your account and include
-                &quot;Account Deletion Request&quot; in the subject
+                If you cannot access your account, you can request deletion by
+                contacting our support team using the email address below.
+                Please use the email address associated with your account and
+                include &quot;Account Deletion Request&quot; in the subject
                 line.
               </p>
 
@@ -116,10 +129,10 @@ export default function ContactPage() {
               </div>
 
               <p className="mt-3 leading-7">
-                When an account is deleted, the account and
-                associated personal data are deleted, subject to
-                any information that we may be required to retain
-                by law.
+                When an account is deleted, we delete the account and
+                associated personal data, subject to information that we may
+                be required to retain by law, security requirements, or other
+                legitimate obligations.
               </p>
             </section>
 
@@ -129,15 +142,13 @@ export default function ContactPage() {
               </h2>
 
               <p className="mt-3 leading-7">
-                For questions concerning your account or
-                personal information, please contact us using
-                the support email above.
+                For questions concerning your account or personal information,
+                please contact us using the support email above.
               </p>
 
               <p className="mt-3 leading-7">
-                For more information about how we handle
-                personal information, please review our
-                Privacy Policy.
+                For more information about how we handle personal information,
+                please review our Privacy Policy.
               </p>
             </section>
           </div>
