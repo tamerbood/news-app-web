@@ -9,7 +9,7 @@ const categories = [
     value: 'World',
   },
   {
-    label: 'رياضة',
+    label: 'أخبار الرياضة',
     value: 'Sports',
   },
   {
@@ -83,6 +83,13 @@ export default function Navbar() {
             className="text-sm font-medium text-gray-700 hover:text-black"
           >
             الرئيسية
+          </Link>
+
+          <Link
+            href="/sports"
+            className="text-sm font-medium text-gray-700 hover:text-black"
+          >
+            الرياضة
           </Link>
 
           {loggedIn && (

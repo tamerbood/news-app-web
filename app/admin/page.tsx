@@ -36,12 +36,21 @@ type YouTubeChannel = {
   isActive: boolean;
 };
 
+type SportsLeague = {
+  id: string;
+  externalId: number;
+  season: number;
+  name: string;
+  isActive: boolean;
+};
+
 export default function AdminDashboard() {
   const [user, setUser] = useState<User | null>(null);
   const [articles, setArticles] = useState<Article[]>([]);
   const [sources, setSources] = useState<Source[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [sportsLeagues, setSportsLeagues] = useState<SportsLeague[]>([]);
 const [youtubeChannels, setYouTubeChannels] =
   useState<YouTubeChannel[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,6 +79,7 @@ const [youtubeChannels, setYouTubeChannels] =
           categoriesResponse,
           usersResponse,
           youtubeChannelsResponse,
+          sportsLeaguesResponse,
         ] = await Promise.all([
           fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/auth/me`,
@@ -99,6 +109,10 @@ const [youtubeChannels, setYouTubeChannels] =
   `${process.env.NEXT_PUBLIC_API_URL}/youtube/managed-channels`,
   { headers },
 ),
+          fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/sports/admin/leagues`,
+            { headers },
+          ),
         ]);
 
         if (!userResponse.ok) {
@@ -138,8 +152,9 @@ const [youtubeChannels, setYouTubeChannels] =
           !articlesResponse.ok ||
           !sourcesResponse.ok ||
           !categoriesResponse.ok ||
-          !usersResponse.ok||
-          !youtubeChannelsResponse.ok
+          !usersResponse.ok ||
+          !youtubeChannelsResponse.ok ||
+          !sportsLeaguesResponse.ok
         ) {
           throw new Error(
             'Failed to load dashboard data',
@@ -159,6 +174,9 @@ const [youtubeChannels, setYouTubeChannels] =
           await usersResponse.json();
 const youtubeChannelsData =
   await youtubeChannelsResponse.json();
+
+        const sportsLeaguesData =
+          await sportsLeaguesResponse.json();
         setUser(currentUser);
 
         setArticles(
@@ -199,6 +217,14 @@ const youtubeChannelsData =
       youtubeChannelsData.value ??
       [],
 );
+
+        setSportsLeagues(
+          Array.isArray(sportsLeaguesData)
+            ? sportsLeaguesData
+            : sportsLeaguesData.items ??
+              sportsLeaguesData.value ??
+              [],
+        );
       } catch (err) {
         setError(
           err instanceof Error
@@ -322,6 +348,13 @@ const youtubeChannelsData =
   description="YouTube Shorts channels"
   href="/admin/youtube"
 />
+
+          <DashboardCard
+            title="Sports"
+            value={sportsLeagues.filter((league) => league.isActive).length}
+            description="Active sports leagues"
+            href="/admin/sports"
+          />
 
 
 
@@ -497,6 +530,10 @@ const youtubeChannelsData =
   label="YouTube Channels"
   href="/admin/youtube"
 />
+              <QuickLink
+                label="Sports Leagues"
+                href="/admin/sports"
+              />
               <QuickLink
                 label="Sources"
                 href="/admin/sources"
