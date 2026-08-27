@@ -55,6 +55,7 @@ export default function SourcesPage() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [importing, setImporting] = useState(false);
 
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -286,6 +287,52 @@ export default function SourcesPage() {
     }
   }
 
+  async function importCsv(file: File) {
+    try {
+      setImporting(true);
+      setError('');
+      setMessage('');
+
+      const token = localStorage.getItem('admin_token');
+      if (!token) {
+        window.location.href = '/admin/login';
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/sources/import-csv`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        },
+      );
+
+      const body = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(
+          body?.message ?? `Import failed: ${response.status}`,
+        );
+      }
+
+      setMessage(
+        `Import complete: ${body.imported} imported, ${body.duplicate} duplicate, ${body.invalidRss} invalid RSS, ${body.failed} failed.`,
+      );
+      await loadData();
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'Failed to import CSV',
+      );
+    } finally {
+      setImporting(false);
+    }
+  }
+
   async function deleteSource(source: Source) {
     const confirmed = window.confirm(
       `Are you sure you want to delete "${source.name}"?`,
@@ -436,12 +483,29 @@ export default function SourcesPage() {
             </p>
           </div>
 
-          <button
-            onClick={openAddForm}
-            className="rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
-          >
-            + Add Source
-          </button>
+          <div className="flex items-center gap-3">
+            <label className="cursor-pointer rounded-lg border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-800 transition hover:bg-gray-50">
+              {importing ? 'Importing...' : '↑ Import RSS CSV'}
+              <input
+                type="file"
+                accept=".csv,text/csv"
+                className="hidden"
+                disabled={importing}
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  event.currentTarget.value = '';
+                  if (file) void importCsv(file);
+                }}
+              />
+            </label>
+
+            <button
+              onClick={openAddForm}
+              className="rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
+            >
+              + Add Source
+            </button>
+          </div>
         </div>
       </header>
 
