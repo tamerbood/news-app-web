@@ -22,6 +22,7 @@ type Source = {
   rssUrl: string;
   logoUrl: string | null;
   isActive: boolean;
+  isGlobal: boolean;
   categoryId: string | null;
   category?: Category | null;
   countryId: string | null;
@@ -36,6 +37,7 @@ type SourceForm = {
   categoryId: string;
   countryId: string;
   isActive: boolean;
+  isGlobal: boolean;
 };
 
 const emptyForm: SourceForm = {
@@ -46,6 +48,7 @@ const emptyForm: SourceForm = {
   categoryId: '',
   countryId: '',
   isActive: true,
+  isGlobal: false,
 };
 
 export default function SourcesPage() {
@@ -183,6 +186,7 @@ export default function SourcesPage() {
       categoryId: source.categoryId ?? '',
       countryId: source.countryId ?? '',
       isActive: source.isActive,
+      isGlobal: source.isGlobal ?? false,
     });
 
     setMessage('');
@@ -234,6 +238,8 @@ export default function SourcesPage() {
         rssUrl: form.rssUrl.trim(),
         logoUrl:
           form.logoUrl.trim() || undefined,
+        isActive: form.isActive,
+        isGlobal: form.isGlobal,
         categoryId:
           form.categoryId || undefined,
         countryId:
@@ -688,25 +694,43 @@ export default function SourcesPage() {
                 />
               </div>
 
-              <div className="flex items-center gap-3 pt-8">
-                <input
-                  id="isActive"
-                  type="checkbox"
-                  checked={form.isActive}
-                  onChange={(event) =>
-                    updateForm(
-                      'isActive',
-                      event.target.checked,
-                    )
-                  }
-                  className="h-4 w-4"
-                />
+              <div className="flex flex-wrap items-center gap-6 pt-8 md:col-span-2">
+                <label className="flex items-center gap-3">
+                  <input
+                    id="isActive"
+                    type="checkbox"
+                    checked={form.isActive}
+                    onChange={(event) =>
+                      updateForm(
+                        'isActive',
+                        event.target.checked,
+                      )
+                    }
+                    className="h-4 w-4"
+                  />
 
-                <label
-                  htmlFor="isActive"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  Source is active
+                  <span className="text-sm font-medium text-gray-700">
+                    Source is active
+                  </span>
+                </label>
+
+                <label className="flex items-center gap-3">
+                  <input
+                    id="isGlobal"
+                    type="checkbox"
+                    checked={form.isGlobal}
+                    onChange={(event) =>
+                      updateForm(
+                        'isGlobal',
+                        event.target.checked,
+                      )
+                    }
+                    className="h-4 w-4"
+                  />
+
+                  <span className="text-sm font-medium text-gray-700">
+                    Global source (For You)
+                  </span>
                 </label>
               </div>
 
@@ -808,6 +832,12 @@ export default function SourcesPage() {
                             ? 'Active'
                             : 'Inactive'}
                         </span>
+
+                        {source.isGlobal && (
+                          <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
+                            Global
+                          </span>
+                        )}
                       </div>
 
                       <p className="mt-2 truncate text-sm text-gray-500">
