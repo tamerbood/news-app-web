@@ -44,6 +44,14 @@ type SportsLeague = {
   isActive: boolean;
 };
 
+type LiveChannel = {
+  id: string;
+  name: string;
+  logoUrl: string | null;
+  streamUrl: string;
+  isActive: boolean;
+};
+
 export default function AdminDashboard() {
   const [user, setUser] = useState<User | null>(null);
   const [articles, setArticles] = useState<Article[]>([]);
@@ -52,7 +60,8 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState<User[]>([]);
   const [sportsLeagues, setSportsLeagues] = useState<SportsLeague[]>([]);
 const [youtubeChannels, setYouTubeChannels] =
-  useState<YouTubeChannel[]>([]);
+  useState<YouTubeChannel[]>([])
+  const [liveChannels, setLiveChannels] = useState<LiveChannel[]>([]);;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -80,6 +89,7 @@ const [youtubeChannels, setYouTubeChannels] =
           usersResponse,
           youtubeChannelsResponse,
           sportsLeaguesResponse,
+          liveChannelsResponse,
         ] = await Promise.all([
           fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/auth/me`,
@@ -111,6 +121,10 @@ const [youtubeChannels, setYouTubeChannels] =
 ),
           fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/sports/admin/leagues`,
+            { headers },
+          ),
+          fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/live-channels`,
             { headers },
           ),
         ]);
@@ -154,7 +168,8 @@ const [youtubeChannels, setYouTubeChannels] =
           !categoriesResponse.ok ||
           !usersResponse.ok ||
           !youtubeChannelsResponse.ok ||
-          !sportsLeaguesResponse.ok
+          !sportsLeaguesResponse.ok ||
+          !liveChannelsResponse.ok
         ) {
           throw new Error(
             'Failed to load dashboard data',
@@ -177,6 +192,9 @@ const youtubeChannelsData =
 
         const sportsLeaguesData =
           await sportsLeaguesResponse.json();
+
+        const liveChannelsData =
+          await liveChannelsResponse.json();
         setUser(currentUser);
 
         setArticles(
@@ -223,6 +241,14 @@ const youtubeChannelsData =
             ? sportsLeaguesData
             : sportsLeaguesData.items ??
               sportsLeaguesData.value ??
+              [],
+        );
+
+        setLiveChannels(
+          Array.isArray(liveChannelsData)
+            ? liveChannelsData
+            : liveChannelsData.items ??
+              liveChannelsData.value ??
               [],
         );
       } catch (err) {
@@ -354,6 +380,13 @@ const youtubeChannelsData =
             value={sportsLeagues.filter((league) => league.isActive).length}
             description="Active sports leagues"
             href="/admin/sports"
+          />
+
+          <DashboardCard
+            title="Live Channels"
+            value={liveChannels.filter((channel) => channel.isActive).length}
+            description="Active live channels"
+            href="/admin/live-channels"
           />
 
 
@@ -530,6 +563,10 @@ const youtubeChannelsData =
   label="YouTube Channels"
   href="/admin/youtube"
 />
+              <QuickLink
+                label="Live Channels"
+                href="/admin/live-channels"
+              />
               <QuickLink
                 label="Sports Leagues"
                 href="/admin/sports"
