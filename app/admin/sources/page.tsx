@@ -23,6 +23,7 @@ type Source = {
   logoUrl: string | null;
   isActive: boolean;
   isGlobal: boolean;
+  isBreakingSource: boolean;
   categoryId: string | null;
   category?: Category | null;
   countryId: string | null;
@@ -38,6 +39,7 @@ type SourceForm = {
   countryId: string;
   isActive: boolean;
   isGlobal: boolean;
+  isBreakingSource: boolean;
 };
 
 const emptyForm: SourceForm = {
@@ -49,6 +51,7 @@ const emptyForm: SourceForm = {
   countryId: '',
   isActive: true,
   isGlobal: false,
+  isBreakingSource: false,
 };
 
 export default function SourcesPage() {
@@ -69,6 +72,9 @@ export default function SourcesPage() {
 
   const [form, setForm] =
     useState<SourceForm>(emptyForm);
+
+  const [sourceView, setSourceView] =
+    useState<'all' | 'normal' | 'breaking'>('all');
 
   useEffect(() => {
     loadData();
@@ -187,6 +193,7 @@ export default function SourcesPage() {
       countryId: source.countryId ?? '',
       isActive: source.isActive,
       isGlobal: source.isGlobal ?? false,
+      isBreakingSource: source.isBreakingSource ?? false,
     });
 
     setMessage('');
@@ -240,6 +247,7 @@ export default function SourcesPage() {
           form.logoUrl.trim() || undefined,
         isActive: form.isActive,
         isGlobal: form.isGlobal,
+        isBreakingSource: form.isBreakingSource,
         categoryId:
           form.categoryId || undefined,
         countryId:
@@ -732,6 +740,25 @@ export default function SourcesPage() {
                     Global source (For You)
                   </span>
                 </label>
+
+                <label className="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2">
+                  <input
+                    id="isBreakingSource"
+                    type="checkbox"
+                    checked={form.isBreakingSource}
+                    onChange={(event) =>
+                      updateForm(
+                        'isBreakingSource',
+                        event.target.checked,
+                      )
+                    }
+                    className="h-4 w-4"
+                  />
+
+                  <span className="text-sm font-semibold text-red-700">
+                    Breaking source — sync every minute
+                  </span>
+                </label>
               </div>
 
               <div className="flex gap-3 md:col-span-2">
@@ -765,12 +792,32 @@ export default function SourcesPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-bold text-gray-900">
-                  All Sources
+                  Sources
                 </h2>
 
                 <p className="mt-1 text-sm text-gray-500">
-                  {sources.length} sources
+                  Manage normal and breaking RSS sources from here.
                 </p>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {(['all', 'normal', 'breaking'] as const).map((view) => (
+                  <button
+                    key={view}
+                    onClick={() => setSourceView(view)}
+                    className={
+                      sourceView === view
+                        ? 'rounded-lg bg-black px-3 py-2 text-xs font-semibold text-white'
+                        : 'rounded-lg border border-gray-300 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50'
+                    }
+                  >
+                    {view === 'all'
+                      ? `All (${sources.length})`
+                      : view === 'normal'
+                        ? `Normal (${sources.filter((source) => !source.isBreakingSource).length})`
+                        : `Breaking (${sources.filter((source) => source.isBreakingSource).length})`}
+                  </button>
+                ))}
               </div>
 
               <button
@@ -793,7 +840,15 @@ export default function SourcesPage() {
             </div>
           ) : (
             <div className="divide-y divide-gray-100">
-              {sources.map((source) => {
+              {sources
+                .filter((source) =>
+                  sourceView === 'all'
+                    ? true
+                    : sourceView === 'breaking'
+                      ? source.isBreakingSource
+                      : !source.isBreakingSource,
+                )
+                .map((source) => {
                 const country =
                   getCountry(source);
 
@@ -836,6 +891,12 @@ export default function SourcesPage() {
                         {source.isGlobal && (
                           <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
                             Global
+                          </span>
+                        )}
+
+                        {source.isBreakingSource && (
+                          <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
+                            BREAKING · 1 MIN
                           </span>
                         )}
                       </div>

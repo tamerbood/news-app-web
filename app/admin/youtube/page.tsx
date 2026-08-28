@@ -55,7 +55,9 @@ export default function YouTubeAdminPage() {
 
   const [success, setSuccess] =
     useState('');
-
+const [verifying, setVerifying] = useState(false);
+const [syncingId, setSyncingId] = useState<string | null>(null);
+const [syncingShortsId, setSyncingShortsId] = useState<string | null>(null);
   const apiUrl =
     process.env.NEXT_PUBLIC_API_URL;
 
@@ -180,6 +182,231 @@ localStorage.removeItem('admin_user');
       behavior: 'smooth',
     });
   }
+async function verifyChannel() {
+  if (!apiUrl) {
+    setError('NEXT_PUBLIC_API_URL is not configured.');
+    return;
+  }
+
+  const channelId = form.channelId.trim();
+
+  if (!channelId) {
+    setError('YouTube Channel ID is required.');
+    return;
+  }
+
+  const token = localStorage.getItem('admin_token');
+
+  if (!token) {
+    window.location.href = '/admin/login';
+    return;
+  }
+
+  try {
+    setVerifying(true);
+    setError('');
+    setSuccess('');
+
+    const response = await fetch(
+      `${apiUrl}/youtube/channels/${encodeURIComponent(channelId)}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      },
+    );
+
+    if (response.status === 401) {
+      localStorage.removeItem('admin_token');
+      localStorage.removeItem('admin_user');
+      window.location.href = '/admin/login';
+      return;
+    }
+
+    if (!response.ok) {
+      let message = 'Failed to verify YouTube channel.';
+
+      try {
+        const data = await response.json();
+
+        if (Array.isArray(data.message)) {
+          message = data.message.join(', ');
+        } else if (typeof data.message === 'string') {
+          message = data.message;
+        }
+      } catch {
+        // Keep default message.
+      }
+
+      throw new Error(message);
+    }
+
+    const data = await response.json();
+
+    setForm((current) => ({
+      ...current,
+      channelId: data.channelId ?? channelId,
+      name: data.name ?? '',
+      handle: data.handle ?? '',
+      thumbnailUrl: data.thumbnailUrl ?? '',
+    }));
+
+    setSuccess('Channel verified successfully.');
+  } catch (error) {
+    setError(
+      error instanceof Error
+        ? error.message
+        : 'Failed to verify YouTube channel.',
+    );
+  } finally {
+    setVerifying(false);
+  }
+}
+async function syncChannel(channel: YouTubeChannel) {
+  if (!apiUrl) return;
+
+  const token = localStorage.getItem('admin_token');
+
+  if (!token) {
+    window.location.href = '/admin/login';
+    return;
+  }
+
+  try {
+    setError('');
+    setSuccess('');
+    setSyncingId(channel.id);
+
+    const response = await fetch(
+      `${apiUrl}/youtube/sync/${encodeURIComponent(channel.channelId)}`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    if (response.status === 401) {
+      localStorage.removeItem('admin_token');
+      localStorage.removeItem('admin_user');
+      window.location.href = '/admin/login';
+      return;
+    }
+
+    if (!response.ok) {
+      let message = 'Failed to sync YouTube channel.';
+
+      try {
+        const data = await response.json();
+
+        if (typeof data.message === 'string') {
+          message = data.message;
+        }
+      } catch {
+        // Keep default message.
+      }
+
+      throw new Error(message);
+    }
+
+    await loadChannels();
+
+    setSuccess(`"${channel.name}" synced successfully.`);
+  } catch (error) {
+    setError(
+      error instanceof Error
+        ? error.message
+        : 'Failed to sync YouTube channel.',
+    );
+  } finally {
+    setSyncingId(null);
+  }
+}
+async function syncShorts(channel: YouTubeChannel) {
+  if (!apiUrl) return;
+
+  const token = localStorage.getItem('admin_token');
+
+  if (!token) {
+    window.location.href = '/admin/login';
+    return;
+  }
+
+  if (!channel.handle) {
+    setError(
+      `"${channel.name}" has no YouTube handle. Verify/update the channel first.`,
+    );
+    return;
+  }
+
+  try {
+    setError('');
+    setSuccess('');
+    setSyncingShortsId(channel.id);
+
+    const response = await fetch(
+      `${apiUrl}/youtube/channels/${encodeURIComponent(
+        channel.channelId,
+      )}/shorts-sync`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    if (response.status === 401) {
+      localStorage.removeItem('admin_token');
+      localStorage.removeItem('admin_user');
+      window.location.href = '/admin/login';
+      return;
+    }
+
+    if (!response.ok) {
+      let message = 'Failed to sync Shorts.';
+
+      try {
+        const data = await response.json();
+
+        if (typeof data.message === 'string') {
+          message = data.message;
+        }
+      } catch {
+        // Keep default message.
+      }
+
+      throw new Error(message);
+    }
+
+    const data = await response.json();
+
+    await loadChannels();
+
+    const count =
+      typeof data?.created === 'number'
+        ? data.created
+        : typeof data?.count === 'number'
+          ? data.count
+          : null;
+
+    setSuccess(
+      count !== null
+        ? `"${channel.name}" Shorts synced successfully. ${count} new Shorts.`
+        : `"${channel.name}" Shorts synced successfully.`,
+    );
+  } catch (error) {
+    setError(
+      error instanceof Error
+        ? error.message
+        : 'Failed to sync Shorts.',
+    );
+  } finally {
+    setSyncingShortsId(null);
+  }
+}
 
   // =========================================================
   // CREATE / UPDATE
@@ -577,7 +804,21 @@ localStorage.removeItem('admin_user');
                 placeholder="UCxxxxxxxxxxxxxxxxxxxxxx"
                 className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-blue-500"
               />
-
+<div className="mt-3">
+  <button
+    type="button"
+    onClick={verifyChannel}
+    disabled={
+      verifying ||
+      !form.channelId.trim()
+    }
+    className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-50"
+  >
+    {verifying
+      ? 'Verifying...'
+      : 'Verify Channel'}
+  </button>
+</div>
               <p className="mt-1 text-xs text-gray-400">
                 Example: UCfiwzLy-8yKzIbsmZTzxDgw
               </p>
@@ -746,7 +987,6 @@ localStorage.removeItem('admin_user');
                           YT
                         </div>
                       )}
-
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
                           <h3 className="truncate font-semibold text-gray-900">
@@ -786,7 +1026,33 @@ localStorage.removeItem('admin_user');
                         )}
                       </div>
                     </div>
+<button
+  type="button"
+  onClick={() => syncChannel(channel)}
+  disabled={
+    syncingId === channel.id ||
+    syncingShortsId === channel.id ||
+    !channel.isActive
+  }
+  className="rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-xs font-semibold text-green-700 hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-50"
+>
+  {syncingId === channel.id ? 'Syncing...' : 'Sync'}
+</button>
 
+<button
+  type="button"
+  onClick={() => syncShorts(channel)}
+  disabled={
+    syncingShortsId === channel.id ||
+    syncingId === channel.id ||
+    !channel.isActive
+  }
+  className="rounded-xl border border-purple-200 bg-purple-50 px-3 py-2 text-xs font-semibold text-purple-700 hover:bg-purple-100 disabled:cursor-not-allowed disabled:opacity-50"
+>
+  {syncingShortsId === channel.id
+    ? 'Syncing Shorts...'
+    : 'Sync Shorts'}
+</button>
                     <div className="flex flex-wrap gap-2">
                       <button
                         type="button"

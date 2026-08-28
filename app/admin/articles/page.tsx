@@ -22,6 +22,14 @@ type Category = {
   name: string;
 };
 
+type BreakingKeyword = {
+  id: string;
+  keyword: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
 type Article = {
   id: string;
   sourceId: string;
@@ -55,6 +63,14 @@ export default function ArticlesPage() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [sources, setSources] = useState<Source[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [breakingKeywords, setBreakingKeywords] =
+    useState<BreakingKeyword[]>([]);
+  const [breakingKeyword, setBreakingKeyword] =
+    useState('');
+  const [savingBreakingKeyword, setSavingBreakingKeyword] =
+    useState(false);
+  const [deletingBreakingKeywordId, setDeletingBreakingKeywordId] =
+    useState<string | null>(null);
 
   const [search, setSearch] = useState('');
   const [sourceFilter, setSourceFilter] =
@@ -101,6 +117,7 @@ export default function ArticlesPage() {
         articlesResponse,
         sourcesResponse,
         categoriesResponse,
+        breakingKeywordsResponse,
       ] = await Promise.all([
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/articles`, {
           headers,
@@ -111,6 +128,10 @@ export default function ArticlesPage() {
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`, {
           headers,
         }),
+        fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/articles/breaking/keywords`,
+          { headers },
+        ),
       ]);
 
       if (!articlesResponse.ok) {
@@ -131,6 +152,19 @@ export default function ArticlesPage() {
         );
       }
 
+      if (!breakingKeywordsResponse.ok) {
+        if (breakingKeywordsResponse.status === 401) {
+          localStorage.removeItem('admin_token');
+          localStorage.removeItem('admin_user');
+          window.location.href = '/admin/login';
+          return;
+        }
+
+        throw new Error(
+          `Failed to load breaking keywords: ${breakingKeywordsResponse.status}`,
+        );
+      }
+
       const articlesData =
         await articlesResponse.json();
 
@@ -139,9 +173,26 @@ export default function ArticlesPage() {
 
       const categoriesData =
         await categoriesResponse.json();
+const breakingKeywordsData =
+  await breakingKeywordsResponse.json();
 
-     const loadedArticles =
-  articlesData.value ?? articlesData;
+const loadedBreakingKeywords =
+  Array.isArray(breakingKeywordsData)
+    ? breakingKeywordsData
+    : Array.isArray(breakingKeywordsData?.value)
+      ? breakingKeywordsData.value
+      : Array.isArray(breakingKeywordsData?.items)
+        ? breakingKeywordsData.items
+        : [];
+
+setBreakingKeywords(loadedBreakingKeywords);
+const loadedArticles = Array.isArray(articlesData)
+  ? articlesData
+  : Array.isArray(articlesData?.value)
+    ? articlesData.value
+    : Array.isArray(articlesData?.items)
+      ? articlesData.items
+      : [];
 
 setArticles(
   [...loadedArticles].sort((a, b) => {
@@ -339,6 +390,149 @@ setArticles(
       );
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function addBreakingKeyword() {
+    const keyword = breakingKeyword.trim();
+
+    if (!keyword) {
+      setError('Breaking keyword is required.');
+      return;
+    }
+
+    try {
+      setSavingBreakingKeyword(true);
+      setError('');
+      setMessage('');
+
+      const token =
+        localStorage.getItem('admin_token');
+
+      if (!token) {
+        window.location.href = '/admin/login';
+        return;
+      }
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/articles/breaking/keywords`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ keyword }),
+        },
+      );
+
+      if (response.status === 401) {
+        localStorage.removeItem('admin_token');
+        localStorage.removeItem('admin_user');
+        window.location.href = '/admin/login';
+        return;
+      }
+
+      if (!response.ok) {
+        const body = await response.text();
+        throw new Error(
+          `Failed to add breaking keyword: ${response.status} ${body}`,
+        );
+      }
+
+      const data = await response.json();
+      const created = Array.isArray(data)
+        ? data[0]
+        : data;
+
+      if (created?.id) {
+        setBreakingKeywords((current) => {
+          const withoutDuplicate = current.filter(
+            (item) => item.id !== created.id,
+          );
+
+          return [...withoutDuplicate, created];
+        });
+      } else {
+        await loadData();
+      }
+
+      setBreakingKeyword('');
+      setMessage(
+        `Breaking keyword "${keyword}" added successfully.`,
+      );
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Failed to add breaking keyword.',
+      );
+    } finally {
+      setSavingBreakingKeyword(false);
+    }
+  }
+
+  async function deleteBreakingKeyword(
+    keyword: BreakingKeyword,
+  ) {
+    const confirmed = window.confirm(
+      `Delete breaking keyword "${keyword.keyword}"?`,
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setDeletingBreakingKeywordId(keyword.id);
+      setError('');
+      setMessage('');
+
+      const token =
+        localStorage.getItem('admin_token');
+
+      if (!token) {
+        window.location.href = '/admin/login';
+        return;
+      }
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/articles/breaking/keywords/${keyword.id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.status === 401) {
+        localStorage.removeItem('admin_token');
+        localStorage.removeItem('admin_user');
+        window.location.href = '/admin/login';
+        return;
+      }
+
+      if (!response.ok) {
+        const body = await response.text();
+        throw new Error(
+          `Failed to delete breaking keyword: ${response.status} ${body}`,
+        );
+      }
+
+      setBreakingKeywords((current) =>
+        current.filter((item) => item.id !== keyword.id),
+      );
+
+      setMessage(
+        `Breaking keyword "${keyword.keyword}" deleted successfully.`,
+      );
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Failed to delete breaking keyword.',
+      );
+    } finally {
+      setDeletingBreakingKeywordId(null);
     }
   }
 
@@ -549,6 +743,106 @@ setArticles(
             {message}
           </div>
         )}
+
+        <section className="mb-8 rounded-2xl bg-white p-6 shadow-sm">
+          <div className="mb-5 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">
+                Breaking Keywords
+              </h2>
+              <p className="mt-1 text-sm text-gray-500">
+                Articles whose headlines contain these keywords can appear in the global Breaking section.
+              </p>
+            </div>
+
+            <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-600">
+              {breakingKeywords.filter((item) => item.isActive).length} active
+            </span>
+          </div>
+
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              void addBreakingKeyword();
+            }}
+            className="flex flex-col gap-3 md:flex-row"
+          >
+            <input
+              value={breakingKeyword}
+              onChange={(event) =>
+                setBreakingKeyword(event.target.value)
+              }
+              placeholder="Add a breaking keyword..."
+              className="min-w-0 flex-1 rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-red-500"
+              disabled={savingBreakingKeyword}
+            />
+
+            <button
+              type="submit"
+              disabled={
+                savingBreakingKeyword ||
+                !breakingKeyword.trim()
+              }
+              className="rounded-lg bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {savingBreakingKeyword
+                ? 'Adding...'
+                : '+ Add Keyword'}
+            </button>
+          </form>
+
+          <div className="mt-5">
+            {breakingKeywords.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-gray-300 px-5 py-8 text-center text-sm text-gray-500">
+                No breaking keywords configured.
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {breakingKeywords.map((keyword) => (
+                  <div
+                    key={keyword.id}
+                    className="flex items-center gap-2 rounded-full border border-red-100 bg-red-50 px-3 py-2"
+                  >
+                    <span className="text-sm font-semibold text-red-700">
+                      {keyword.keyword}
+                    </span>
+
+                    <span
+                      className={
+                        keyword.isActive
+                          ? 'text-[10px] font-bold uppercase tracking-wide text-green-600'
+                          : 'text-[10px] font-bold uppercase tracking-wide text-gray-400'
+                      }
+                    >
+                      {keyword.isActive
+                        ? 'Active'
+                        : 'Inactive'}
+                    </span>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        void deleteBreakingKeyword(keyword)
+                      }
+                      disabled={
+                        deletingBreakingKeywordId ===
+                        keyword.id
+                      }
+                      className="rounded-full px-1.5 text-sm font-bold text-red-500 hover:bg-red-100 disabled:opacity-50"
+                      aria-label={`Delete ${keyword.keyword}`}
+                      title={`Delete ${keyword.keyword}`}
+                    >
+                      {deletingBreakingKeywordId ===
+                      keyword.id
+                        ? '…'
+                        : '×'}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
 
         {showForm && (
           <section className="mb-8 rounded-2xl bg-white p-6 shadow-sm">
