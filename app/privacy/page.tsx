@@ -42,7 +42,8 @@ export default function PrivacyPolicyPage() {
                 <li>Email address</li>
                 <li>Password credentials</li>
                 <li>Account creation and update information</li>
-                <li>Account-related activity, such as favorite articles and followed news sources</li>
+                <li>Account-related activity, such as favorite articles, followed news sources, sports teams, interests, and article reactions such as likes or dislikes</li>
+                <li>Authentication information and account identifiers used to manage your account, including when signing in with Google through Firebase Authentication</li>
               </ul>
 
               <p className="mt-4 leading-7">
@@ -50,6 +51,13 @@ export default function PrivacyPolicyPage() {
                 Messaging (FCM) and may process a device notification token
                 and device platform information to deliver notifications to
                 your device.
+              </p>
+
+              <p className="mt-4 leading-7">
+                When you use personalized features, the application may store
+                your selected interests, followed sports teams, and article
+                reactions such as likes or dislikes in connection with your
+                account.
               </p>
 
               <p className="mt-4 leading-7">
@@ -91,10 +99,11 @@ export default function PrivacyPolicyPage() {
 
               <ul className="mt-3 list-disc space-y-2 pl-6">
                 <li>Create and manage your account</li>
-                <li>Authenticate your account</li>
-                <li>Provide personalized features</li>
+                <li>Authenticate your account, including Google sign-in through Firebase Authentication</li>
+                <li>Provide personalized features based on your selected interests and preferences</li>
                 <li>Save and manage your favorite articles</li>
-                <li>Manage followed news sources</li>
+                <li>Manage followed news sources and sports teams</li>
+                <li>Record article reactions such as likes or dislikes</li>
                 <li>Provide weather information</li>
                 <li>Deliver news notifications</li>
                 <li>Maintain and improve the application</li>
@@ -151,7 +160,8 @@ export default function PrivacyPolicyPage() {
 
               <p className="mt-3 leading-7">
                 Mada Alalam uses third-party services to provide certain
-                features, including Firebase Cloud Messaging for notifications
+                features, including Firebase Authentication for account
+                authentication, Firebase Cloud Messaging for notifications,
                 and services used to provide weather information.
               </p>
 
