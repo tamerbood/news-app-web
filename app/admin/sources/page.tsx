@@ -24,6 +24,7 @@ type Source = {
   isActive: boolean;
   isGlobal: boolean;
   isBreakingSource: boolean;
+  isStorySource: boolean;
   categoryId: string | null;
   category?: Category | null;
   countryId: string | null;
@@ -40,6 +41,7 @@ type SourceForm = {
   isActive: boolean;
   isGlobal: boolean;
   isBreakingSource: boolean;
+  isStorySource: boolean;
 };
 
 const emptyForm: SourceForm = {
@@ -52,6 +54,7 @@ const emptyForm: SourceForm = {
   isActive: true,
   isGlobal: false,
   isBreakingSource: false,
+  isStorySource: false,
 };
 
 export default function SourcesPage() {
@@ -194,6 +197,7 @@ export default function SourcesPage() {
       isActive: source.isActive,
       isGlobal: source.isGlobal ?? false,
       isBreakingSource: source.isBreakingSource ?? false,
+      isStorySource: source.isStorySource ?? false,
     });
 
     setMessage('');
@@ -248,6 +252,7 @@ export default function SourcesPage() {
         isActive: form.isActive,
         isGlobal: form.isGlobal,
         isBreakingSource: form.isBreakingSource,
+        isStorySource: form.isStorySource,
         categoryId:
           form.categoryId || undefined,
         countryId:
@@ -741,6 +746,25 @@ export default function SourcesPage() {
                   </span>
                 </label>
 
+                <label className="flex items-center gap-3 rounded-lg border border-purple-200 bg-purple-50 px-3 py-2">
+                  <input
+                    id="isStorySource"
+                    type="checkbox"
+                    checked={form.isStorySource}
+                    onChange={(event) =>
+                      updateForm(
+                        'isStorySource',
+                        event.target.checked,
+                      )
+                    }
+                    className="h-4 w-4"
+                  />
+
+                  <span className="text-sm font-semibold text-purple-700">
+                    Story source — automatic Stories
+                  </span>
+                </label>
+
                 <label className="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2">
                   <input
                     id="isBreakingSource"
@@ -891,6 +915,12 @@ export default function SourcesPage() {
                         {source.isGlobal && (
                           <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
                             Global
+                          </span>
+                        )}
+
+                        {source.isStorySource && (
+                          <span className="rounded-full bg-purple-50 px-3 py-1 text-xs font-semibold text-purple-700">
+                            STORY
                           </span>
                         )}
 

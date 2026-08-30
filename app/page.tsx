@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Stories from './components/Stories';
 import {
   FormEvent,
   useEffect,
@@ -685,6 +686,9 @@ const [
   return (
     <main className="min-h-screen bg-gray-100">
       <section className="mx-auto max-w-7xl px-6 py-8">
+
+        {/* Stories */}
+        <Stories />
 
         {/* Header */}
         <div className="mb-6">

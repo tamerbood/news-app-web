@@ -1,0 +1,315 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+
+type Story = {
+  id: string;
+  title: string;
+  description?: string | null;
+  mediaUrl: string;
+  mediaType?: string;
+  actionUrl?: string | null;
+  sourceId?: string | null;
+  isActive: boolean;
+  sortOrder?: number;
+  publishedAt?: string | null;
+  expiresAt?: string | null;
+  sourceName?: string | null;
+  sourceLogoUrl?: string | null;
+};
+
+export default function Stories() {
+  const [stories, setStories] = useState<Story[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<number | null>(null);
+
+  async function loadStories() {
+    const api = process.env.NEXT_PUBLIC_API_URL;
+    if (!api) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${api}/stories`, {
+        cache: 'no-store',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to load stories');
+      }
+
+      const data = await response.json();
+      const items = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.data)
+          ? data.data
+          : [];
+
+      setStories(
+        items.filter(
+          (story: Story) =>
+            story &&
+            story.isActive !== false &&
+            typeof story.mediaUrl === 'string' &&
+            story.mediaUrl.trim(),
+        ),
+      );
+    } catch (error) {
+      console.error('Failed to load stories:', error);
+      setStories([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadStories();
+
+    const interval = window.setInterval(
+      loadStories,
+      60 * 1000,
+    );
+
+    return () => window.clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (selected === null) return;
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setSelected(null);
+      }
+
+      if (event.key === 'ArrowRight') {
+        setSelected((current) =>
+          current === null
+            ? current
+            : Math.min(current + 1, stories.length - 1),
+        );
+      }
+
+      if (event.key === 'ArrowLeft') {
+        setSelected((current) =>
+          current === null
+            ? current
+            : Math.max(current - 1, 0),
+        );
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [selected, stories.length]);
+
+  if (loading && stories.length === 0) {
+    return (
+      <section
+        dir="rtl"
+        className="mb-8 rounded-2xl bg-white p-4 shadow-sm"
+      >
+        <div className="flex gap-4 overflow-hidden">
+          {[1, 2, 3, 4, 5].map((item) => (
+            <div key={item} className="shrink-0 text-center">
+              <div className="h-20 w-20 animate-pulse rounded-full bg-gray-200" />
+              <div className="mx-auto mt-2 h-3 w-16 animate-pulse rounded bg-gray-200" />
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  if (stories.length === 0) {
+    return null;
+  }
+
+  const activeStory =
+    selected === null ? null : stories[selected];
+
+  return (
+    <>
+      <section
+        dir="rtl"
+        className="mb-8 overflow-hidden rounded-2xl bg-white p-4 shadow-sm"
+      >
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-gray-900">
+            القصص
+          </h2>
+          <span className="text-xs text-gray-500">
+            أخبار من المصادر
+          </span>
+        </div>
+
+        <div className="flex gap-4 overflow-x-auto pb-2">
+          {stories.map((story, index) => (
+            <button
+              key={story.id}
+              type="button"
+              onClick={() => setSelected(index)}
+              className="w-24 shrink-0 text-center outline-none"
+              aria-label={`فتح قصة ${story.title}`}
+            >
+              <span className="mx-auto block h-20 w-20 rounded-full bg-gradient-to-br from-black via-gray-700 to-gray-300 p-[3px]">
+                <span className="flex h-full w-full items-center justify-center overflow-hidden rounded-full border-2 border-white bg-gray-100">
+                  {story.sourceLogoUrl ? (
+                    <img
+                      src={story.sourceLogoUrl}
+                      alt=""
+                      className="h-full w-full object-contain bg-white p-2"
+                      onError={(event) => {
+                        event.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  ) : (
+                    <img
+                      src={story.mediaUrl}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  )}
+                </span>
+              </span>
+
+              <span className="mt-2 block truncate text-xs font-semibold text-gray-800">
+                {story.sourceName || story.title}
+              </span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {activeStory && (
+        <div
+          dir="rtl"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="عرض القصة"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              setSelected(null);
+            }
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setSelected(null)}
+            className="absolute right-4 top-4 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-black/60 text-2xl text-white transition hover:bg-black/80"
+            aria-label="إغلاق"
+          >
+            ×
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              setSelected((current) =>
+                current === null
+                  ? current
+                  : Math.max(current - 1, 0),
+              )
+            }
+            disabled={selected === 0}
+            className="absolute right-3 top-1/2 z-20 hidden -translate-y-1/2 rounded-full bg-black/50 px-4 py-3 text-2xl text-white disabled:opacity-20 md:block"
+            aria-label="القصة السابقة"
+          >
+            ›
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              setSelected((current) =>
+                current === null
+                  ? current
+                  : Math.min(current + 1, stories.length - 1),
+              )
+            }
+            disabled={selected === stories.length - 1}
+            className="absolute left-3 top-1/2 z-20 hidden -translate-y-1/2 rounded-full bg-black/50 px-4 py-3 text-2xl text-white disabled:opacity-20 md:block"
+            aria-label="القصة التالية"
+          >
+            ‹
+          </button>
+
+          <div className="relative h-[min(82vh,760px)] w-full max-w-[430px] overflow-hidden rounded-2xl bg-gray-900 shadow-2xl">
+            <div className="absolute left-3 right-3 top-3 z-10 flex gap-1">
+              {stories.map((story, index) => (
+                <span
+                  key={story.id}
+                  className={`h-1 flex-1 rounded-full ${
+                    index === selected
+                      ? 'bg-white'
+                      : 'bg-white/35'
+                  }`}
+                />
+              ))}
+            </div>
+
+            {activeStory.mediaType === 'video' ? (
+              <video
+                key={activeStory.id}
+                src={activeStory.mediaUrl}
+                className="h-full w-full object-cover"
+                autoPlay
+                loop
+                controls
+                playsInline
+              />
+            ) : (
+              <img
+                src={activeStory.mediaUrl}
+                alt={activeStory.title}
+                className="h-full w-full object-cover"
+              />
+            )}
+
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent p-5 pt-24 text-white">
+              <div className="mb-2 flex items-center gap-2">
+                {activeStory.sourceLogoUrl && (
+                  <img
+                    src={activeStory.sourceLogoUrl}
+                    alt=""
+                    className="h-7 w-7 rounded-full bg-white object-contain p-1"
+                  />
+                )}
+                <span className="text-sm font-semibold">
+                  {activeStory.sourceName || 'مصدر إخباري'}
+                </span>
+              </div>
+
+              <h3 className="text-xl font-bold leading-8">
+                {activeStory.title}
+              </h3>
+
+              {activeStory.description && (
+                <p className="mt-2 line-clamp-4 text-sm leading-6 text-white/90">
+                  {activeStory.description}
+                </p>
+              )}
+
+              {activeStory.actionUrl && (
+                <a
+                  href={activeStory.actionUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="pointer-events-auto mt-4 inline-block rounded-xl bg-white px-4 py-2 text-sm font-bold text-gray-900"
+                >
+                  قراءة الخبر
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}

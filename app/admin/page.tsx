@@ -585,6 +585,11 @@ const youtubeChannelsData =
                 label="Users"
                 href="/admin/users"
               />
+
+              <QuickLink
+                label="Stories"
+                href="/admin/stories"
+              />
             </div>
           </div>
         </section>
