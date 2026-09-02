@@ -113,10 +113,10 @@ export default function AboutPage() {
               </p>
 
               <a
-                href="https://news-app-web-veru.onrender.com/contact"
+                href="https://madaalalam.com/contact"
                 className="mt-3 inline-block font-semibold text-blue-600 hover:text-blue-800"
               >
-                https://news-app-web-veru.onrender.com/contact
+                https://madaalalam.com/contact
               </a>
             </section>
           </div>
