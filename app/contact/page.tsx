@@ -40,10 +40,10 @@ export default function ContactPage() {
                 </p>
 
                 <a
-                  href="mailto:tamerxothman@gmail.com"
+                  href="mailto:contact@madaalalam.com"
                   className="mt-1 inline-block font-semibold text-blue-600 hover:text-blue-800"
                 >
-                  tamerxothman@gmail.com
+                  contact@madaalalam.com
                 </a>
               </div>
             </section>
@@ -121,10 +121,10 @@ export default function ContactPage() {
                 </p>
 
                 <a
-                  href="mailto:tamerxothman@gmail.com?subject=Account%20Deletion%20Request"
+                  href="mailto:contact@madaalalam.com?subject=Account%20Deletion%20Request"
                   className="mt-1 inline-block font-semibold text-blue-600 hover:text-blue-800"
                 >
-                  tamerxothman@gmail.com
+                  contact@madaalalam.com
                 </a>
               </div>
 
