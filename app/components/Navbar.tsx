@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, type TouchEvent } from 'react';
 import ThemeToggle from './ThemeToggle';
 
 const categories = [
@@ -15,6 +15,8 @@ export default function Navbar() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [email, setEmail] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
+  const touchStartX = useRef<number | null>(null);
+  const touchCurrentX = useRef<number | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('user_token');
@@ -29,6 +31,23 @@ export default function Navbar() {
     document.body.style.overflow = mobileOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [mobileOpen]);
+
+  function handleTouchStart(event: TouchEvent<HTMLDivElement>) {
+    touchStartX.current = event.touches[0]?.clientX ?? null;
+    touchCurrentX.current = touchStartX.current;
+  }
+
+  function handleTouchMove(event: TouchEvent<HTMLDivElement>) {
+    touchCurrentX.current = event.touches[0]?.clientX ?? touchCurrentX.current;
+  }
+
+  function handleTouchEnd() {
+    if (touchStartX.current === null || touchCurrentX.current === null) return;
+    const distance = touchCurrentX.current - touchStartX.current;
+    if (Math.abs(distance) >= 70) setMobileOpen(false);
+    touchStartX.current = null;
+    touchCurrentX.current = null;
+  }
 
   function logout() {
     localStorage.removeItem('user_token');
@@ -75,15 +94,28 @@ export default function Navbar() {
         </div>
       </header>
 
-      {mobileOpen && <div className="fixed inset-0 z-[70] bg-slate-950/35 backdrop-blur-[2px] lg:hidden" aria-hidden="true" onClick={() => setMobileOpen(false)} />}
-      <div id="mada-mobile-nav" className={`mada-mobile-nav lg:hidden ${mobileOpen ? 'block' : 'hidden'}`}>
-        <div className="mada-container mada-mobile-nav-grid">
-          <Link className={active('/') ? 'active' : ''} href="/">الرئيسية</Link>
-          <Link className={active('/sports') ? 'active' : ''} href="/sports">الرياضة</Link>
-          <Link className={active('/favorites') ? 'active' : ''} href={loggedIn ? '/favorites' : '/login'}>المفضلة</Link>
-          <Link className={active('/account') ? 'active' : ''} href={loggedIn ? '/account' : '/login'}>{loggedIn ? 'الحساب' : 'دخول'}</Link>
-          {categories.map(([label, value]) => <Link key={value} href={`/categories?category=${encodeURIComponent(value)}`}>{label}</Link>)}
-          <button type="button" onClick={() => setMobileOpen(false)} className="mada-nav-link col-span-2">إغلاق القائمة</button>
+      {mobileOpen && <button type="button" className="mada-mobile-backdrop lg:hidden" aria-label="إغلاق القائمة" onClick={() => setMobileOpen(false)} />}
+      <div
+        id="mada-mobile-nav"
+        className={`mada-mobile-nav lg:hidden ${mobileOpen ? 'is-open' : ''}`}
+        aria-hidden={!mobileOpen}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        <div className="mada-mobile-nav-inner">
+          <div className="mada-mobile-nav-header">
+            <span>القائمة</span>
+            <button type="button" className="mada-mobile-close" aria-label="إغلاق القائمة" onClick={() => setMobileOpen(false)}>✕</button>
+          </div>
+          <div className="mada-mobile-nav-grid">
+            <Link className={active('/') ? 'active' : ''} href="/">الرئيسية</Link>
+            <Link className={active('/sports') ? 'active' : ''} href="/sports">الرياضة</Link>
+            <Link className={active('/favorites') ? 'active' : ''} href={loggedIn ? '/favorites' : '/login'}>المفضلة</Link>
+            <Link className={active('/account') ? 'active' : ''} href={loggedIn ? '/account' : '/login'}>{loggedIn ? 'الحساب' : 'دخول'}</Link>
+            {categories.map(([label, value]) => <Link key={value} href={`/categories?category=${encodeURIComponent(value)}`}>{label}</Link>)}
+          </div>
+          <div className="mada-mobile-swipe-hint">اسحب يمينًا أو يسارًا للإغلاق</div>
         </div>
       </div>
     </>

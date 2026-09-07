@@ -236,10 +236,27 @@ a { text-decoration: none; }
 .mada-nav-link.active { color: var(--mada-brand-500); background: var(--mada-brand-50); }
 .mada-header-actions { display: flex; align-items: center; gap: 7px; }
 .mada-menu { display: none; }
-.mada-mobile-nav { display: none; border-bottom: 1px solid var(--mada-border); background: var(--mada-surface); box-shadow: var(--mada-shadow-sm); }
-.mada-mobile-nav .mada-container { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; padding: 8px 0; }
-.mada-mobile-nav a { min-height: 42px; display: grid; place-items: center; padding: 8px 5px; border-radius: var(--mada-radius-sm); color: var(--mada-foreground-soft); font-size: 11px; font-weight: 850; }
-.mada-mobile-nav a:hover, .mada-mobile-nav a.active { background: var(--mada-brand-50); color: var(--mada-brand-500); }
+.mada-mobile-backdrop {
+  position: fixed; inset: 0; z-index: 79; width: 100%; height: 100%; border: 0; padding: 0;
+  background: rgba(7,16,31,.38); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+  cursor: pointer;
+}
+.mada-mobile-nav {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 80; display: block; width: min(86vw, 360px);
+  overflow-y: auto; overscroll-behavior: contain; border-left: 1px solid var(--mada-border);
+  background: var(--mada-surface); box-shadow: -24px 0 70px rgba(7,16,31,.18);
+  transform: translateX(105%); visibility: hidden; pointer-events: none;
+  transition: transform 280ms cubic-bezier(.22,1,.36,1), visibility 280ms ease;
+  touch-action: pan-y;
+}
+.mada-mobile-nav.is-open { transform: translateX(0); visibility: visible; pointer-events: auto; }
+.mada-mobile-nav-inner { min-height: 100%; padding: 18px; display: flex; flex-direction: column; }
+.mada-mobile-nav-header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding-bottom:18px; border-bottom:1px solid var(--mada-border); color:var(--mada-foreground); font-size:18px; font-weight:900; }
+.mada-mobile-close { width:42px; height:42px; display:grid; place-items:center; border:1px solid var(--mada-border); border-radius:12px; background:var(--mada-surface-soft); color:var(--mada-foreground); cursor:pointer; font-size:16px; }
+.mada-mobile-nav-grid { display:grid; grid-template-columns:1fr; gap:7px; padding-top:16px; }
+.mada-mobile-nav-grid a { min-height:50px; display:flex; align-items:center; justify-content:flex-start; padding:0 14px; border-radius:14px; color:var(--mada-foreground-soft); font-size:15px; font-weight:800; transition:background var(--mada-duration) var(--mada-ease), color var(--mada-duration) var(--mada-ease), transform var(--mada-duration-fast) var(--mada-ease); }
+.mada-mobile-nav-grid a:hover, .mada-mobile-nav-grid a.active { background:var(--mada-brand-50); color:var(--mada-brand-500); }
+.mada-mobile-swipe-hint { margin-top:auto; padding-top:24px; color:var(--mada-muted-soft); text-align:center; font-size:11px; font-weight:700; }
 
 /* --------------------------------------------------------------------------\n   Buttons / controls\n   -------------------------------------------------------------------------- */
 .mada-btn {
@@ -301,7 +318,7 @@ a { text-decoration: none; }
 }
 .mada-hero::before { content:""; position:absolute; width:460px; height:460px; border-radius:50%; right:-180px; top:-250px; background:rgba(96,165,250,.18); filter:blur(2px); }
 .mada-hero::after { content:""; position:absolute; width:320px; height:320px; border-radius:50%; left:-110px; bottom:-190px; background:rgba(37,99,235,.20); filter:blur(14px); }
-.mada-hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 1.15fr .85fr; gap: 32px; align-items: center; }
+.mada-hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr; gap: 32px; align-items: center; }
 .mada-hero-grid > div:first-child { position: relative; isolation: isolate; padding: 22px 26px 24px; }
 .mada-hero-grid > div:first-child::before {
   content: ""; position: absolute; z-index: -1; inset: -34px -52px -30px -30px;
@@ -311,18 +328,11 @@ a { text-decoration: none; }
 }
 .mada-hero h1 { margin: 0; max-width: 800px; color: #fff !important; font-size: clamp(2.3rem, 5.2vw, 4.25rem); line-height: 1.05; letter-spacing: -.045em; font-weight: 800; text-shadow: 0 3px 22px rgba(0,0,0,.24); }
 .mada-hero p { max-width: 650px; margin: 18px 0 0; color: rgba(255,255,255,.80) !important; line-height: 1.9; text-shadow: 0 2px 12px rgba(0,0,0,.18); }
-.mada-hero-stat { justify-self: end; width: min(100%, 320px); padding: 22px; border: 1px solid rgba(255,255,255,.13); background: rgba(255,255,255,.075); backdrop-filter: blur(14px); border-radius: var(--mada-radius-xl); }
-.mada-hero-stat strong { display:block; margin-top:4px; font-size: 40px; letter-spacing:-.03em; }
-.mada-hero-stat span { color: rgba(255,255,255,.65); font-size: 12px; }
 .mada-hero-kicker { color:#93c5fd; position: relative; z-index: 1; text-shadow: 0 2px 12px rgba(0,0,0,.22); }
 .mada-btn-hero-light { color:var(--mada-brand-950); background:#fff; }
 .mada-btn-hero-ghost { color:#fff; background:rgba(255,255,255,.09); border-color:rgba(255,255,255,.16); }
 
 .mada-story-wrap { margin: 24px 0; }
-.mada-filter { padding: 20px; margin: 24px 0 30px; }
-.mada-filter-grid { display: grid; grid-template-columns: 1.8fr repeat(3,1fr); gap: 10px; }
-.mada-filter-footer { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:12px; }
-.mada-result-count { color: var(--mada-muted); font-size: 12px; }
 
 .mada-news-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; }
 .mada-news-card { overflow:hidden; background:var(--mada-surface); border:1px solid var(--mada-border); border-radius:var(--mada-radius-xl); box-shadow:var(--mada-shadow-sm); transition:transform var(--mada-duration) var(--mada-ease), box-shadow var(--mada-duration) var(--mada-ease), border-color var(--mada-duration) var(--mada-ease); }
@@ -479,10 +489,8 @@ main .hover\\:bg-gray-800:hover { background:var(--mada-brand-800) !important; }
 .dark main .text-slate-500, .dark main .text-slate-400 { color:var(--mada-muted) !important; }
 
 @media (max-width: 1100px) {
-  .mada-filter-grid { grid-template-columns:repeat(2,1fr); }
   .mada-news-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .mada-hero-grid { grid-template-columns:1fr; }
-  .mada-hero-stat { justify-self:start; }
   .mada-nav { display:none; }
   .mada-menu { display:inline-flex; }
 }
@@ -493,8 +501,6 @@ main .hover\\:bg-gray-800:hover { background:var(--mada-brand-800) !important; }
   .mada-brand-copy span { display:none; }
   .mada-header-actions .mada-btn:not(.mada-menu), .mada-header-actions .mada-theme-toggle { display:none; }
   .mada-menu { display:inline-flex; width:42px; padding:0; }
-  .mada-mobile-nav { display:block; }
-  .mada-filter-grid { grid-template-columns:1fr; }
   .mada-news-grid { grid-template-columns:1fr; }
   .mada-news-media { height:230px; }
   .mada-footer-inner { flex-direction:column; }
@@ -511,7 +517,6 @@ main .hover\\:bg-gray-800:hover { background:var(--mada-brand-800) !important; }
 
 /* ==========================================================================\n   MADA ALALAM — Unified Page Application Layer\n   Applies the Design System consistently to legacy page markup while keeping\n   page-specific layout/behavior intact.\n   ========================================================================== */
 .mada-brand-mark-footer { width:36px; height:36px; border-radius:11px; font-size:15px; }
-.mada-mobile-nav-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
 
 .mada-shell main.mada-page { color:var(--mada-foreground); }
 .mada-shell main.mada-page h1,
