@@ -30,6 +30,7 @@ export default function HomeClient({
   initialArticles,
   initialTotalPages,
   initialStories,
+  topStories,
 }: {
   initialArticles: Article[];
   initialTotalPages: number;
