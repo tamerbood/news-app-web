@@ -3,11 +3,10 @@
 import Link from 'next/link';
 import Stories from './components/Stories';
 import NewsCard from './components/NewsCard';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 
 type Article = { id: string; title: string; description?: string; url: string; imageUrl?: string; publishedAt?: string; source?: { name: string }; category?: { name: string } };
 const ARTICLES_PER_PAGE = 20;
-const TOP_STORIES_COUNT = 5;
 const LATEST_COUNT = 8;
 const MAX_CATEGORY_ITEMS = 4;
 
@@ -35,6 +34,7 @@ export default function HomeClient({
   initialArticles: Article[];
   initialTotalPages: number;
   initialStories: Story[];
+  topStories: ReactNode;
 }) {
   const [articles, setArticles] = useState<Article[]>(initialArticles);
   const [page, setPage] = useState(1);
@@ -127,13 +127,9 @@ export default function HomeClient({
     pages.push(totalPages); return pages;
   }
 
-  // Distribute the current API page into sections without ever reusing an article.
-  // The same article id can appear in only one section on this page.
-  const topStories = articles.slice(0, TOP_STORIES_COUNT);
-  const leadArticle = topStories[0] ?? null;
-  const supportingArticles = topStories.slice(1);
-  const latestArticles = articles.slice(TOP_STORIES_COUNT, TOP_STORIES_COUNT + LATEST_COUNT);
-  const categorySourceArticles = articles.slice(TOP_STORIES_COUNT + LATEST_COUNT);
+  // The first five articles are rendered by the server-side TopStories component.
+  const latestArticles = articles.slice(5, 5 + LATEST_COUNT);
+  const categorySourceArticles = articles.slice(5 + LATEST_COUNT);
   const categoryGroups = Array.from(
     categorySourceArticles.reduce((groups, article) => {
       const name = article.category?.name?.trim() || 'منوعات';
@@ -168,41 +164,7 @@ export default function HomeClient({
           </div>
         </section>
 
-        {leadArticle && !loading && !error && (
-          <section id="top-stories" className="mada-top-stories" aria-labelledby="top-stories-title">
-            <div className="mada-section-head">
-              <div><div className="mada-kicker">Top Stories</div><h2 id="top-stories-title">أهم الأخبار الآن</h2><p>أبرز ما يستحق انتباهك من آخر الأخبار الواردة.</p></div>
-            </div>
-            <div className="mada-top-stories-grid">
-              <Link href={`/articles/${leadArticle.id}`} className="mada-lead-story">
-                <div className="mada-lead-story-media">
-                  {leadArticle.imageUrl ? <img src={leadArticle.imageUrl} alt="" width="1280" height="720" fetchPriority="high" loading="eager" decoding="async" /> : <div className="mada-lead-story-placeholder">MADA</div>}
-                  <span className="mada-story-category">{leadArticle.category?.name || 'أخبار'}</span>
-                </div>
-                <div className="mada-lead-story-body">
-                  <div className="mada-story-meta">{leadArticle.source?.name || 'مصدر إخباري'}{formatDate(leadArticle.publishedAt) ? ` • ${formatDate(leadArticle.publishedAt)}` : ''}</div>
-                  <h3>{leadArticle.title}</h3>
-                  {leadArticle.description && <p>{leadArticle.description}</p>}
-                </div>
-              </Link>
-
-              <div className="mada-supporting-stories">
-                {supportingArticles.map((article) => (
-                  <Link href={`/articles/${article.id}`} key={article.id} className="mada-supporting-story">
-                    <div className="mada-supporting-story-media">
-                      {article.imageUrl ? <img src={article.imageUrl} alt="" width="112" height="88" loading="lazy" decoding="async" /> : <div className="mada-story-placeholder">M</div>}
-                    </div>
-                    <div className="mada-supporting-story-body">
-                      <span>{article.category?.name || 'أخبار'}</span>
-                      <h3>{article.title}</h3>
-                      <p>{article.source?.name || 'مصدر إخباري'}{formatDate(article.publishedAt) ? ` • ${formatDate(article.publishedAt)}` : ''}</p>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
+        {page === 1 && !loading && !error && topStories}
 
         <div className="mada-story-wrap"><Stories initialStories={initialStories} /></div>
 

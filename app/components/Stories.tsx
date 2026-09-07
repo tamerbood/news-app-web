@@ -66,13 +66,9 @@ export default function Stories({ initialStories = [] }: { initialStories?: Stor
   }
 
   useEffect(() => {
-    loadStories();
-
-    const interval = window.setInterval(
-      loadStories,
-      60 * 1000,
-    );
-
+    // The first payload is already rendered server-side. Avoid an immediate
+    // duplicate request during hydration; refresh in the background later.
+    const interval = window.setInterval(loadStories, 60 * 1000);
     return () => window.clearInterval(interval);
   }, []);
 
@@ -184,6 +180,9 @@ export default function Stories({ initialStories = [] }: { initialStories?: Stor
                     <img
                       src={story.sourceLogoUrl}
                       alt=""
+                      width="80"
+                      height="80"
+                      sizes="80px"
                       className="h-full w-full object-contain bg-white p-2"
                       loading="lazy"
                       decoding="async"
@@ -195,6 +194,9 @@ export default function Stories({ initialStories = [] }: { initialStories?: Stor
                     <img
                       src={story.mediaUrl}
                       alt=""
+                      width="80"
+                      height="80"
+                      sizes="80px"
                       className="h-full w-full object-cover"
                       loading="lazy"
                       decoding="async"
@@ -294,6 +296,8 @@ export default function Stories({ initialStories = [] }: { initialStories?: Stor
               <img
                 src={activeStory.mediaUrl}
                 alt={activeStory.title}
+                width="430"
+                height="760"
                 className="h-full w-full object-cover"
               />
             )}

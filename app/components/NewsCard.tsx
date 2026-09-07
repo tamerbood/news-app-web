@@ -15,27 +15,33 @@ export default function NewsCard({ article, favorite, favoriteLoading, onFavorit
 
   return (
     <article className="mada-news-card">
-      <Link href={`/articles/${article.id}`} aria-label={`قراءة: ${article.title}`} className="block">
-        <div className="mada-news-media">
-          <img src={image} alt="" width="640" height="360" loading="lazy" decoding="async" />
-          <div className="mada-news-overlay">
-            {article.category?.name && <span className="mada-pill">{article.category.name}</span>}
-            {article.source?.name && <span className="mada-pill mada-pill-dark">{article.source.name}</span>}
-          </div>
+      <div className="mada-news-media">
+        <img
+          src={image}
+          alt=""
+          width="640"
+          height="360"
+          loading="lazy"
+          decoding="async"
+          sizes="(max-width: 620px) 100vw, (max-width: 900px) 50vw, 25vw"
+        />
+        <div className="mada-news-overlay">
+          {article.category?.name && <span className="mada-pill">{article.category.name}</span>}
+          {article.source?.name && <span className="mada-pill mada-pill-dark">{article.source.name}</span>}
         </div>
-      </Link>
+      </div>
       <div className="mada-news-body">
         <div className="mada-news-meta">
           {article.category?.name && <span className="mada-ui-badge mada-ui-badge-info">{article.category.name}</span>}
           {article.publishedAt && <span className="mada-ui-badge mada-ui-badge-neutral">{date}</span>}
         </div>
-        <h3>{article.title}</h3>
+        <h3><Link href={`/articles/${article.id}`} className="mada-news-title-link">{article.title}</Link></h3>
         {article.description && <p className="mada-news-description">{article.description}</p>}
         <div className="mada-news-footer">
           <span className="mada-news-date">{article.source?.name ?? 'مدى العالم'}</span>
           <div className="flex gap-2">
             <button className={`mada-icon-btn ${favorite ? 'saved' : ''}`} onClick={onFavorite} disabled={favoriteLoading} aria-label={favorite ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}>{favoriteLoading ? '…' : favorite ? '★' : '☆'}</button>
-            <Link className="mada-btn mada-btn-primary" href={`/articles/${article.id}`}>قراءة الخبر</Link>
+            <span className="mada-btn mada-btn-primary" aria-hidden="true">قراءة الخبر</span>
           </div>
         </div>
       </div>

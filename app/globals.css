@@ -680,3 +680,13 @@ main .hover\:bg-gray-800:hover { background:var(--mada-brand-800) !important; }
   .mada-category-grid { grid-template-columns: 1fr; }
   .mada-category-block { margin-top: 32px; }
 }
+
+/* Performance/accessibility refinements: keep critical LCP content paintable. */
+.mada-top-stories { content-visibility: visible; contain-intrinsic-size: none; }
+.mada-news-title-link { color: inherit; text-decoration: none; }
+.mada-news-title-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* Keep the small metadata hierarchy readable on light surfaces. */
+.mada-page .mada-news-date,
+.mada-page .mada-supporting-story-body p,
+.mada-page .mada-story-meta { color: #475569; }

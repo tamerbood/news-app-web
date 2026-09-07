@@ -30,6 +30,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="ar" dir="rtl" className={`${madaSans.variable} ${geistMono.variable} h-full antialiased`}>
+      <head>
+        <link rel="preconnect" href="https://api--news-app-api--b6c2jw7bfhzv.code.run" />
+        <link rel="preconnect" href="https://www.vetogate.com" />
+        <link rel="preconnect" href="https://imgy.pro" />
+        <link rel="preconnect" href="https://www.lbcgroup.tv" />
+      </head>
       <body className="min-h-full flex flex-col">
         <SiteChrome>{children}</SiteChrome>
       </body>
