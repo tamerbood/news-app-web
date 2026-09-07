@@ -118,7 +118,7 @@ export default function HomeClient() {
           <div className="mada-hero-grid">
             <div>
               <div className="mada-kicker mada-hero-kicker">MADA ALALAM</div>
-              <h1>كل الأخبار التي تهمك، في مدى واحد.</h1>
+              <h1>مدى العالم — كل الأخبار التي تهمك، في مدى واحد.</h1>
               <p>منصة تجمع الأخبار من مصادر متعددة وتضعها أمامك في تجربة عربية سريعة، واضحة، ومرتبة حسب اهتماماتك.</p>
               <div className="flex flex-wrap gap-2 mt-6">
                 <a href="#top-stories" className="mada-btn mada-btn-hero-light">أهم الأخبار الآن ↓</a>

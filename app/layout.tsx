@@ -27,33 +27,9 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://madaalalam.com';
-  const structuredData = [
-    {
-      '@context': 'https://schema.org',
-      '@type': 'Organization',
-      name: 'مدى العالم',
-      url: siteUrl,
-      logo: `${siteUrl.replace(/\/$/, '')}/favicon.ico`,
-    },
-    {
-      '@context': 'https://schema.org',
-      '@type': 'WebSite',
-      name: 'مدى العالم',
-      url: siteUrl,
-      inLanguage: 'ar',
-    },
-  ];
-
   return (
     <html lang="ar" dir="rtl" className={`${madaSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(structuredData).replace(/</g, '\\u003c'),
-          }}
-        />
         <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
