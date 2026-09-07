@@ -184,6 +184,34 @@ export default function ArticleClient({ initialArticle }: { initialArticle: Arti
   return (
     <main className="mada-page min-h-screen bg-transparent">
       <article className="mx-auto max-w-5xl px-4 py-8 sm:px-6 md:py-10">
+        {/* Breadcrumb navigation */}
+        <nav aria-label="Breadcrumb" className="mb-5 text-sm text-gray-500">
+          <ol className="flex flex-wrap items-center gap-2">
+            <li>
+              <Link href="/" className="transition hover:text-blue-700">
+                الرئيسية
+              </Link>
+            </li>
+            {article.category?.name && (
+              <>
+                <li aria-hidden="true">/</li>
+                <li>
+                  <Link
+                    href={`/categories?category=${encodeURIComponent(article.category.name)}`}
+                    className="transition hover:text-blue-700"
+                  >
+                    {article.category.name}
+                  </Link>
+                </li>
+              </>
+            )}
+            <li aria-hidden="true">/</li>
+            <li aria-current="page" className="max-w-full truncate text-gray-700">
+              {article.title}
+            </li>
+          </ol>
+        </nav>
+
         {/* Back */}
         <Link
           href="/"

@@ -16,6 +16,9 @@ export default function robots(): MetadataRoute.Robots {
         '/api/',
       ],
     },
-    sitemap: `${siteUrl.replace(/\/$/, '')}/sitemap.xml`,
+    sitemap: [
+      `${siteUrl.replace(/\/$/, '')}/sitemap.xml`,
+      `${siteUrl.replace(/\/$/, '')}/news-sitemap.xml`,
+    ],
   };
 }

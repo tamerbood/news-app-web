@@ -112,7 +112,40 @@ export default async function ArticlePage({
       '@type': 'Organization',
       name: 'مدى العالم',
       url: siteUrl,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${siteUrl.replace(/\/$/, '')}/favicon.ico`,
+      },
     },
+  };
+
+  const breadcrumbItems = [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: 'الرئيسية',
+      item: `${siteUrl.replace(/\/$/, '')}/`,
+    },
+    ...(article.category?.name
+      ? [{
+          '@type': 'ListItem',
+          position: 2,
+          name: article.category.name,
+          item: `${siteUrl.replace(/\/$/, '')}/categories?category=${encodeURIComponent(article.category.name)}`,
+        }]
+      : []),
+    {
+      '@type': 'ListItem',
+      position: article.category?.name ? 3 : 2,
+      name: article.title,
+      item: canonical,
+    },
+  ];
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: breadcrumbItems,
   };
 
   return (
@@ -121,6 +154,12 @@ export default async function ArticlePage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c'),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, '\\u003c'),
         }}
       />
       <ArticleClient initialArticle={article} />

@@ -24,6 +24,7 @@ export const metadata: Metadata = {
   publisher: 'مدى العالم',
   robots: { index: true, follow: true },
   keywords: ["مدى العالم", "أخبار", "أخبار عربية", "أخبار العالم", "رياضة", "تكنولوجيا"],
+  icons: { icon: '/favicon.ico', shortcut: '/favicon.ico' },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
