@@ -11,7 +11,7 @@ export default function NewsCard({ article, favorite, favoriteLoading, onFavorit
   article: Article; favorite: boolean; favoriteLoading: boolean; onFavorite: () => void;
 }) {
   const image = article.imageUrl?.trim() || `${process.env.NEXT_PUBLIC_API_URL}/assets/images/news-placeholder.png`;
-  const date = article.publishedAt ? new Date(article.publishedAt).toLocaleDateString('ar-JO', { day:'numeric', month:'short', year:'numeric' }) : '';
+  const date = article.publishedAt ? new Date(article.publishedAt).toLocaleDateString('ar-JO', { day:'numeric', month:'short', year:'numeric', timeZone:'Asia/Amman' }) : '';
 
   return (
     <article className="mada-news-card">

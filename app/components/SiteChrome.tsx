@@ -12,8 +12,9 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
 
   return (
     <div className="mada-shell">
+      <a className="mada-skip-link" href="#main-content">تخطى إلى المحتوى الرئيسي</a>
       <Navbar />
-      <main className="flex-1">{children}</main>
+      <div className="flex-1" id="main-content">{children}</div>
       <footer className="mada-footer">
         <div className="mada-container mada-footer-inner">
           <div>
@@ -24,7 +25,7 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
             <Link href="/privacy">الخصوصية</Link><Link href="/terms">الشروط والأحكام</Link>
           </nav>
         </div>
-        <div className="mada-footer-bottom">© {new Date().getFullYear()} مدى العالم. جميع الحقوق محفوظة.</div>
+        <div className="mada-footer-bottom">© {2026} مدى العالم. جميع الحقوق محفوظة.</div>
       </footer>
     </div>
   );

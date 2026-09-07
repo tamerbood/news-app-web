@@ -260,7 +260,7 @@ export default function ArticleClient({ initialArticle }: { initialArticle: Arti
                 Published on{' '}
                 {new Date(
                   article.publishedAt,
-                ).toLocaleDateString()}
+                ).toLocaleDateString('ar-JO', { timeZone: 'Asia/Amman', day: 'numeric', month: 'long', year: 'numeric' })}
               </div>
             )}
 

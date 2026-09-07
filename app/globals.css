@@ -189,6 +189,8 @@ body {
 button, input, select, textarea { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
 a { text-decoration: none; }
+.mada-skip-link { position: fixed; top: 10px; right: 10px; z-index: 1000; transform: translateY(-180%); padding: 10px 14px; border-radius: 12px; background: var(--mada-brand-950); color: #fff; font-weight: 800; box-shadow: var(--mada-shadow-lg); transition: transform var(--mada-duration) var(--mada-ease); }
+.mada-skip-link:focus-visible { transform: translateY(0); color: #fff; }
 ::selection { background: rgba(37, 99, 235, 0.20); }
 :focus-visible { outline: 3px solid rgba(59, 130, 246, 0.38); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) {
@@ -308,7 +310,7 @@ a { text-decoration: none; }
   background: var(--mada-surface); border: 1px solid var(--mada-border); border-radius: var(--mada-radius-lg); box-shadow: var(--mada-shadow-lg);
   opacity: 0; visibility: hidden; transform: translateY(-4px); transition: opacity var(--mada-duration) var(--mada-ease), transform var(--mada-duration) var(--mada-ease), visibility var(--mada-duration) var(--mada-ease);
 }
-.mada-dropdown:hover .mada-dropdown-panel, .mada-dropdown:focus-within .mada-dropdown-panel { opacity: 1; visibility: visible; transform: translateY(0); }
+.mada-dropdown:hover .mada-dropdown-panel, .mada-dropdown:focus-within .mada-dropdown-panel, .mada-dropdown.is-open .mada-dropdown-panel { opacity: 1; visibility: visible; transform: translateY(0); }
 .mada-dropdown-panel a { display: block; padding: 10px 12px; border-radius: var(--mada-radius-xs); color: var(--mada-foreground-soft); font-size: 13px; font-weight: 750; }
 .mada-dropdown-panel a:hover { background: var(--mada-surface-soft); color: var(--mada-foreground); }
 

@@ -15,8 +15,11 @@ export default function Navbar() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [email, setEmail] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [categoriesOpen, setCategoriesOpen] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const touchCurrentX = useRef<number | null>(null);
+  const mobileNavRef = useRef<HTMLDivElement | null>(null);
+  const menuTriggerRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('user_token');
@@ -26,10 +29,30 @@ export default function Navbar() {
     catch { localStorage.removeItem('user_token'); localStorage.removeItem('user'); }
   }, []);
 
-  useEffect(() => { setMobileOpen(false); }, [pathname]);
+  useEffect(() => { setMobileOpen(false); setCategoriesOpen(false); }, [pathname]);
   useEffect(() => {
-    document.body.style.overflow = mobileOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    if (!mobileOpen) return;
+    const previousActive = document.activeElement as HTMLElement | null;
+    const focusableSelector = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const focusFirst = () => mobileNavRef.current?.querySelector<HTMLElement>(focusableSelector)?.focus();
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { setMobileOpen(false); return; }
+      if (event.key !== 'Tab' || !mobileNavRef.current) return;
+      const focusable = Array.from(mobileNavRef.current.querySelectorAll<HTMLElement>(focusableSelector));
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', handleKeyDown);
+    requestAnimationFrame(focusFirst);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+      (menuTriggerRef.current ?? previousActive)?.focus?.();
+    };
   }, [mobileOpen]);
 
   function handleTouchStart(event: TouchEvent<HTMLDivElement>) {
@@ -71,9 +94,9 @@ export default function Navbar() {
             <Link className={`mada-nav-link ${active('/') ? 'active' : ''}`} href="/">الرئيسية</Link>
             <Link className={`mada-nav-link ${active('/sports') ? 'active' : ''}`} href="/sports">الرياضة</Link>
             {loggedIn && <Link className={`mada-nav-link ${active('/favorites') ? 'active' : ''}`} href="/favorites">المفضلة</Link>}
-            <div className="mada-dropdown">
-              <button className="mada-nav-link" type="button" aria-haspopup="menu">الأقسام <span aria-hidden="true">⌄</span></button>
-              <div className="mada-dropdown-panel" role="menu">
+            <div className={`mada-dropdown ${categoriesOpen ? 'is-open' : ''}`}>
+              <button className="mada-nav-link" type="button" aria-haspopup="menu" aria-expanded={categoriesOpen} aria-controls="mada-categories-menu" onKeyDown={(event) => { if (event.key === 'Escape') setCategoriesOpen(false); }} onClick={() => setCategoriesOpen(v => !v)}>الأقسام <span aria-hidden="true">⌄</span></button>
+              <div id="mada-categories-menu" className="mada-dropdown-panel" role="menu">
                 {categories.map(([label, value]) => <Link key={value} href={`/categories?category=${encodeURIComponent(value)}`} role="menuitem">{label}</Link>)}
               </div>
             </div>
@@ -89,16 +112,19 @@ export default function Navbar() {
             ) : (
               <Link className="mada-btn mada-btn-primary" href="/login">تسجيل الدخول</Link>
             )}
-            <button className="mada-btn mada-btn-ghost mada-menu mada-btn-icon" aria-label={mobileOpen ? 'إغلاق القائمة' : 'فتح القائمة'} aria-expanded={mobileOpen} onClick={() => setMobileOpen(v => !v)}>{mobileOpen ? '✕' : '☰'}</button>
+            <button className="mada-btn mada-btn-ghost mada-menu mada-btn-icon" ref={menuTriggerRef} aria-label={mobileOpen ? 'إغلاق القائمة' : 'فتح القائمة'} aria-expanded={mobileOpen} aria-controls="mada-mobile-nav" onClick={() => setMobileOpen(v => !v)}>{mobileOpen ? '✕' : '☰'}</button>
           </div>
         </div>
       </header>
 
       {mobileOpen && <button type="button" className="mada-mobile-backdrop lg:hidden" aria-label="إغلاق القائمة" onClick={() => setMobileOpen(false)} />}
-      <div
+      {mobileOpen && <div
         id="mada-mobile-nav"
-        className={`mada-mobile-nav lg:hidden ${mobileOpen ? 'is-open' : ''}`}
-        aria-hidden={!mobileOpen}
+        ref={mobileNavRef}
+        className="mada-mobile-nav lg:hidden is-open"
+        role="dialog"
+        aria-modal="true"
+        aria-label="قائمة التنقل على الهاتف"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -117,7 +143,7 @@ export default function Navbar() {
           </div>
           <div className="mada-mobile-swipe-hint">اسحب يمينًا أو يسارًا للإغلاق</div>
         </div>
-      </div>
+      </div>}
     </>
   );
 }

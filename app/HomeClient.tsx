@@ -147,7 +147,7 @@ export default function HomeClient({
   function formatDate(value?: string) {
     if (!value) return '';
     try {
-      return new Intl.DateTimeFormat('ar', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(value));
+      return new Intl.DateTimeFormat('ar', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Amman' }).format(new Date(value));
     } catch { return ''; }
   }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type Story = {
   id: string;
@@ -22,6 +22,8 @@ export default function Stories({ initialStories = [] }: { initialStories?: Stor
   const [stories, setStories] = useState<Story[]>(initialStories);
   const [loading, setLoading] = useState(initialStories.length === 0);
   const [selected, setSelected] = useState<number | null>(null);
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+  const lastTriggerRef = useRef<HTMLButtonElement | null>(null);
 
   async function loadStories() {
     const api = process.env.NEXT_PUBLIC_API_URL;
@@ -101,10 +103,29 @@ export default function Stories({ initialStories = [] }: { initialStories?: Stor
 
     window.addEventListener('keydown', handleKeyDown);
     document.body.style.overflow = 'hidden';
+    const previousActive = document.activeElement as HTMLElement | null;
+    const focusableSelector = 'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
+    const focusDialog = () => {
+      const first = dialogRef.current?.querySelector<HTMLElement>(focusableSelector);
+      first?.focus();
+    };
+    const handleTab = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab' || !dialogRef.current) return;
+      const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>(focusableSelector));
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
+    document.addEventListener('keydown', handleTab);
+    requestAnimationFrame(focusDialog);
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keydown', handleTab);
       document.body.style.overflow = '';
+      (lastTriggerRef.current ?? previousActive)?.focus?.();
     };
   }, [selected, stories.length]);
 
@@ -153,7 +174,7 @@ export default function Stories({ initialStories = [] }: { initialStories?: Stor
             <button
               key={story.id}
               type="button"
-              onClick={() => setSelected(index)}
+              onClick={(event) => { lastTriggerRef.current = event.currentTarget; setSelected(index); }}
               className="w-24 shrink-0 text-center outline-none"
               aria-label={`فتح قصة ${story.title}`}
             >
@@ -196,7 +217,8 @@ export default function Stories({ initialStories = [] }: { initialStories?: Stor
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4"
           role="dialog"
           aria-modal="true"
-          aria-label="عرض القصة"
+          aria-labelledby="story-dialog-title"
+          ref={dialogRef}
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) {
               setSelected(null);
@@ -292,7 +314,7 @@ export default function Stories({ initialStories = [] }: { initialStories?: Stor
                 </span>
               </div>
 
-              <h3 className="text-xl font-bold leading-8">
+              <h3 id="story-dialog-title" className="text-xl font-bold leading-8">
                 {activeStory.title}
               </h3>
 

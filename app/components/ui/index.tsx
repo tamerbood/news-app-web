@@ -1,7 +1,7 @@
 'use client';
 
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export type ButtonVariant = 'primary' | 'soft' | 'ghost' | 'danger' | 'success';
 
@@ -74,14 +74,33 @@ export function StatCard({ label, value, sub, icon }: { label:string; value:Reac
 }
 
 export function Modal({ open, title, onClose, children }: { open:boolean; title:string; onClose:()=>void; children:ReactNode }) {
+  const modalRef = useRef<HTMLDivElement | null>(null);
+  const titleId = 'mada-modal-title';
   useEffect(() => {
     if (!open) return;
-    const handler = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose(); };
+    const previousActive = document.activeElement as HTMLElement | null;
+    const handler = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { onClose(); return; }
+      if (event.key !== 'Tab' || !modalRef.current) return;
+      const selector = 'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
+      const focusable = Array.from(modalRef.current.querySelectorAll<HTMLElement>(selector));
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
     document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
+    requestAnimationFrame(() => {
+      modalRef.current?.querySelector<HTMLElement>('button:not([disabled]), input, select, textarea, a[href]')?.focus();
+    });
+    return () => {
+      document.removeEventListener('keydown', handler);
+      previousActive?.focus?.();
+    };
   }, [open, onClose]);
   if (!open) return null;
-  return <><div className="mada-ui-overlay" onClick={onClose}/><div className="mada-ui-modal" role="dialog" aria-modal="true" aria-label={title}><div className="mada-ui-modal-panel"><div className="mada-ui-modal-head"><h2 className="m-0 text-base font-black">{title}</h2><IconButton label="إغلاق" onClick={onClose}>✕</IconButton></div><div className="mada-ui-modal-body">{children}</div></div></div></>;
+  return <><div className="mada-ui-overlay" onClick={onClose} aria-hidden="true"/><div className="mada-ui-modal" role="dialog" aria-modal="true" aria-labelledby={titleId} ref={modalRef}><div className="mada-ui-modal-panel"><div className="mada-ui-modal-head"><h2 id={titleId} className="m-0 text-base font-black">{title}</h2><IconButton label="إغلاق" onClick={onClose}>✕</IconButton></div><div className="mada-ui-modal-body">{children}</div></div></div></>;
 }
 
 export function Toast({ tone='success', children }: { tone?:'success'|'error'; children:ReactNode }) { return <div className={`mada-ui-toast mada-ui-toast-${tone}`} role="status">{children}</div>; }
