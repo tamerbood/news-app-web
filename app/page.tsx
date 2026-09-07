@@ -32,8 +32,10 @@ export default function HomePage() {
         const data = await response.json();
         if (!mounted) return;
         const rawItems = Array.isArray(data.items) ? data.items : [];
-        const uniqueItems = Array.from(
-          new Map(rawItems.filter((item: Article) => item?.id).map((item: Article) => [item.id, item])).values(),
+        const uniqueItems: Article[] = Array.from(
+          new Map<string, Article>(
+            rawItems.filter((item: Article) => item?.id).map((item: Article) => [item.id, item]),
+          ).values(),
         );
         setArticles(uniqueItems); setTotalPages(data.totalPages ?? 1); setError('');
       } catch (e) { if (mounted) setError(e instanceof Error ? e.message : 'تعذر تحميل الأخبار.'); }

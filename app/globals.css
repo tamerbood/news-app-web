@@ -480,7 +480,7 @@ main .bg-gray-50 { background:var(--mada-surface-soft) !important; }
 main .bg-blue-50 { background:var(--mada-brand-50) !important; }
 main .text-blue-600 { color:var(--mada-brand-500) !important; }
 main .bg-black { background:var(--mada-brand-950) !important; }
-main .hover\\:bg-gray-800:hover { background:var(--mada-brand-800) !important; }
+main .hover\:bg-gray-800:hover { background:var(--mada-brand-800) !important; }
 .dark main .bg-white, .dark main .bg-slate-50, .dark main .bg-gray-50 { background:var(--mada-surface) !important; }
 .dark main .bg-gray-100 { background:var(--mada-surface-soft) !important; }
 .dark main .border-gray-100, .dark main .border-gray-200, .dark main .border-slate-200 { border-color:var(--mada-border) !important; }
