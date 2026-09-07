@@ -1,19 +1,17 @@
-'use client';
-
-import { optimizeImageUrl } from '../lib/optimized-image-url';
-
 import Link from 'next/link';
+import FavoriteButton from './FavoriteButton';
+import { optimizeImageUrl } from '../lib/optimized-image-url';
 
 type Article = {
   id: string; title: string; description?: string; url?: string; imageUrl?: string;
   publishedAt?: string; source?: { name: string }; category?: { name: string };
 };
 
-export default function NewsCard({ article, favorite, favoriteLoading, onFavorite }: {
-  article: Article; favorite: boolean; favoriteLoading: boolean; onFavorite: () => void;
-}) {
+export default function NewsCard({ article }: { article: Article }) {
   const image = article.imageUrl?.trim() || `${process.env.NEXT_PUBLIC_API_URL}/assets/images/news-placeholder.png`;
-  const date = article.publishedAt ? new Date(article.publishedAt).toLocaleDateString('ar-JO', { day:'numeric', month:'short', year:'numeric', timeZone:'Asia/Amman' }) : '';
+  const date = article.publishedAt
+    ? new Date(article.publishedAt).toLocaleDateString('ar-JO', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Amman' })
+    : '';
 
   return (
     <article className="mada-news-card">
@@ -43,7 +41,7 @@ export default function NewsCard({ article, favorite, favoriteLoading, onFavorit
         <div className="mada-news-footer">
           <span className="mada-news-date">{article.source?.name ?? 'مدى العالم'}</span>
           <div className="flex gap-2">
-            <button className={`mada-icon-btn ${favorite ? 'saved' : ''}`} onClick={onFavorite} disabled={favoriteLoading} aria-label={favorite ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}>{favoriteLoading ? '…' : favorite ? '★' : '☆'}</button>
+            <FavoriteButton id={article.id} />
             <span className="mada-btn mada-btn-primary" aria-hidden="true">قراءة الخبر</span>
           </div>
         </div>

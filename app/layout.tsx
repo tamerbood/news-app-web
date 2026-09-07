@@ -6,7 +6,7 @@ import SiteChrome from "./components/SiteChrome";
 const madaSans = IBM_Plex_Sans_Arabic({
   variable: "--font-mada-sans",
   subsets: ["arabic", "latin"],
-  display: "optional",
+  display: "swap",
   weight: ["400", "700"],
   preload: true,
 });

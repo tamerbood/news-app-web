@@ -55,12 +55,12 @@ export const metadata: Metadata = {
   },
 };
 
-async function getInitialArticles(): Promise<ArticlesResponse> {
+async function getInitialArticles(page = 1): Promise<ArticlesResponse> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
   if (!apiUrl) return {};
 
   try {
-    const response = await fetch(`${apiUrl}/articles?page=1&limit=20`, {
+    const response = await fetch(`${apiUrl}/articles?page=${page}&limit=20`, {
       next: { revalidate: 60 },
     });
     if (!response.ok) return {};
@@ -113,11 +113,22 @@ async function getInitialStories(): Promise<Story[]> {
   }
 }
 
-export default async function HomePage() {
-  const [initialArticles, initialStories] = await Promise.all([
-    getInitialArticles(),
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string | string[] }>;
+}) {
+  const params = await searchParams;
+  const rawPage = Array.isArray(params.page) ? params.page[0] : params.page;
+  const parsedPage = Number.parseInt(rawPage ?? '1', 10);
+  const page = Number.isFinite(parsedPage) && parsedPage > 0 ? Math.min(parsedPage, 1000) : 1;
+
+  const [initialArticles, topArticles, initialStories] = await Promise.all([
+    getInitialArticles(page),
+    page === 1 ? Promise.resolve(undefined) : getInitialArticles(1),
     getInitialStories(),
   ]);
+  const resolvedTopArticles = topArticles ?? initialArticles;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://madaalalam.com';
   const normalizedSiteUrl = siteUrl.replace(/\/$/, '');
 
@@ -172,8 +183,10 @@ export default async function HomePage() {
       />
       <HomeClient
         initialArticles={initialArticles.items ?? []}
+        topArticles={resolvedTopArticles.items ?? []}
         initialTotalPages={initialArticles.totalPages ?? 1}
         initialStories={initialStories}
+        page={page}
       />
     </>
   );

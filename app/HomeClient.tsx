@@ -11,12 +11,16 @@ type Story = {
 
 export default function HomeClient({
   initialArticles,
+  topArticles,
   initialTotalPages,
   initialStories,
+  page,
 }: {
   initialArticles: Article[];
+  topArticles: Article[];
   initialTotalPages: number;
   initialStories: Story[];
+  page: number;
 }) {
   return (
     <main className="mada-page">
@@ -35,13 +39,13 @@ export default function HomeClient({
           </div>
         </section>
 
-        <TopStories articles={initialArticles.slice(0, 5)} />
+        <TopStories articles={topArticles.slice(0, 5)} />
 
         <div className="mada-story-wrap">
           <Stories initialStories={initialStories} />
         </div>
 
-        <NewsFeed initialArticles={initialArticles} initialTotalPages={initialTotalPages} />
+        <NewsFeed articles={initialArticles} totalPages={initialTotalPages} page={page} />
       </div>
     </main>
   );

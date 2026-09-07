@@ -695,3 +695,20 @@ main .hover\:bg-gray-800:hover { background:var(--mada-brand-800) !important; }
 @media (prefers-reduced-motion: no-preference) {
   .mada-hero h1 { text-shadow: 0 2px 14px rgba(0,0,0,.18); }
 }
+
+
+/* Performance: keep the hero paint path simple without changing its visual language. */
+.mada-hero::before,
+.mada-hero::after,
+.mada-hero-grid > div:first-child::before {
+  filter: none;
+}
+.mada-hero h1 {
+  text-shadow: none;
+}
+
+/* Accessibility: darken the informational badge so its text meets contrast on the light surface. */
+.mada-ui-badge-info {
+  color: #075985;
+  background: #e0f2fe;
+}
