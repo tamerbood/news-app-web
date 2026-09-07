@@ -170,7 +170,7 @@
   --color-background: var(--mada-background);
   --color-foreground: var(--mada-foreground);
   --font-sans: var(--font-mada-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 * { box-sizing: border-box; }
@@ -690,3 +690,8 @@ main .hover\:bg-gray-800:hover { background:var(--mada-brand-800) !important; }
 .mada-page .mada-news-date,
 .mada-page .mada-supporting-story-body p,
 .mada-page .mada-story-meta { color: #475569; }
+
+/* Performance: keep the LCP hero text independent of expensive visual effects during first paint. */
+@media (prefers-reduced-motion: no-preference) {
+  .mada-hero h1 { text-shadow: 0 2px 14px rgba(0,0,0,.18); }
+}

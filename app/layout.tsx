@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans_Arabic, Geist_Mono } from "next/font/google";
+import { IBM_Plex_Sans_Arabic } from "next/font/google";
 import "./globals.css";
 import SiteChrome from "./components/SiteChrome";
 
 const madaSans = IBM_Plex_Sans_Arabic({
   variable: "--font-mada-sans",
   subsets: ["arabic", "latin"],
-  display: "swap",
-  weight: ["400", "500", "600", "700"],
+  display: "optional",
+  weight: ["400", "700"],
+  preload: true,
 });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://madaalalam.com'),
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="ar" dir="rtl" className={`${madaSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="ar" dir="rtl" className={`${madaSans.variable} h-full antialiased`}>
       <head>
         <link rel="preconnect" href="https://www.vetogate.com" />
         <link rel="preconnect" href="https://www.lbcgroup.tv" />
