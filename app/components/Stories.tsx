@@ -1,5 +1,6 @@
-import { optimizeImageUrl } from '../lib/optimized-image-url';
 'use client';
+
+import { optimizeImageUrl } from '../lib/optimized-image-url';
 
 import { useEffect, useRef, useState } from 'react';
 
