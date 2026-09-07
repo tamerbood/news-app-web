@@ -67,6 +67,9 @@ export default function SourcesPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [bulkCategoryId, setBulkCategoryId] = useState('');
+  const [bulkSaving, setBulkSaving] = useState(false);
+  const [selectedSourceIds, setSelectedSourceIds] = useState<string[]>([]);
 
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -527,6 +530,74 @@ export default function SourcesPage() {
     }
   }
 
+  function toggleSourceSelection(sourceId: string) {
+    setSelectedSourceIds((current) =>
+      current.includes(sourceId)
+        ? current.filter((id) => id !== sourceId)
+        : [...current, sourceId],
+    );
+  }
+
+  function selectAllVisibleSources(visibleSources: Source[]) {
+    const visibleIds = visibleSources.map((source) => source.id);
+    const allSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedSourceIds.includes(id));
+
+    setSelectedSourceIds((current) => {
+      if (allSelected) {
+        return current.filter((id) => !visibleIds.includes(id));
+      }
+
+      return [...new Set([...current, ...visibleIds])];
+    });
+  }
+
+  async function bulkUpdateCategory() {
+    if (selectedSourceIds.length === 0) return;
+
+    try {
+      setBulkSaving(true);
+      setError('');
+      setMessage('');
+
+      const token = localStorage.getItem('admin_token');
+      if (!token) {
+        window.location.href = '/admin/login';
+        return;
+      }
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/sources/bulk-category`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            sourceIds: selectedSourceIds,
+            categoryId: bulkCategoryId || null,
+          }),
+        },
+      );
+
+      const body = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(body?.message ?? `Bulk update failed: ${response.status}`);
+      }
+
+      setMessage(
+        `${body.updated} source${body.updated === 1 ? '' : 's'} updated successfully.`,
+      );
+      setSelectedSourceIds([]);
+      setBulkCategoryId('');
+      await loadData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update source categories');
+    } finally {
+      setBulkSaving(false);
+    }
+  }
+
   function getCategoryName(source: Source) {
     if (source.category?.name) {
       return source.category.name;
@@ -549,6 +620,22 @@ export default function SourcesPage() {
         country.id === source.countryId,
     );
   }
+
+  const visibleSources = sources.filter((source) =>
+    sourceView === 'all'
+      ? true
+      : sourceView === 'active'
+        ? source.isActive
+        : sourceView === 'inactive'
+          ? !source.isActive
+          : sourceView === 'breaking'
+            ? source.isBreakingSource
+            : !source.isBreakingSource,
+  );
+
+  const allVisibleSelected =
+    visibleSources.length > 0 &&
+    visibleSources.every((source) => selectedSourceIds.includes(source.id));
 
   return (
     <AdminShell title="Sources">
@@ -928,31 +1015,77 @@ export default function SourcesPage() {
                 Refresh
               </button>
             </div>
+
+            <div className="mt-5 flex flex-col gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="text-sm font-semibold text-gray-900">
+                  Bulk category update
+                </p>
+                <p className="mt-1 text-xs text-gray-600">
+                  Select sources below, then assign one category to all of them.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-lg bg-white px-3 py-2 text-xs font-semibold text-gray-700">
+                  {selectedSourceIds.length} selected
+                </span>
+                <select
+                  value={bulkCategoryId}
+                  onChange={(event) => setBulkCategoryId(event.target.value)}
+                  disabled={bulkSaving}
+                  className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500"
+                >
+                  <option value="">Uncategorized</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  onClick={() => void bulkUpdateCategory()}
+                  disabled={bulkSaving || selectedSourceIds.length === 0}
+                  className="rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {bulkSaving ? 'Updating...' : 'Apply Category'}
+                </button>
+                {selectedSourceIds.length > 0 && (
+                  <button
+                    onClick={() => setSelectedSourceIds([])}
+                    disabled={bulkSaving}
+                    className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
 
           {loading ? (
             <div className="px-6 py-16 text-center text-gray-500">
               Loading sources...
             </div>
-          ) : sources.length === 0 ? (
+          ) : visibleSources.length === 0 ? (
             <div className="px-6 py-16 text-center text-gray-500">
               No sources found.
             </div>
           ) : (
             <div className="divide-y divide-gray-100">
-              {sources
-                .filter((source) =>
-                  sourceView === 'all'
-                    ? true
-                    : sourceView === 'active'
-                      ? source.isActive
-                      : sourceView === 'inactive'
-                        ? !source.isActive
-                        : sourceView === 'breaking'
-                          ? source.isBreakingSource
-                          : !source.isBreakingSource,
-                )
-                .map((source) => {
+              <div className="flex items-center justify-between bg-gray-50 px-6 py-3">
+                <label className="flex items-center gap-3 text-sm font-medium text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={allVisibleSelected}
+                    onChange={() => selectAllVisibleSources(visibleSources)}
+                    className="h-4 w-4"
+                  />
+                  Select all visible ({visibleSources.length})
+                </label>
+              </div>
+
+              {visibleSources.map((source) => {
                 const country =
                   getCountry(source);
 
@@ -961,7 +1094,15 @@ export default function SourcesPage() {
                     key={source.id}
                     className="flex flex-col gap-4 px-6 py-5 lg:flex-row lg:items-center lg:justify-between"
                   >
-                    <div className="min-w-0">
+                    <div className="flex min-w-0 items-start gap-4">
+                      <input
+                        type="checkbox"
+                        checked={selectedSourceIds.includes(source.id)}
+                        onChange={() => toggleSourceSelection(source.id)}
+                        aria-label={`Select ${source.name}`}
+                        className="mt-1 h-4 w-4 shrink-0"
+                      />
+                      <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-3">
                         <h3 className="font-semibold text-gray-900">
                           {source.name}
@@ -1014,6 +1155,7 @@ export default function SourcesPage() {
                       <p className="mt-2 truncate text-sm text-gray-500">
                         {source.rssUrl}
                       </p>
+                      </div>
                     </div>
 
                     <div className="flex shrink-0 flex-wrap gap-2">
