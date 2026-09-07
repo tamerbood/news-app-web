@@ -1,5 +1,7 @@
 'use client';
 
+import { optimizeImageUrl } from '../lib/optimized-image-url';
+
 import Link from 'next/link';
 
 type Article = {
@@ -17,10 +19,10 @@ export default function NewsCard({ article, favorite, favoriteLoading, onFavorit
     <article className="mada-news-card">
       <div className="mada-news-media">
         <img
-          src={image}
+          src={optimizeImageUrl(image, 450)}
           alt=""
-          width="640"
-          height="360"
+          width="450"
+          height="253"
           loading="lazy"
           decoding="async"
           fetchPriority="low"

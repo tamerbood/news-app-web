@@ -1,3 +1,4 @@
+import { optimizeImageUrl } from '../lib/optimized-image-url';
 import Link from 'next/link';
 
 type Article = {
@@ -46,10 +47,10 @@ export default function TopStories({ articles }: { articles: Article[] }) {
           <div className="mada-lead-story-media">
             {leadArticle.imageUrl ? (
               <img
-                src={leadArticle.imageUrl}
+                src={optimizeImageUrl(leadArticle.imageUrl, 450)}
                 alt=""
-                width="1280"
-                height="720"
+                width="450"
+                height="253"
                 fetchPriority="high"
                 loading="eager"
                 decoding="async"
@@ -76,7 +77,7 @@ export default function TopStories({ articles }: { articles: Article[] }) {
               <div className="mada-supporting-story-media">
                 {article.imageUrl ? (
                   <img
-                    src={article.imageUrl}
+                    src={optimizeImageUrl(article.imageUrl, 160)}
                     alt=""
                     width="112"
                     height="88"

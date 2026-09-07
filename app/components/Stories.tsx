@@ -1,3 +1,4 @@
+import { optimizeImageUrl } from '../lib/optimized-image-url';
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
@@ -178,7 +179,7 @@ export default function Stories({ initialStories = [] }: { initialStories?: Stor
                 <span className="flex h-full w-full items-center justify-center overflow-hidden rounded-full border-2 border-white bg-gray-100">
                   {story.sourceLogoUrl ? (
                     <img
-                      src={story.sourceLogoUrl}
+                      src={optimizeImageUrl(story.sourceLogoUrl, 160)}
                       alt=""
                       width="80"
                       height="80"
@@ -193,7 +194,7 @@ export default function Stories({ initialStories = [] }: { initialStories?: Stor
                     />
                   ) : (
                     <img
-                      src={story.mediaUrl}
+                      src={optimizeImageUrl(story.mediaUrl, 160)}
                       alt=""
                       width="80"
                       height="80"
@@ -287,7 +288,7 @@ export default function Stories({ initialStories = [] }: { initialStories?: Stor
             {activeStory.mediaType === 'video' ? (
               <video
                 key={activeStory.id}
-                src={activeStory.mediaUrl}
+                src={optimizeImageUrl(activeStory.mediaUrl, 860)}
                 className="h-full w-full object-cover"
                 autoPlay
                 loop
@@ -296,7 +297,7 @@ export default function Stories({ initialStories = [] }: { initialStories?: Stor
               />
             ) : (
               <img
-                src={activeStory.mediaUrl}
+                src={optimizeImageUrl(activeStory.mediaUrl, 860)}
                 alt={activeStory.title}
                 width="430"
                 height="760"
@@ -308,7 +309,7 @@ export default function Stories({ initialStories = [] }: { initialStories?: Stor
               <div className="mb-2 flex items-center gap-2">
                 {activeStory.sourceLogoUrl && (
                   <img
-                    src={activeStory.sourceLogoUrl}
+                    src={optimizeImageUrl(activeStory.sourceLogoUrl, 64)}
                     alt=""
                     className="h-7 w-7 rounded-full bg-white object-contain p-1"
                     loading="lazy"

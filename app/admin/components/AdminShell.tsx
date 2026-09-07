@@ -63,7 +63,7 @@ export default function AdminShell({ children, title, eyebrow = 'مدى العا
   }
 
   const active = (href: string) => href === '/admin' ? pathname === '/admin' : pathname.startsWith(href);
-  const allItems = adminNavigation.flatMap(section => section.items);
+  const allItems = adminNavigation.reduce<NavItem[]>((items, section) => items.concat(section.items), []);
 
   return (
     <div dir="rtl" className="admin-shell min-h-screen">
