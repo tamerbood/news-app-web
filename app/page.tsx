@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import HomeClient from './HomeClient';
-import TopStories from './components/TopStories';
 
 type Article = {
   id: string;
@@ -175,10 +174,7 @@ export default async function HomePage() {
         initialArticles={initialArticles.items ?? []}
         initialTotalPages={initialArticles.totalPages ?? 1}
         initialStories={initialStories}
-        topStories={
-          <TopStories
-            articles={(initialArticles.items ?? []).slice(0, 5)}
-          />
+      />
         }
       />
     </>

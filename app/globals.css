@@ -690,3 +690,7 @@ main .hover\:bg-gray-800:hover { background:var(--mada-brand-800) !important; }
 .mada-page .mada-news-date,
 .mada-page .mada-supporting-story-body p,
 .mada-page .mada-story-meta { color: #475569; }
+
+
+/* Performance: keep the above-the-fold LCP region renderable immediately. */
+.mada-top-stories { content-visibility: visible; contain-intrinsic-size: auto; }
