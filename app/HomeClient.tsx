@@ -11,18 +11,44 @@ const TOP_STORIES_COUNT = 5;
 const LATEST_COUNT = 8;
 const MAX_CATEGORY_ITEMS = 4;
 
-export default function HomeClient() {
-  const [articles, setArticles] = useState<Article[]>([]);
+type Story = {
+  id: string;
+  title: string;
+  description?: string | null;
+  mediaUrl: string;
+  mediaType?: string;
+  actionUrl?: string | null;
+  sourceId?: string | null;
+  isActive: boolean;
+  sortOrder?: number;
+  publishedAt?: string | null;
+  expiresAt?: string | null;
+  sourceName?: string | null;
+  sourceLogoUrl?: string | null;
+};
+
+export default function HomeClient({
+  initialArticles,
+  initialTotalPages,
+  initialStories,
+}: {
+  initialArticles: Article[];
+  initialTotalPages: number;
+  initialStories: Story[];
+}) {
+  const [articles, setArticles] = useState<Article[]>(initialArticles);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(true);
+  const [totalPages, setTotalPages] = useState(initialTotalPages);
+  const [loading, setLoading] = useState(initialArticles.length === 0);
   const [error, setError] = useState('');
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   const [favoriteLoading, setFavoriteLoading] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
-    async function loadArticles() {
+    let refreshTimer: ReturnType<typeof setInterval> | undefined;
+
+    async function loadArticles(showLoading = true) {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL;
         if (!apiUrl) throw new Error('لم يتم إعداد رابط الـAPI.');
@@ -39,12 +65,26 @@ export default function HomeClient() {
         );
         setArticles(uniqueItems); setTotalPages(data.totalPages ?? 1); setError('');
       } catch (e) { if (mounted) setError(e instanceof Error ? e.message : 'تعذر تحميل الأخبار.'); }
-      finally { if (mounted) setLoading(false); }
+      finally { if (mounted && showLoading) setLoading(false); }
     }
-    setLoading(true); loadArticles();
-    const interval = setInterval(loadArticles, 60000);
-    return () => { mounted = false; clearInterval(interval); };
-  }, [page]);
+
+    const hasServerData = page === 1 && initialArticles.length > 0;
+    if (!hasServerData) {
+      setLoading(true);
+      void loadArticles();
+    } else {
+      setLoading(false);
+    }
+
+    refreshTimer = setInterval(() => {
+      void loadArticles(false);
+    }, 60000);
+
+    return () => {
+      mounted = false;
+      if (refreshTimer) clearInterval(refreshTimer);
+    };
+  }, [page, initialArticles.length]);
 
   useEffect(() => {
     async function loadFavorites() {
@@ -136,7 +176,7 @@ export default function HomeClient() {
             <div className="mada-top-stories-grid">
               <Link href={`/articles/${leadArticle.id}`} className="mada-lead-story">
                 <div className="mada-lead-story-media">
-                  {leadArticle.imageUrl ? <img src={leadArticle.imageUrl} alt="" /> : <div className="mada-lead-story-placeholder">MADA</div>}
+                  {leadArticle.imageUrl ? <img src={leadArticle.imageUrl} alt="" width="1280" height="720" fetchPriority="high" loading="eager" decoding="async" /> : <div className="mada-lead-story-placeholder">MADA</div>}
                   <span className="mada-story-category">{leadArticle.category?.name || 'أخبار'}</span>
                 </div>
                 <div className="mada-lead-story-body">
@@ -150,7 +190,7 @@ export default function HomeClient() {
                 {supportingArticles.map((article) => (
                   <Link href={`/articles/${article.id}`} key={article.id} className="mada-supporting-story">
                     <div className="mada-supporting-story-media">
-                      {article.imageUrl ? <img src={article.imageUrl} alt="" /> : <div className="mada-story-placeholder">M</div>}
+                      {article.imageUrl ? <img src={article.imageUrl} alt="" width="112" height="88" loading="lazy" decoding="async" /> : <div className="mada-story-placeholder">M</div>}
                     </div>
                     <div className="mada-supporting-story-body">
                       <span>{article.category?.name || 'أخبار'}</span>
@@ -164,7 +204,7 @@ export default function HomeClient() {
           </section>
         )}
 
-        <div className="mada-story-wrap"><Stories /></div>
+        <div className="mada-story-wrap"><Stories initialStories={initialStories} /></div>
 
         <section id="latest">
           <div className="mada-section-head"><div><div className="mada-kicker">Latest</div><h2>آخر الأخبار</h2><p>تصفح الأخبار زمنيًا، من الأحدث إلى الأقدم.</p></div></div>

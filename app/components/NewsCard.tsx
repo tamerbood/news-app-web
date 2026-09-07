@@ -17,7 +17,7 @@ export default function NewsCard({ article, favorite, favoriteLoading, onFavorit
     <article className="mada-news-card">
       <Link href={`/articles/${article.id}`} aria-label={`قراءة: ${article.title}`} className="block">
         <div className="mada-news-media">
-          <img src={image} alt="" loading="lazy" />
+          <img src={image} alt="" width="640" height="360" loading="lazy" decoding="async" />
           <div className="mada-news-overlay">
             {article.category?.name && <span className="mada-pill">{article.category.name}</span>}
             {article.source?.name && <span className="mada-pill mada-pill-dark">{article.source.name}</span>}
@@ -29,7 +29,7 @@ export default function NewsCard({ article, favorite, favoriteLoading, onFavorit
           {article.category?.name && <span className="mada-ui-badge mada-ui-badge-info">{article.category.name}</span>}
           {article.publishedAt && <span className="mada-ui-badge mada-ui-badge-neutral">{date}</span>}
         </div>
-        <h3><Link href={`/articles/${article.id}`}>{article.title}</Link></h3>
+        <h3>{article.title}</h3>
         {article.description && <p className="mada-news-description">{article.description}</p>}
         <div className="mada-news-footer">
           <span className="mada-news-date">{article.source?.name ?? 'مدى العالم'}</span>

@@ -18,9 +18,9 @@ type Story = {
   sourceLogoUrl?: string | null;
 };
 
-export default function Stories() {
-  const [stories, setStories] = useState<Story[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function Stories({ initialStories = [] }: { initialStories?: Story[] }) {
+  const [stories, setStories] = useState<Story[]>(initialStories);
+  const [loading, setLoading] = useState(initialStories.length === 0);
   const [selected, setSelected] = useState<number | null>(null);
 
   async function loadStories() {
@@ -164,6 +164,8 @@ export default function Stories() {
                       src={story.sourceLogoUrl}
                       alt=""
                       className="h-full w-full object-contain bg-white p-2"
+                      loading="lazy"
+                      decoding="async"
                       onError={(event) => {
                         event.currentTarget.style.display = 'none';
                       }}
@@ -173,6 +175,8 @@ export default function Stories() {
                       src={story.mediaUrl}
                       alt=""
                       className="h-full w-full object-cover"
+                      loading="lazy"
+                      decoding="async"
                     />
                   )}
                 </span>
@@ -279,6 +283,8 @@ export default function Stories() {
                     src={activeStory.sourceLogoUrl}
                     alt=""
                     className="h-7 w-7 rounded-full bg-white object-contain p-1"
+                    loading="lazy"
+                    decoding="async"
                   />
                 )}
                 <span className="text-sm font-semibold">
