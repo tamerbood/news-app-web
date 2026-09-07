@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  experimental: {
+    inlineCss: true,
+  },
   turbopack: {
     resolveAlias: {
       "../build/polyfills/polyfill-module": "./lib/modern-polyfill.js",
