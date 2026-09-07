@@ -175,8 +175,6 @@ export default async function HomePage() {
         initialTotalPages={initialArticles.totalPages ?? 1}
         initialStories={initialStories}
       />
-        }
-      />
     </>
   );
 }
