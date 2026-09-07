@@ -273,7 +273,7 @@ export default function ArticlePage() {
    */
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-100">
+      <main className="mada-page min-h-screen bg-transparent">
         <div className="mx-auto max-w-5xl px-6 py-12">
           <div className="rounded-2xl bg-white p-8 text-center shadow-sm">
             <p className="text-gray-500">
@@ -290,7 +290,7 @@ export default function ArticlePage() {
    */
   if (error || !article) {
     return (
-      <main className="min-h-screen bg-gray-100">
+      <main className="mada-page min-h-screen bg-transparent">
         <div className="mx-auto max-w-4xl px-6 py-12">
           <div className="rounded-2xl bg-white p-8 shadow-sm">
             <h1 className="text-2xl font-bold text-gray-900">
@@ -318,7 +318,7 @@ export default function ArticlePage() {
    * Article Page
    */
   return (
-    <main className="min-h-screen bg-gray-100">
+    <main className="mada-page min-h-screen bg-transparent">
       <article className="mx-auto max-w-5xl px-4 py-8 sm:px-6 md:py-10">
         {/* Back */}
         <Link

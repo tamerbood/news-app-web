@@ -1,5 +1,7 @@
 'use client';
 
+import AdminShell from '../components/AdminShell';
+
 import { useEffect, useMemo, useState } from 'react';
 
 type Source = {
@@ -466,6 +468,7 @@ export default function StoriesAdminPage() {
   const manualCount = stories.length - autoCount;
 
   return (
+    <AdminShell title="Stories">
     <main dir="rtl" className="min-h-screen bg-gray-100 p-6">
       <div className="mx-auto max-w-7xl">
         <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -950,5 +953,6 @@ export default function StoriesAdminPage() {
         </div>
       )}
     </main>
+    </AdminShell>
   );
 }

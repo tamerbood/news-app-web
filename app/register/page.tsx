@@ -91,7 +91,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 px-6 py-12">
+    <main className="mada-page min-h-screen bg-transparent px-6 py-12">
       <div className="mx-auto w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
         <div className="mb-8">
           <p className="text-sm font-semibold text-gray-500">

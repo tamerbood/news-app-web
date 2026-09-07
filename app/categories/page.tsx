@@ -203,7 +203,7 @@ function CategoriesContent() {
   return (
     <main
       dir="rtl"
-      className="min-h-screen bg-gray-100"
+      className="mada-page min-h-screen bg-transparent"
     >
       <section className="mx-auto max-w-7xl px-6 py-10">
         <div className="mb-8">
@@ -358,7 +358,7 @@ export default function CategoriesPage() {
       fallback={
         <main
           dir="rtl"
-          className="min-h-screen bg-gray-100"
+          className="mada-page min-h-screen bg-transparent"
         >
           <section className="mx-auto max-w-7xl px-6 py-10">
             <p className="text-gray-500">

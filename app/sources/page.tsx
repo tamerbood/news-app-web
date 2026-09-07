@@ -480,7 +480,7 @@ export default function SourcesPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-100">
+    <main className="mada-page min-h-screen bg-transparent">
       <header className="border-b bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
           <div>

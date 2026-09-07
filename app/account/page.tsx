@@ -340,7 +340,7 @@ const data = await response.json();
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-100">
+      <main className="mada-page min-h-screen bg-transparent">
         <div className="mx-auto max-w-4xl px-6 py-12">
           <div className="rounded-2xl bg-white p-8 text-center">
             Loading account...
@@ -355,7 +355,7 @@ const data = await response.json();
   }
 
   return (
-    <main className="min-h-screen bg-gray-100">
+    <main className="mada-page min-h-screen bg-transparent">
       <section className="mx-auto max-w-4xl px-6 py-10">
 
         {/* Header */}
@@ -506,8 +506,8 @@ const data = await response.json();
                   }
                 >
                   {showEmailPassword
-                    ? 'ðŸ™ˆ'
-                    : 'ðŸ‘ï¸'}
+                    ? '🙈'
+                    : '👁️'}
                 </button>
               </div>
             </div>
@@ -589,8 +589,8 @@ const data = await response.json();
                   }
                 >
                   {showCurrentPassword
-                    ? 'ðŸ™ˆ'
-                    : 'ðŸ‘ï¸'}
+                    ? '🙈'
+                    : '👁️'}
                 </button>
               </div>
             </div>
@@ -638,8 +638,8 @@ const data = await response.json();
                   }
                 >
                   {showNewPassword
-                    ? 'ðŸ™ˆ'
-                    : 'ðŸ‘ï¸'}
+                    ? '🙈'
+                    : '👁️'}
                 </button>
               </div>
             </div>
@@ -687,8 +687,8 @@ const data = await response.json();
                   }
                 >
                   {showConfirmPassword
-                    ? 'ðŸ™ˆ'
-                    : 'ðŸ‘ï¸'}
+                    ? '🙈'
+                    : '👁️'}
                 </button>
               </div>
             </div>
@@ -784,8 +784,8 @@ const data = await response.json();
                 }
               >
                 {showDeletePassword
-                  ? 'ðŸ™ˆ'
-                  : 'ðŸ‘ï¸'}
+                  ? '🙈'
+                  : '👁️'}
               </button>
             </div>
 

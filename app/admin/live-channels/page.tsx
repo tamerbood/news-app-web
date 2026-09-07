@@ -1,5 +1,7 @@
 'use client';
 
+import AdminShell from '../components/AdminShell';
+
 import { FormEvent, useEffect, useState } from 'react';
 
 type Country = {
@@ -268,6 +270,7 @@ export default function LiveChannelsPage() {
   }
 
   return (
+    <AdminShell title="Live Channels">
     <main className="min-h-screen bg-gray-100" dir="rtl">
       <header className="border-b bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
@@ -566,5 +569,6 @@ export default function LiveChannelsPage() {
         </section>
       </section>
     </main>
+    </AdminShell>
   );
 }

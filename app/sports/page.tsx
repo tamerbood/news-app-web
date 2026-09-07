@@ -136,7 +136,7 @@ export default function SportsPage() {
   }, [apiUrl, tab, date]);
 
   return (
-    <main dir="rtl" className="min-h-screen bg-gray-100">
+    <main dir="rtl" className="mada-page min-h-screen bg-transparent">
       <section className="mx-auto max-w-7xl px-6 py-10">
         <div className="mb-8 flex items-end justify-between gap-4">
           <div>

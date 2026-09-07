@@ -1,5 +1,7 @@
 'use client';
 
+import AdminShell from '../components/AdminShell';
+
 import {
   FormEvent,
   useEffect,
@@ -716,6 +718,7 @@ localStorage.removeItem('admin_user');
   // =========================================================
 
   return (
+    <AdminShell title="YouTube">
     <main className="min-h-screen bg-gray-50">
       <header className="border-b bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
@@ -1100,5 +1103,6 @@ localStorage.removeItem('admin_user');
         </section>
       </section>
     </main>
+    </AdminShell>
   );
 }

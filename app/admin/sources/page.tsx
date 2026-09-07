@@ -1,5 +1,7 @@
 'use client';
 
+import AdminShell from '../components/AdminShell';
+
 import { FormEvent, useEffect, useState } from 'react';
 
 type Category = {
@@ -480,6 +482,7 @@ export default function SourcesPage() {
   }
 
   return (
+    <AdminShell title="Sources">
     <main className="min-h-screen bg-gray-100">
       <header className="border-b bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
@@ -974,5 +977,6 @@ export default function SourcesPage() {
         </section>
       </section>
     </main>
+    </AdminShell>
   );
 }

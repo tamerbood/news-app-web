@@ -1,5 +1,7 @@
 'use client';
 
+import AdminShell from '../components/AdminShell';
+
 import {
   FormEvent,
   useEffect,
@@ -268,6 +270,7 @@ export default function CategoriesPage() {
   }
 
   return (
+    <AdminShell title="Categories">
     <main className="min-h-screen bg-gray-100">
       <header className="border-b bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
@@ -492,6 +495,7 @@ export default function CategoriesPage() {
         </section>
       </section>
     </main>
+    </AdminShell>
   );
 }
 

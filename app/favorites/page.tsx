@@ -128,7 +128,7 @@ export default function FavoritesPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-gray-100">
+    <main className="mada-page min-h-screen bg-transparent">
       <section className="mx-auto max-w-7xl px-6 py-10">
         <div className="mb-8">
           <Link
