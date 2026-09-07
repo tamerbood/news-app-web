@@ -186,6 +186,7 @@ export default function Stories({ initialStories = [] }: { initialStories?: Stor
                       className="h-full w-full object-contain bg-white p-2"
                       loading="lazy"
                       decoding="async"
+                      fetchPriority="low"
                       onError={(event) => {
                         event.currentTarget.style.display = 'none';
                       }}
@@ -200,6 +201,7 @@ export default function Stories({ initialStories = [] }: { initialStories?: Stor
                       className="h-full w-full object-cover"
                       loading="lazy"
                       decoding="async"
+                      fetchPriority="low"
                     />
                   )}
                 </span>

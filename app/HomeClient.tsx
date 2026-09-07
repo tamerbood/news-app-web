@@ -1,33 +1,12 @@
-import Link from 'next/link';
 import Stories from './components/Stories';
-import NewsFeed from './components/NewsFeed';
 import TopStories from './components/TopStories';
+import NewsFeed from './components/NewsFeed';
 
-type Article = {
-  id: string;
-  title: string;
-  description?: string;
-  url: string;
-  imageUrl?: string;
-  publishedAt?: string;
-  source?: { name: string };
-  category?: { name: string };
-};
-
+type Article = { id: string; title: string; description?: string; url: string; imageUrl?: string; publishedAt?: string; source?: { name: string }; category?: { name: string } };
 type Story = {
-  id: string;
-  title: string;
-  description?: string | null;
-  mediaUrl: string;
-  mediaType?: string;
-  actionUrl?: string | null;
-  sourceId?: string | null;
-  isActive: boolean;
-  sortOrder?: number;
-  publishedAt?: string | null;
-  expiresAt?: string | null;
-  sourceName?: string | null;
-  sourceLogoUrl?: string | null;
+  id: string; title: string; description?: string | null; mediaUrl: string; mediaType?: string;
+  actionUrl?: string | null; sourceId?: string | null; isActive: boolean; sortOrder?: number;
+  publishedAt?: string | null; expiresAt?: string | null; sourceName?: string | null; sourceLogoUrl?: string | null;
 };
 
 export default function HomeClient({
@@ -50,7 +29,7 @@ export default function HomeClient({
               <p>منصة تجمع الأخبار من مصادر متعددة وتضعها أمامك في تجربة عربية سريعة، واضحة، ومرتبة حسب اهتماماتك.</p>
               <div className="flex flex-wrap gap-2 mt-6">
                 <a href="#top-stories" className="mada-btn mada-btn-hero-light">أهم الأخبار الآن ↓</a>
-                <Link href="/sports" className="mada-btn mada-btn-hero-ghost">آخر الأخبار الرياضية</Link>
+                <a href="/sports" className="mada-btn mada-btn-hero-ghost">آخر الأخبار الرياضية</a>
               </div>
             </div>
           </div>
@@ -62,10 +41,7 @@ export default function HomeClient({
           <Stories initialStories={initialStories} />
         </div>
 
-        <NewsFeed
-          initialArticles={initialArticles}
-          initialTotalPages={initialTotalPages}
-        />
+        <NewsFeed initialArticles={initialArticles} initialTotalPages={initialTotalPages} />
       </div>
     </main>
   );

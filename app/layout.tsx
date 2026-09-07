@@ -31,10 +31,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="ar" dir="rtl" className={`${madaSans.variable} ${geistMono.variable} h-full antialiased`}>
       <head>
-        <link rel="preconnect" href="https://www.vetogate.com" crossOrigin="" />
-        <link rel="preconnect" href="https://www.lbcgroup.tv" crossOrigin="" />
-        <link rel="preconnect" href="https://www.aljadeed.tv" crossOrigin="" />
-        <link rel="preconnect" href="https://aawsat.com" crossOrigin="" />
+        <link rel="preconnect" href="https://www.vetogate.com" />
+        <link rel="preconnect" href="https://www.lbcgroup.tv" />
+        <link rel="preconnect" href="https://www.aljadeed.tv" />
+        <link rel="preconnect" href="https://aawsat.com" />
       </head>
       <body className="min-h-full flex flex-col">
         <SiteChrome>{children}</SiteChrome>

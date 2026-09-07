@@ -23,6 +23,7 @@ export default function NewsCard({ article, favorite, favoriteLoading, onFavorit
           height="360"
           loading="lazy"
           decoding="async"
+          fetchPriority="low"
           sizes="(max-width: 620px) 100vw, (max-width: 900px) 50vw, 25vw"
         />
         <div className="mada-news-overlay">
