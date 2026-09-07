@@ -79,7 +79,9 @@ export default function SourcesPage() {
     useState<SourceForm>(emptyForm);
 
   const [sourceView, setSourceView] =
-    useState<'all' | 'normal' | 'breaking'>('all');
+    useState<'all' | 'active' | 'inactive' | 'normal' | 'breaking'>('all');
+
+  const inactiveStorageKey = 'madaalalam_admin_inactive_sources';
 
   useEffect(() => {
     loadData();
@@ -108,7 +110,7 @@ export default function SourcesPage() {
         countriesResponse,
       ] = await Promise.all([
         fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/sources`,
+          `${process.env.NEXT_PUBLIC_API_URL}/sources?includeInactive=true`,
           {
             headers,
           },
@@ -156,9 +158,29 @@ export default function SourcesPage() {
       const countriesData =
           await countriesResponse.json();
 
-      setSources(
-        sourcesData.value ?? sourcesData,
-      );
+      const apiSources = Array.isArray(sourcesData.value)
+        ? sourcesData.value
+        : Array.isArray(sourcesData)
+          ? sourcesData
+          : [];
+
+      let storedInactive: Source[] = [];
+      try {
+        const raw = localStorage.getItem(inactiveStorageKey);
+        const parsed = raw ? JSON.parse(raw) : [];
+        if (Array.isArray(parsed)) storedInactive = parsed;
+      } catch {
+        storedInactive = [];
+      }
+
+      const mergedSources = [...apiSources];
+      for (const stored of storedInactive) {
+        if (!mergedSources.some((item) => item.id === stored.id)) {
+          mergedSources.push({ ...stored, isActive: false });
+        }
+      }
+
+      setSources(mergedSources);
 
       setCategories(
         categoriesData.value ?? categoriesData,
@@ -405,6 +427,39 @@ export default function SourcesPage() {
     }
   }
 
+  function saveStoredInactive(next: Source[]) {
+    try {
+      localStorage.setItem(inactiveStorageKey, JSON.stringify(next));
+    } catch {
+      // Ignore storage failures; the API state remains authoritative.
+    }
+  }
+
+  function rememberInactive(source: Source) {
+    try {
+      const raw = localStorage.getItem(inactiveStorageKey);
+      const current = raw ? JSON.parse(raw) : [];
+      const list = Array.isArray(current) ? current : [];
+      saveStoredInactive([
+        ...list.filter((item: Source) => item.id !== source.id),
+        { ...source, isActive: false },
+      ]);
+    } catch {
+      // Ignore storage failures.
+    }
+  }
+
+  function forgetInactive(sourceId: string) {
+    try {
+      const raw = localStorage.getItem(inactiveStorageKey);
+      const current = raw ? JSON.parse(raw) : [];
+      const list = Array.isArray(current) ? current : [];
+      saveStoredInactive(list.filter((item: Source) => item.id !== sourceId));
+    } catch {
+      // Ignore storage failures.
+    }
+  }
+
   async function toggleActive(source: Source) {
     try {
       setError('');
@@ -439,6 +494,20 @@ export default function SourcesPage() {
           `Update failed: ${response.status} ${body}`,
         );
       }
+
+      if (source.isActive) {
+        rememberInactive(source);
+      } else {
+        forgetInactive(source.id);
+      }
+
+      setSources((current) =>
+        current.map((item) =>
+          item.id === source.id
+            ? { ...item, isActive: !source.isActive }
+            : item,
+        ),
+      );
 
       setMessage(
         `${source.name} is now ${
@@ -828,7 +897,7 @@ export default function SourcesPage() {
               </div>
 
               <div className="flex flex-wrap gap-2">
-                {(['all', 'normal', 'breaking'] as const).map((view) => (
+                {(['all', 'active', 'inactive', 'normal', 'breaking'] as const).map((view) => (
                   <button
                     key={view}
                     onClick={() => setSourceView(view)}
@@ -840,9 +909,13 @@ export default function SourcesPage() {
                   >
                     {view === 'all'
                       ? `All (${sources.length})`
-                      : view === 'normal'
-                        ? `Normal (${sources.filter((source) => !source.isBreakingSource).length})`
-                        : `Breaking (${sources.filter((source) => source.isBreakingSource).length})`}
+                      : view === 'active'
+                        ? `Active (${sources.filter((source) => source.isActive).length})`
+                        : view === 'inactive'
+                          ? `Inactive (${sources.filter((source) => !source.isActive).length})`
+                          : view === 'normal'
+                            ? `Normal (${sources.filter((source) => !source.isBreakingSource).length})`
+                            : `Breaking (${sources.filter((source) => source.isBreakingSource).length})`}
                   </button>
                 ))}
               </div>
@@ -871,9 +944,13 @@ export default function SourcesPage() {
                 .filter((source) =>
                   sourceView === 'all'
                     ? true
-                    : sourceView === 'breaking'
-                      ? source.isBreakingSource
-                      : !source.isBreakingSource,
+                    : sourceView === 'active'
+                      ? source.isActive
+                      : sourceView === 'inactive'
+                        ? !source.isActive
+                        : sourceView === 'breaking'
+                          ? source.isBreakingSource
+                          : !source.isBreakingSource,
                 )
                 .map((source) => {
                 const country =
