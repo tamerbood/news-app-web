@@ -31,15 +31,6 @@ const categoryLabels: Record<string, string> = {
   Cars: 'سيارات',
 };
 
-const allowedCategories = [
-  'World',
-  'Sports',
-  'Technology',
-  'Business',
-  'Cars',
-  'Entertainment',
-];
-
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://madaalalam.com';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
 
@@ -64,13 +55,11 @@ async function getCategories(): Promise<Category[]> {
 
     if (!Array.isArray(loaded)) return [];
 
-    const filtered = loaded.filter((category: Category) =>
-      category?.id && allowedCategories.includes(category.name),
+    // Use the real categories returned by the API, including Arabic names.
+    // A hard-coded English allow-list would hide valid categories from the public page.
+    return loaded.filter(
+      (category: Category) => Boolean(category?.id && category?.name),
     );
-
-    return allowedCategories
-      .map((name) => filtered.find((category: Category) => category.name === name))
-      .filter((category): category is Category => Boolean(category));
   } catch {
     return [];
   }
