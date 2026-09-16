@@ -1,5 +1,5 @@
-import { optimizeImageUrl } from '../lib/optimized-image-url';
 import Link from 'next/link';
+import { optimizeImageUrl } from '../lib/optimized-image-url';
 
 type Article = {
   id: string;
@@ -17,91 +17,80 @@ function formatRelative(value?: string) {
   if (!value) return '';
   const time = new Date(value).getTime();
   if (!Number.isFinite(time)) return '';
-  const diff = Math.max(0, Date.now() - time);
-  const minutes = Math.floor(diff / 60000);
+  const minutes = Math.max(0, Math.floor((Date.now() - time) / 60000));
   if (minutes < 1) return 'الآن';
   if (minutes < 60) return `منذ ${minutes} دقيقة`;
   const hours = Math.floor(minutes / 60);
   if (hours < 24) return `منذ ${hours} ساعة`;
-  const days = Math.floor(hours / 24);
-  return `منذ ${days} يوم`;
+  return `منذ ${Math.floor(hours / 24)} يوم`;
 }
 
-function shortDescription(value?: string) {
+function summary(value?: string, limit = 145) {
   const text = value?.replace(/\s+/g, ' ').trim();
   if (!text) return '';
-  return text.length > 145 ? `${text.slice(0, 145).trim()}…` : text;
+  return text.length > limit ? `${text.slice(0, limit).trim()}…` : text;
 }
 
-export default function TopStories({ articles }: { articles: Article[] }) {
+export default function TopStories({ articles, countryLabel }: { articles: Article[]; countryLabel: string }) {
   if (!articles.length) return null;
 
   const ordered = [...articles].sort((a, b) => {
-    const score = (article: Article) => (article.isPinned ? 3 : 0) + (article.isFeatured ? 2 : 0);
+    const score = (x: Article) => (x.isPinned ? 4 : 0) + (x.isFeatured ? 2 : 0);
     return score(b) - score(a);
   });
-  const leadArticle = ordered[0];
-  const supportingArticles = ordered.slice(1, 5);
+  const lead = ordered[0];
+  const secondary = ordered.slice(1, 4);
+  const side = ordered.slice(4, 6);
 
   return (
     <section id="top-stories" className="mada-top-stories" aria-labelledby="top-stories-title">
-      <div className="mada-section-head mada-editorial-head">
+      <div className="mada-editorial-section-head">
         <div>
-          <div className="mada-section-mark"><span /> أهم الأخبار</div>
+          <span className="mada-section-eyebrow">TOP STORIES · {countryLabel.toUpperCase()}</span>
           <h2 id="top-stories-title">أهم ما يجري الآن</h2>
-          <p>مختارات تحريرية من أحدث الأخبار التي تستحق الانتباه.</p>
         </div>
-        <Link href="#latest" className="mada-section-more">استكشف آخر الأخبار <span aria-hidden="true">←</span></Link>
+        <Link href="#latest" className="mada-editorial-more">كل الأخبار <span>←</span></Link>
       </div>
 
-      <div className="mada-top-stories-grid">
-        <Link href={`/articles/${leadArticle.id}`} className="mada-lead-story">
-          <div className="mada-lead-story-media">
-            {leadArticle.imageUrl ? (
-              <img
-                src={optimizeImageUrl(leadArticle.imageUrl, 960)}
-                alt=""
-                width="960"
-                height="540"
-                fetchPriority="high"
-                loading="eager"
-                decoding="async"
-                sizes="(max-width: 900px) 100vw, 68vw"
-              />
-            ) : <div className="mada-lead-story-placeholder">MADA</div>}
-            <span className="mada-lead-story-label">رئيسي</span>
-          </div>
-          <div className="mada-lead-story-body">
-            <div className="mada-story-meta">
-              <span>{leadArticle.source?.name || 'مصدر إخباري'}</span>
-              {leadArticle.category?.name && <><i /> <span>{leadArticle.category.name}</span></>}
-              {formatRelative(leadArticle.publishedAt) && <><i /> <span>{formatRelative(leadArticle.publishedAt)}</span></>}
+      <div className="mada-hero-news-grid">
+        <Link href={`/articles/${lead.id}`} className="mada-hero-news">
+          <div className="mada-hero-news-image">
+            {lead.imageUrl ? <img src={optimizeImageUrl(lead.imageUrl, 1100)} alt="" width="1100" height="620" fetchPriority="high" loading="eager" sizes="(max-width: 800px) 100vw, 66vw" /> : <div className="mada-image-placeholder">MADA</div>}
+            <div className="mada-hero-overlay" />
+            <span className="mada-hero-live">الأبرز</span>
+            <div className="mada-hero-copy">
+              <div className="mada-hero-meta"><span>{lead.category?.name || 'أخبار'}</span><i /> <span>{lead.source?.name || 'مصدر إخباري'}</span><i /> <span>{formatRelative(lead.publishedAt)}</span></div>
+              <h3>{lead.title}</h3>
+              {summary(lead.description, 175) && <p>{summary(lead.description, 175)}</p>}
+              <span className="mada-hero-read">فتح الخبر <b>←</b></span>
             </div>
-            <h3>{leadArticle.title}</h3>
-            {shortDescription(leadArticle.description) && <p>{shortDescription(leadArticle.description)}</p>}
-            <span className="mada-read-link">اقرأ الخبر <span aria-hidden="true">←</span></span>
           </div>
         </Link>
 
-        <div className="mada-supporting-stories" aria-label="أخبار مهمة">
-          {supportingArticles.map((article, index) => (
-            <Link href={`/articles/${article.id}`} key={article.id} className="mada-supporting-story">
-              <div className="mada-supporting-story-copy">
-                <div className="mada-supporting-story-meta">
-                  <span>{article.category?.name || 'أخبار'}</span>
-                  {formatRelative(article.publishedAt) && <><i /> <span>{formatRelative(article.publishedAt)}</span></>}
-                </div>
+        <div className="mada-news-side-column">
+          {secondary.map((article, index) => (
+            <Link href={`/articles/${article.id}`} key={article.id} className="mada-news-side-item">
+              <span className="mada-news-side-number">0{index + 2}</span>
+              <div className="mada-news-side-image">
+                {article.imageUrl ? <img src={optimizeImageUrl(article.imageUrl, 360)} alt="" width="360" height="220" loading="lazy" sizes="180px" /> : <span>M</span>}
+              </div>
+              <div className="mada-news-side-copy">
+                <div><span>{article.category?.name || 'أخبار'}</span><i /><span>{formatRelative(article.publishedAt)}</span></div>
                 <h3>{article.title}</h3>
-                <p>{article.source?.name || 'مصدر إخباري'}</p>
+                <small>{article.source?.name || 'مصدر إخباري'}</small>
               </div>
-              <div className="mada-supporting-story-media">
-                {article.imageUrl ? (
-                  <img src={optimizeImageUrl(article.imageUrl, 320)} alt="" width="320" height="190" loading="lazy" decoding="async" sizes="140px" />
-                ) : <div className="mada-story-placeholder">M</div>}
-              </div>
-              <span className="mada-supporting-index" aria-hidden="true">0{index + 2}</span>
             </Link>
           ))}
+          {side.length > 0 && (
+            <div className="mada-news-mini-row">
+              {side.map((article) => (
+                <Link href={`/articles/${article.id}`} key={article.id}>
+                  <span>{article.category?.name || 'خبر'}</span>
+                  <strong>{article.title}</strong>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </section>

@@ -19,40 +19,43 @@ function formatRelative(value?: string) {
   return `منذ ${Math.floor(hours / 24)} يوم`;
 }
 
-function compactDescription(value?: string) {
+function compactDescription(value?: string, limit = 105) {
   const text = value?.replace(/\s+/g, ' ').trim();
   if (!text) return '';
-  return text.length > 110 ? `${text.slice(0, 110).trim()}…` : text;
+  return text.length > limit ? `${text.slice(0, limit).trim()}…` : text;
 }
 
-export default function NewsCard({ article }: { article: Article }) {
+export default function NewsCard({ article, variant = 'standard' }: { article: Article; variant?: 'standard' | 'compact' }) {
   const image = article.imageUrl?.trim() || `${process.env.NEXT_PUBLIC_API_URL}/assets/images/news-placeholder.png`;
-  const summary = compactDescription(article.description);
+  const summary = compactDescription(article.description, variant === 'compact' ? 80 : 105);
+
+  if (variant === 'compact') {
+    return (
+      <article className="mada-news-card mada-news-card-compact">
+        <Link href={`/articles/${article.id}`} className="mada-compact-image" aria-label={`قراءة: ${article.title}`}>
+          <img src={optimizeImageUrl(image, 420)} alt="" width="420" height="260" loading="lazy" decoding="async" sizes="180px" />
+        </Link>
+        <div className="mada-compact-copy">
+          <div className="mada-news-meta-line"><span>{article.category?.name || 'أخبار'}</span><i /><span>{formatRelative(article.publishedAt)}</span></div>
+          <h3><Link href={`/articles/${article.id}`}>{article.title}</Link></h3>
+          <span className="mada-compact-source">{article.source?.name || 'مصدر إخباري'}</span>
+        </div>
+      </article>
+    );
+  }
 
   return (
     <article className="mada-news-card">
       <Link href={`/articles/${article.id}`} className="mada-news-media" aria-label={`قراءة: ${article.title}`}>
-        <img
-          src={optimizeImageUrl(image, 560)}
-          alt=""
-          width="560"
-          height="315"
-          loading="lazy"
-          decoding="async"
-          fetchPriority="low"
-          sizes="(max-width: 620px) 100vw, (max-width: 1100px) 50vw, 33vw"
-        />
+        <img src={optimizeImageUrl(image, 620)} alt="" width="620" height="350" loading="lazy" decoding="async" sizes="(max-width: 620px) 100vw, (max-width: 1100px) 50vw, 33vw" />
         {article.category?.name && <span className="mada-news-category">{article.category.name}</span>}
       </Link>
       <div className="mada-news-body">
-        <div className="mada-news-meta-line">
-          <span>{article.source?.name || 'مصدر إخباري'}</span>
-          {formatRelative(article.publishedAt) && <><i /> <span>{formatRelative(article.publishedAt)}</span></>}
-        </div>
+        <div className="mada-news-meta-line"><span>{article.source?.name || 'مصدر إخباري'}</span><i /><span>{formatRelative(article.publishedAt)}</span></div>
         <h3><Link href={`/articles/${article.id}`} className="mada-news-title-link">{article.title}</Link></h3>
         {summary && <p className="mada-news-description">{summary}</p>}
         <div className="mada-news-footer">
-          <Link href={`/articles/${article.id}`} className="mada-card-read">قراءة الخبر <span aria-hidden="true">←</span></Link>
+          <Link href={`/articles/${article.id}`} className="mada-card-read">قراءة الخبر <span>←</span></Link>
           <FavoriteButton id={article.id} />
         </div>
       </div>

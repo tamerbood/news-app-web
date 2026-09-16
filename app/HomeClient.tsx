@@ -2,7 +2,7 @@ import Stories from './components/Stories';
 import TopStories from './components/TopStories';
 import NewsFeed from './components/NewsFeed';
 
-type Article = {
+ type Article = {
   id: string;
   title: string;
   description?: string;
@@ -14,6 +14,7 @@ type Article = {
   isFeatured?: boolean;
   isPinned?: boolean;
 };
+
 type Story = {
   id: string; title: string; description?: string | null; mediaUrl: string; mediaType?: string;
   actionUrl?: string | null; sourceId?: string | null; isActive: boolean; sortOrder?: number;
@@ -53,34 +54,35 @@ export default function HomeClient({
   return (
     <main className="mada-page mada-home" id="home-content">
       <div className="mada-container">
-        <div className="mada-home-intro">
-          <div>
-            <span className="mada-kicker">MADA ALALAM · NEWS DESK</span>
-            <h1>الأخبار التي تهمك، مرتبة في مكان واحد.</h1>
+        <section className="mada-newsroom-masthead" aria-labelledby="newsroom-title">
+          <div className="mada-masthead-copy">
+            <span className="mada-kicker"><span className="mada-kicker-rule" /> MADA ALALAM · NEWSROOM</span>
+            <h1 id="newsroom-title">المشهد الإخباري، <em>الآن.</em></h1>
+            <p>الأخبار الأهم من حولك، مرتبة حسب الأولوية ومحدثة باستمرار.</p>
           </div>
-          <div className="mada-home-context">
-            <span className="mada-context-dot" aria-hidden="true" />
-            <span>أخبار {localLabel}</span>
-            <span className="mada-context-separator" aria-hidden="true">·</span>
+          <div className="mada-masthead-status">
+            <span className="mada-status-live"><i /> مباشر</span>
+            <span>{localLabel === 'العالم' ? 'تغطية عالمية' : `تغطية ${localLabel}`}</span>
+            <span>·</span>
             <span>تحديث مستمر</span>
           </div>
-        </div>
+        </section>
 
         {hasBreaking && (
           <section className="mada-breaking-bar" aria-label="الأخبار العاجلة">
-            <div className="mada-breaking-label"><span className="mada-live-dot" /> عاجل</div>
+            <div className="mada-breaking-label"><span className="mada-live-dot" /> عاجل الآن</div>
             <div className="mada-breaking-track">
-              {breakingArticles.slice(0, 6).map((article) => (
+              {breakingArticles.slice(0, 8).map((article) => (
                 <a key={article.id} href={`/articles/${article.id}`} className="mada-breaking-item">
-                  {article.title}
+                  <span>•</span> {article.title}
                 </a>
               ))}
             </div>
-            <a href="#latest" className="mada-breaking-link">آخر الأخبار</a>
+            <a href="#latest" className="mada-breaking-link">آخر الأخبار ←</a>
           </section>
         )}
 
-        <TopStories articles={topArticles.slice(0, 5)} />
+        <TopStories articles={topArticles.slice(0, 6)} countryLabel={localLabel} />
 
         <div className="mada-story-wrap">
           <Stories initialStories={initialStories} />
