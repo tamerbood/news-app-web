@@ -71,12 +71,14 @@ export default function HomeClient({
         {hasBreaking && (
           <section className="mada-breaking-bar" aria-label="الأخبار العاجلة">
             <div className="mada-breaking-label"><span className="mada-live-dot" /> عاجل الآن</div>
-            <div className="mada-breaking-track">
-              {breakingArticles.slice(0, 8).map((article) => (
-                <a key={article.id} href={`/articles/${article.id}`} className="mada-breaking-item">
-                  <span>•</span> {article.title}
-                </a>
-              ))}
+            <div className="mada-breaking-window">
+              <div className="mada-breaking-track">
+                {[...breakingArticles.slice(0, 8), ...breakingArticles.slice(0, 8)].map((article, index) => (
+                  <a key={`${article.id}-${index}`} href={`/articles/${article.id}`} className="mada-breaking-item">
+                    <span>•</span> {article.title}
+                  </a>
+                ))}
+              </div>
             </div>
             <a href="#latest" className="mada-breaking-link">آخر الأخبار ←</a>
           </section>

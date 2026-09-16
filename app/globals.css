@@ -1324,3 +1324,120 @@ body {
   .mada-category-editorial-grid .mada-news-card-compact { display: grid; grid-template-columns: 112px minmax(0,1fr); gap: 13px; }
   .mada-category-editorial-grid .mada-news-card-compact .mada-compact-image { width: 112px; height: 78px; aspect-ratio: auto; }
 }
+
+
+/* ==========================================================================\n   MADA ALALAM — Editorial 3.2 micro refinement\n   Smaller masthead + true right-moving breaking-news ticker.\n   ========================================================================== */
+.mada-newsroom-masthead {
+  padding: 26px 0 18px;
+  min-height: 170px;
+}
+.mada-masthead-copy h1 {
+  max-width: 760px;
+  font-size: clamp(2.4rem, 4.3vw, 4rem);
+  line-height: 1.08;
+  letter-spacing: -.045em;
+}
+.mada-masthead-copy p {
+  margin-top: 11px;
+  font-size: 12px;
+  line-height: 1.75;
+}
+.mada-masthead-status {
+  padding-bottom: 3px;
+  font-size: 9px;
+}
+
+.mada-breaking-bar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  min-height: 44px;
+  margin: 0 0 42px;
+  border-top: 2px solid var(--mada-danger);
+  border-bottom: 1px solid var(--mada-border);
+  overflow: hidden;
+}
+.mada-breaking-label {
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  padding-inline: 0 16px;
+  border-left: 1px solid var(--mada-border);
+  background: #fff;
+  position: relative;
+  z-index: 2;
+}
+.mada-breaking-window {
+  min-width: 0;
+  overflow: hidden;
+  direction: ltr;
+  mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+}
+.mada-breaking-track {
+  width: max-content;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 34px;
+  padding: 0 18px;
+  direction: rtl;
+  animation: mada-breaking-marquee 34s linear infinite;
+  will-change: transform;
+}
+.mada-breaking-item {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--mada-foreground);
+  font-size: 11px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+.mada-breaking-item span { color: var(--mada-danger); }
+.mada-breaking-link {
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  padding-inline-start: 16px;
+  border-right: 1px solid var(--mada-border);
+  background: #fff;
+  position: relative;
+  z-index: 2;
+}
+@keyframes mada-breaking-marquee {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+.mada-breaking-bar:hover .mada-breaking-track,
+.mada-breaking-bar:focus-within .mada-breaking-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mada-breaking-track { animation: none; transform: none; }
+}
+
+@media (max-width: 780px) {
+  .mada-newsroom-masthead {
+    padding: 22px 0 18px;
+    min-height: auto;
+  }
+  .mada-masthead-copy h1 {
+    max-width: 100%;
+    font-size: clamp(2rem, 9vw, 2.9rem);
+    line-height: 1.12;
+    letter-spacing: -.04em;
+  }
+  .mada-masthead-copy p { font-size: 11px; }
+  .mada-breaking-bar {
+    grid-template-columns: auto minmax(0, 1fr);
+    min-height: 42px;
+    margin-bottom: 34px;
+  }
+  .mada-breaking-label { padding-inline: 0 11px; font-size: 10px; }
+  .mada-breaking-track { gap: 24px; padding-inline: 12px; animation-duration: 28s; }
+  .mada-breaking-item { font-size: 10px; }
+  .mada-breaking-link { display: none; }
+}
