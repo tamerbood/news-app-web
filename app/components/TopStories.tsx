@@ -86,6 +86,13 @@ export default function TopStories({ articles, countryLabel }: { articles: Artic
               {summary(lead.description) && <p>{summary(lead.description)}</p>}
               <span className="mada-hero-read">فتح الخبر <b>←</b></span>
             </div>
+            <div className="mada-hero-dots" aria-label="التنقل بين أهم الأخبار">
+              {ordered.map((article, index) => (
+                <button key={article.id} type="button" className={index === activeIndex ? 'is-active' : ''} onClick={(event) => { event.preventDefault(); event.stopPropagation(); setActiveIndex(index); }} aria-label={`الخبر ${index + 1}`} aria-current={index === activeIndex ? 'true' : undefined}>
+                  <span>{index + 1}</span><i />
+                </button>
+              ))}
+            </div>
           </div>
         </Link>
 
@@ -106,13 +113,6 @@ export default function TopStories({ articles, countryLabel }: { articles: Artic
         </div>
       </div>
 
-      <div className="mada-hero-dots" aria-label="التنقل بين أهم الأخبار">
-        {ordered.map((article, index) => (
-          <button key={article.id} type="button" className={index === activeIndex ? 'is-active' : ''} onClick={() => setActiveIndex(index)} aria-label={`الخبر ${index + 1}`} aria-current={index === activeIndex ? 'true' : undefined}>
-            <span>{index + 1}</span><i />
-          </button>
-        ))}
-      </div>
     </section>
   );
 }
