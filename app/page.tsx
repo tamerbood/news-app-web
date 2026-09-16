@@ -35,25 +35,42 @@ type Story = {
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://madaalalam.com';
 
-export const metadata: Metadata = {
-  title: 'أخبار العالم لحظة بلحظة',
-  description: 'أحدث أخبار العالم والعرب والرياضة والتكنولوجيا والاقتصاد من مصادر متعددة في تجربة عربية حديثة وسريعة.',
-  alternates: { canonical: '/' },
-  robots: { index: true, follow: true },
-  openGraph: {
-    type: 'website',
-    url: siteUrl,
-    title: 'مدى العالم | أخبار العالم لحظة بلحظة',
-    description: 'أحدث الأخبار من مصادر متعددة في تجربة عربية حديثة وسريعة.',
-    siteName: 'مدى العالم',
-    locale: 'ar_AR',
-  },
-  twitter: {
-    card: 'summary',
-    title: 'مدى العالم | أخبار العالم لحظة بلحظة',
-    description: 'أحدث الأخبار من مصادر متعددة في تجربة عربية حديثة وسريعة.',
-  },
-};
+const homeDescription =
+  'أحدث أخبار العالم والعرب والرياضة والتكنولوجيا والاقتصاد من مصادر متعددة في تجربة عربية حديثة وسريعة.';
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string | string[] }>;
+}): Promise<Metadata> {
+  const params = await searchParams;
+  const rawPage = Array.isArray(params.page) ? params.page[0] : params.page;
+  const parsedPage = Number.parseInt(rawPage ?? '1', 10);
+  const page = Number.isFinite(parsedPage) && parsedPage > 0 ? Math.min(parsedPage, 1000) : 1;
+  const normalizedSiteUrl = siteUrl.replace(/\/$/, '');
+  const canonical = page === 1 ? `${normalizedSiteUrl}/` : `${normalizedSiteUrl}/?page=${page}`;
+  const pageTitle = page === 1 ? 'مدى العالم | أخبار العالم لحظة بلحظة' : `أخبار العالم - الصفحة ${page}`;
+
+  return {
+    title: pageTitle,
+    description: homeDescription,
+    alternates: { canonical },
+    robots: { index: true, follow: true },
+    openGraph: {
+      type: 'website',
+      url: canonical,
+      title: pageTitle,
+      description: 'أحدث الأخبار من مصادر متعددة في تجربة عربية حديثة وسريعة.',
+      siteName: 'مدى العالم',
+      locale: 'ar_AR',
+    },
+    twitter: {
+      card: 'summary',
+      title: pageTitle,
+      description: 'أحدث الأخبار من مصادر متعددة في تجربة عربية حديثة وسريعة.',
+    },
+  };
+}
 
 async function getInitialArticles(page = 1): Promise<ArticlesResponse> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
@@ -131,6 +148,8 @@ export default async function HomePage({
   const resolvedTopArticles = topArticles ?? initialArticles;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://madaalalam.com';
   const normalizedSiteUrl = siteUrl.replace(/\/$/, '');
+  const currentUrl = page === 1 ? `${normalizedSiteUrl}/` : `${normalizedSiteUrl}/?page=${page}`;
+  const currentPageName = page === 1 ? 'مدى العالم | أخبار العالم لحظة بلحظة' : `أخبار العالم - الصفحة ${page}`;
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -139,7 +158,7 @@ export default async function HomePage({
         '@type': 'Organization',
         '@id': `${normalizedSiteUrl}/#organization`,
         name: 'مدى العالم',
-        alternateName: ['MADA ALALAM', 'madaalalam.com'],
+        alternateName: 'MADA ALALAM',
         url: normalizedSiteUrl,
         logo: `${normalizedSiteUrl}/favicon.ico`,
         description: 'مدى العالم منصة أخبار عربية تجمع أحدث الأخبار من مصادر متعددة في مكان واحد.',
@@ -155,17 +174,17 @@ export default async function HomePage({
         '@type': 'WebSite',
         '@id': `${normalizedSiteUrl}/#website`,
         name: 'مدى العالم',
-        alternateName: ['MADA ALALAM', 'madaalalam.com'],
+        alternateName: 'MADA ALALAM',
         url: `${normalizedSiteUrl}/`,
         inLanguage: 'ar',
         publisher: { '@id': `${normalizedSiteUrl}/#organization` },
       },
       {
         '@type': 'WebPage',
-        '@id': `${normalizedSiteUrl}/#webpage`,
-        url: `${normalizedSiteUrl}/`,
-        name: 'مدى العالم | أخبار العالم لحظة بلحظة',
-        description: 'أحدث أخبار العالم والعرب والرياضة والتكنولوجيا والاقتصاد من مصادر متعددة في تجربة عربية حديثة وسريعة.',
+        '@id': `${currentUrl}#webpage`,
+        url: currentUrl,
+        name: currentPageName,
+        description: homeDescription,
         isPartOf: { '@id': `${normalizedSiteUrl}/#website` },
         about: { '@id': `${normalizedSiteUrl}/#organization` },
         inLanguage: 'ar',
