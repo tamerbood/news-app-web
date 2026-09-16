@@ -143,7 +143,7 @@ export default function UserLoginPage() {
               required
               autoComplete="current-password"
               className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-black"
-              placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+              placeholder="••••••••"
             />
           </div>
 
@@ -179,7 +179,7 @@ export default function UserLoginPage() {
             href="/"
             className="text-sm font-medium text-blue-600 hover:text-blue-800"
           >
-            â† Back to News
+            ← Back to News
           </Link>
         </div>
       </div>

@@ -364,7 +364,7 @@ const data = await response.json();
             href="/"
             className="text-sm font-semibold text-blue-600 hover:text-blue-800"
           >
-            â† Back to News
+            ← Back to News
           </Link>
 
           <h1 className="mt-4 text-3xl font-bold text-gray-900">
