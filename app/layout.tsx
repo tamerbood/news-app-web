@@ -23,6 +23,16 @@ export const metadata: Metadata = {
   creator: 'مدى العالم',
   publisher: 'مدى العالم',
   robots: { index: true, follow: true },
+  openGraph: {
+    type: 'website',
+    siteName: 'مدى العالم',
+    locale: 'ar_AR',
+    images: [{ url: '/icons/icon-512.png', width: 512, height: 512, alt: 'مدى العالم' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    images: ['/icons/icon-512.png'],
+  },
   keywords: ["مدى العالم", "أخبار", "أخبار عربية", "أخبار العالم", "رياضة", "تكنولوجيا"],
   icons: { icon: '/icons/icon-512.png', shortcut: '/icons/icon-512.png' },
 };

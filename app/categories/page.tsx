@@ -122,6 +122,21 @@ export async function generateMetadata({
       description: 'تصفح الأخبار حسب التصنيف في مدى العالم.',
       alternates: { canonical: `${siteUrl.replace(/\/$/, '')}/categories` },
       robots: { index: true, follow: true },
+      openGraph: {
+        type: 'website',
+        url: `${siteUrl.replace(/\/$/, '')}/categories`,
+        title: 'تصنيفات الأخبار',
+        description: 'تصفح الأخبار حسب التصنيف في مدى العالم.',
+        siteName: 'مدى العالم',
+        locale: 'ar_AR',
+        images: [{ url: '/icons/icon-512.png', width: 512, height: 512, alt: 'مدى العالم' }],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: 'تصنيفات الأخبار',
+        description: 'تصفح الأخبار حسب التصنيف في مدى العالم.',
+        images: ['/icons/icon-512.png'],
+      },
     };
   }
 
@@ -140,6 +155,13 @@ export async function generateMetadata({
       description: `أحدث أخبار ${label} من مدى العالم.`,
       siteName: 'مدى العالم',
       locale: 'ar_AR',
+      images: [{ url: '/icons/icon-512.png', width: 512, height: 512, alt: 'مدى العالم' }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${label} | أخبار مدى العالم`,
+      description: `أحدث أخبار ${label} من مدى العالم.`,
+      images: ['/icons/icon-512.png'],
     },
   };
 }

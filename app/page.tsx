@@ -62,10 +62,12 @@ export async function generateMetadata({
       description: 'أحدث الأخبار من مصادر متعددة في تجربة عربية حديثة وسريعة.',
       siteName: 'مدى العالم',
       locale: 'ar_AR',
+      images: [{ url: '/icons/icon-512.png', width: 512, height: 512, alt: 'مدى العالم' }],
     },
     twitter: {
-      card: 'summary',
+      card: 'summary_large_image',
       title,
+      images: ['/icons/icon-512.png'],
       description: 'أحدث الأخبار من مصادر متعددة في تجربة عربية حديثة وسريعة.',
     },
   };
