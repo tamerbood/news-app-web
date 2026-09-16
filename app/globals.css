@@ -252,7 +252,7 @@ a { text-decoration: none; }
 }
 .mada-breaking-item::before { content: "•"; position: absolute; right: 9px; color: var(--mada-danger); font-size: 13px; }
 .mada-breaking-item:hover { color: var(--mada-danger); }
-@keyframes mada-breaking-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes mada-breaking-scroll { from { transform: translateX(-50%); } to { transform: translateX(0); } }
 
 .mada-brand-mark {
   position: relative; width: 44px; height: 44px; display: grid; place-items: center; overflow: hidden;
