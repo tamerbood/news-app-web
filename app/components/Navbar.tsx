@@ -6,8 +6,8 @@ import { useEffect, useRef, useState, type TouchEvent } from 'react';
 import ThemeToggle from './ThemeToggle';
 
 const categories = [
-  ['العالم', 'World'], ['الرياضة', 'Sports'], ['تكنولوجيا', 'Technology'],
-  ['اقتصاد', 'Business'], ['سيارات', 'Cars'], ['منوعات', 'Entertainment'],
+  ['العالم', 'العالم'], ['الرياضة', 'الرياضة'], ['تكنولوجيا', 'تكنولوجيا'],
+  ['اقتصاد', 'اقتصاد'], ['سيارات', 'سيارات'], ['منوعات', 'منوعات'],
 ];
 
 export default function Navbar() {
