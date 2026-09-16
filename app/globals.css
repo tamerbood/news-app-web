@@ -1610,3 +1610,87 @@ body { background: #fff !important; }
   .mada-popular-image { width: 92px; height: 68px; }
   .mada-popular-copy h3 { font-size: 12px; line-height: 1.5; }
 }
+
+/* ==========================================================================\n   MADA ALALAM — Final editorial pass\n   Exact agreed navigation + hero composition\n   ========================================================================== */
+.mada-header-inner { min-height: 68px; }
+.mada-brand-mark { width: 42px; height: 42px; border-radius: 10px; background: transparent; box-shadow: none; }
+.mada-brand-mark img { width: 42px; height: 42px; object-fit: contain; border-radius: 10px; }
+.mada-nav { gap: 1px; flex-wrap: nowrap; }
+.mada-nav-link { min-height: 40px; padding: 8px 12px; border-radius: 9px; font-size: 13px; font-weight: 850; white-space: nowrap; }
+.mada-nav-link.active { color: var(--mada-brand-600); background: var(--mada-brand-50); }
+.mada-nav-link:hover { color: var(--mada-foreground); background: #f7f8fa; }
+
+/* Final hero: large story on the right, four related stories on the left. */
+.mada-top-stories { margin: 0 0 68px; }
+.mada-editorial-section-head { margin-bottom: 18px; }
+.mada-editorial-section-head h2 { font-size: clamp(1.85rem, 3vw, 2.55rem); }
+.mada-hero-news-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.78fr) minmax(360px, .82fr);
+  gap: 34px;
+  direction: rtl;
+  align-items: stretch;
+}
+.mada-hero-news { min-width: 0; }
+.mada-hero-news-image { aspect-ratio: 16 / 9; min-height: 420px; background: #0b1220; }
+.mada-hero-overlay { inset: 28% 0 0; background: linear-gradient(180deg, rgba(3,8,17,0) 0%, rgba(3,8,17,.12) 28%, rgba(3,8,17,.93) 100%); }
+.mada-hero-copy { padding: 32px 34px 30px; }
+.mada-hero-copy h3 { font-size: clamp(1.8rem, 3vw, 3.05rem); line-height: 1.24; max-width: 940px; text-wrap: balance; }
+.mada-hero-copy p { font-size: 12px; line-height: 1.8; max-width: 760px; }
+.mada-hero-live { top: 14px; right: 14px; background: var(--mada-danger); padding: 7px 11px; }
+
+.mada-news-side-column {
+  min-width: 0;
+  border-top: 2px solid var(--mada-foreground);
+  direction: rtl;
+  display: flex;
+  flex-direction: column;
+}
+.mada-news-side-item {
+  flex: 1 1 0;
+  grid-template-columns: 30px 120px minmax(0,1fr);
+  gap: 13px;
+  min-height: 0;
+  padding: 14px 0;
+  background: transparent;
+}
+.mada-news-side-number { font-size: 10px; }
+.mada-news-side-image { width: 120px; height: 78px; }
+.mada-news-side-copy h3 { font-size: 14px; line-height: 1.48; text-wrap: balance; }
+.mada-news-side-copy small { font-size: 8px; }
+.mada-news-mini-row { display: none; }
+.mada-hero-dots { justify-content: flex-start; margin-top: 12px; direction: ltr; }
+
+/* The page stays genuinely white; section separation uses rules, not gray panels. */
+body { background: #fff; }
+.mada-page { background: #fff; }
+.mada-home { padding-top: 0; }
+
+@media (max-width: 1180px) {
+  .mada-nav-link { padding-inline: 8px; font-size: 12px; }
+  .mada-hero-news-grid { grid-template-columns: minmax(0,1.65fr) minmax(310px,.85fr); gap: 24px; }
+  .mada-news-side-item { grid-template-columns: 24px 104px minmax(0,1fr); gap: 10px; }
+  .mada-news-side-image { width: 104px; height: 72px; }
+  .mada-news-side-copy h3 { font-size: 12.5px; }
+}
+
+@media (max-width: 900px) {
+  .mada-nav { display: none; }
+  .mada-header-actions .mada-search-btn, .mada-header-actions .mada-theme-toggle { display: inline-flex; }
+  .mada-hero-news-grid { grid-template-columns: 1fr; }
+  .mada-news-side-column { margin-top: 18px; }
+  .mada-news-side-item { min-height: 92px; }
+}
+
+@media (max-width: 780px) {
+  .mada-container { width: min(calc(100% - 24px), 680px); }
+  .mada-header-inner { min-height: 62px; }
+  .mada-brand-mark, .mada-brand-mark img { width: 38px; height: 38px; }
+  .mada-hero-news-image { min-height: 0; aspect-ratio: 4 / 3; }
+  .mada-hero-copy { padding: 22px 18px 20px; }
+  .mada-hero-copy h3 { font-size: clamp(1.45rem, 7vw, 2.1rem); }
+  .mada-news-side-item { grid-template-columns: 24px 96px minmax(0,1fr); padding: 13px 0; }
+  .mada-news-side-image { width: 96px; height: 70px; }
+  .mada-news-side-copy h3 { font-size: 12px; }
+  .mada-news-side-copy small { display: none; }
+}

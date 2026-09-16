@@ -28,7 +28,7 @@ function formatRelative(value?: string) {
   return `منذ ${Math.floor(hours / 24)} يوم`;
 }
 
-function summary(value?: string, limit = 125) {
+function summary(value?: string, limit = 145) {
   const text = value?.replace(/\s+/g, ' ').trim();
   if (!text) return '';
   return text.length > limit ? `${text.slice(0, limit).trim()}…` : text;
@@ -52,8 +52,7 @@ export default function TopStories({ articles, countryLabel }: { articles: Artic
 
   if (!ordered.length) return null;
   const lead = ordered[activeIndex];
-  const side = ordered.filter((_, index) => index !== activeIndex).slice(0, 3);
-  const sidePool = side.length ? side : ordered.slice(1, 4);
+  const sidePool = ordered.filter((_, index) => index !== activeIndex).slice(0, 4);
 
   return (
     <section id="top-stories" className="mada-top-stories" aria-labelledby="top-stories-title">
@@ -68,7 +67,17 @@ export default function TopStories({ articles, countryLabel }: { articles: Artic
       <div className="mada-hero-news-grid">
         <Link href={`/articles/${lead.id}`} className="mada-hero-news" aria-label={`فتح: ${lead.title}`}>
           <div className="mada-hero-news-image">
-            {lead.imageUrl ? <img src={optimizeImageUrl(lead.imageUrl, 1200)} alt="" width="1200" height="675" fetchPriority={activeIndex === 0 ? 'high' : 'auto'} loading={activeIndex === 0 ? 'eager' : 'lazy'} sizes="(max-width: 800px) 100vw, 72vw" /> : <div className="mada-image-placeholder">MADA</div>}
+            {lead.imageUrl ? (
+              <img
+                src={optimizeImageUrl(lead.imageUrl, 1400)}
+                alt=""
+                width="1400"
+                height="788"
+                fetchPriority={activeIndex === 0 ? 'high' : 'auto'}
+                loading={activeIndex === 0 ? 'eager' : 'lazy'}
+                sizes="(max-width: 780px) 100vw, 70vw"
+              />
+            ) : <div className="mada-image-placeholder">MADA</div>}
             <div className="mada-hero-overlay" />
             <span className="mada-hero-live">الأبرز</span>
             <div className="mada-hero-copy">
@@ -83,9 +92,9 @@ export default function TopStories({ articles, countryLabel }: { articles: Artic
         <div className="mada-news-side-column">
           {sidePool.map((article, index) => (
             <Link href={`/articles/${article.id}`} key={article.id} className="mada-news-side-item">
-              <span className="mada-news-side-number">0{index + 2}</span>
+              <span className="mada-news-side-number">{String(index + 2).padStart(2, '0')}</span>
               <div className="mada-news-side-image">
-                {article.imageUrl ? <img src={optimizeImageUrl(article.imageUrl, 360)} alt="" width="360" height="220" loading="lazy" sizes="180px" /> : <span>M</span>}
+                {article.imageUrl ? <img src={optimizeImageUrl(article.imageUrl, 420)} alt="" width="420" height="250" loading="lazy" sizes="132px" /> : <span>M</span>}
               </div>
               <div className="mada-news-side-copy">
                 <div><span>{article.category?.name || 'أخبار'}</span><i /><span>{formatRelative(article.publishedAt)}</span></div>
@@ -94,19 +103,13 @@ export default function TopStories({ articles, countryLabel }: { articles: Artic
               </div>
             </Link>
           ))}
-          <div className="mada-news-mini-row">
-            {ordered.slice(0, 2).map((article) => (
-              <Link href={`/articles/${article.id}`} key={`mini-${article.id}`}><span>خبر</span><strong>{article.title}</strong></Link>
-            ))}
-          </div>
         </div>
       </div>
 
       <div className="mada-hero-dots" aria-label="التنقل بين أهم الأخبار">
         {ordered.map((article, index) => (
           <button key={article.id} type="button" className={index === activeIndex ? 'is-active' : ''} onClick={() => setActiveIndex(index)} aria-label={`الخبر ${index + 1}`} aria-current={index === activeIndex ? 'true' : undefined}>
-            <span>{index + 1}</span>
-            <i />
+            <span>{index + 1}</span><i />
           </button>
         ))}
       </div>
