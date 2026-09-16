@@ -1,123 +1,40 @@
 export default function AboutPage() {
   return (
-    <main className="mada-page min-h-screen bg-transparent">
+    <main dir="rtl" className="mada-page min-h-screen bg-transparent">
       <div className="mx-auto max-w-4xl px-6 py-10">
         <div className="rounded-2xl bg-white p-8 shadow-sm md:p-10">
-          <h1 className="text-3xl font-bold text-gray-900">
-            About Mada Alalam
-          </h1>
-
-          <p className="mt-3 text-sm text-gray-500">
-            Your simple destination for the latest news.
-          </p>
-
+          <h1 className="text-3xl font-bold text-gray-900">عن مدى العالم</h1>
+          <p className="mt-3 text-sm text-gray-500">وجهتك لمتابعة أحدث الأخبار في مكان واحد.</p>
           <div className="mt-8 space-y-8 text-gray-700">
             <section>
-              <h2 className="text-xl font-bold text-gray-900">
-                What is Mada Alalam?
-              </h2>
-
-              <p className="mt-3 leading-7">
-                Mada Alalam is a news aggregation platform designed to help
-                users discover the latest stories from different news sources
-                in one convenient place.
-              </p>
-
-              <p className="mt-3 leading-7">
-                The application organizes news into categories and provides
-                features for browsing, searching, saving favorites, following
-                sources, receiving notifications, checking weather information,
-                and accessing available YouTube content.
-              </p>
+              <h2 className="text-xl font-bold text-gray-900">ما هي مدى العالم؟</h2>
+              <p className="mt-3 leading-7">مدى العالم منصة إخبارية تجمع الأخبار من مصادر متعددة وتساعد المستخدمين على اكتشاف أحدث الأخبار في مكان واحد.</p>
+              <p className="mt-3 leading-7">تنظم المنصة الأخبار حسب التصنيفات والمصادر، وتوفر ميزات التصفح والبحث وحفظ المفضلة ومتابعة المصادر وغيرها من الخدمات المتاحة.</p>
             </section>
-
             <section>
-              <h2 className="text-xl font-bold text-gray-900">
-                What You Can Do
-              </h2>
-
-              <ul className="mt-3 list-disc space-y-2 pl-6">
-                <li>Browse the latest news articles.</li>
-                <li>Search for news by keyword.</li>
-                <li>Filter articles by category.</li>
-                <li>Filter articles by news source.</li>
-                <li>Open the original news article.</li>
-                <li>Save articles to your favorites.</li>
-                <li>Follow news sources.</li>
-                <li>Receive news notifications.</li>
-                <li>Check weather information using your approximate location.</li>
-                <li>Watch available YouTube content.</li>
-                <li>Manage your personal account.</li>
-                <li>Request account deletion.</li>
+              <h2 className="text-xl font-bold text-gray-900">ماذا يمكنك أن تفعل؟</h2>
+              <ul className="mt-3 list-disc space-y-2 pr-6">
+                <li>تصفح أحدث الأخبار.</li><li>البحث عن الأخبار بالكلمات المفتاحية.</li><li>تصفح الأخبار حسب التصنيف أو المصدر.</li><li>الانتقال إلى المصدر الأصلي للخبر.</li><li>حفظ الأخبار في المفضلة.</li><li>متابعة مصادر الأخبار.</li><li>استقبال الإشعارات المتاحة.</li>
               </ul>
             </section>
-
             <section>
-              <h2 className="text-xl font-bold text-gray-900">
-                News Sources
-              </h2>
-
-              <p className="mt-3 leading-7">
-                Mada Alalam retrieves news information from third-party
-                publishers and RSS feeds.
-              </p>
-
-              <p className="mt-3 leading-7">
-                The application provides links to original publishers whenever
-                available so that users can access the complete article from
-                its original source.
-              </p>
-
-              <p className="mt-3 leading-7">
-                News content, images, logos, trademarks, and other publisher
-                materials remain the property of their respective owners.
-              </p>
+              <h2 className="text-xl font-bold text-gray-900">مصادر الأخبار</h2>
+              <p className="mt-3 leading-7">تعتمد مدى العالم على معلومات الأخبار ومصادر RSS التابعة لناشرين ومؤسسات إخبارية خارجية.</p>
+              <p className="mt-3 leading-7">نضع روابط للمصادر الأصلية متى كانت متاحة حتى يتمكن المستخدم من الوصول إلى المحتوى الكامل لدى الناشر الأصلي.</p>
+              <p className="mt-3 leading-7">تبقى الأخبار والصور والشعارات والعلامات التجارية ومواد الناشرين ملكًا لأصحابها.</p>
             </section>
-
             <section>
-              <h2 className="text-xl font-bold text-gray-900">
-                Our Goal
-              </h2>
-
-              <p className="mt-3 leading-7">
-                Our goal is to make discovering news simple, organized, and
-                convenient while helping users find stories from different
-                categories and sources in one place.
-              </p>
+              <h2 className="text-xl font-bold text-gray-900">هدفنا</h2>
+              <p className="mt-3 leading-7">هدفنا تسهيل اكتشاف الأخبار وتنظيمها ومتابعتها من مصادر وتصنيفات متعددة في تجربة واضحة وسريعة.</p>
             </section>
-
             <section>
-              <h2 className="text-xl font-bold text-gray-900">
-                User Accounts
-              </h2>
-
-              <p className="mt-3 leading-7">
-                Users can create an account to access additional features such
-                as favorites and followed news sources.
-              </p>
-
-              <p className="mt-3 leading-7">
-                Account-related information is handled according to our
-                Privacy Policy.
-              </p>
+              <h2 className="text-xl font-bold text-gray-900">الحسابات</h2>
+              <p className="mt-3 leading-7">يمكن للمستخدم إنشاء حساب للوصول إلى ميزات إضافية مثل المفضلة ومتابعة المصادر. وتتم معالجة معلومات الحساب وفقًا لسياسة الخصوصية.</p>
             </section>
-
             <section>
-              <h2 className="text-xl font-bold text-gray-900">
-                Contact
-              </h2>
-
-              <p className="mt-3 leading-7">
-                If you have questions, suggestions, or feedback about Mada
-                Alalam, please visit our Contact page:
-              </p>
-
-              <a
-                href="https://madaalalam.com/contact"
-                className="mt-3 inline-block font-semibold text-blue-600 hover:text-blue-800"
-              >
-                https://madaalalam.com/contact
-              </a>
+              <h2 className="text-xl font-bold text-gray-900">تواصل معنا</h2>
+              <p className="mt-3 leading-7">للاستفسارات أو الاقتراحات أو الملاحظات، يمكنك زيارة صفحة التواصل معنا.</p>
+              <a href="/contact" className="mt-3 inline-block font-semibold text-blue-600 hover:text-blue-800">صفحة التواصل</a>
             </section>
           </div>
         </div>

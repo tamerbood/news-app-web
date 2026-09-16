@@ -4,39 +4,36 @@ export default function ContactPage() {
       <div className="mx-auto max-w-4xl px-6 py-10">
         <div className="rounded-2xl bg-white p-8 shadow-sm md:p-10">
           <h1 className="text-3xl font-bold text-gray-900">
-            Contact Us
+            تواصل معنا
           </h1>
 
           <p className="mt-3 text-sm text-gray-500">
-            We would love to hear from you.
+            يسعدنا أن نسمع منك.
           </p>
 
           <div className="mt-8 space-y-8 text-gray-700">
             <section>
               <h2 className="text-xl font-bold text-gray-900">
-                Get in Touch
+                تواصل معنا
               </h2>
 
               <p className="mt-3 leading-7">
-                If you have questions, suggestions, feedback, or need help
-                with Mada Alalam, you can contact us using the information
-                provided below.
+                إذا كانت لديك أسئلة أو اقتراحات أو ملاحظات أو تحتاج إلى مساعدة بشأن مدى العالم، يمكنك التواصل معنا باستخدام المعلومات أدناه.
               </p>
             </section>
 
             <section>
               <h2 className="text-xl font-bold text-gray-900">
-                Support
+                الدعم
               </h2>
 
               <p className="mt-3 leading-7">
-                For account-related questions or problems with the application,
-                please contact our support team.
+                للاستفسارات المتعلقة بالحساب أو المشكلات المتعلقة بالتطبيق، يمكنك التواصل مع فريق الدعم.
               </p>
 
               <div className="mt-4 rounded-xl bg-gray-50 p-5">
                 <p className="text-sm font-medium text-gray-500">
-                  Support Email
+                  الدعم Email
                 </p>
 
                 <a
@@ -50,7 +47,7 @@ export default function ContactPage() {
 
             <section>
               <h2 className="text-xl font-bold text-gray-900">
-                Feedback and Suggestions
+                الملاحظات والاقتراحات
               </h2>
 
               <p className="mt-3 leading-7">
@@ -62,7 +59,7 @@ export default function ContactPage() {
 
             <section>
               <h2 className="text-xl font-bold text-gray-900">
-                News Content
+                محتوى الأخبار
               </h2>
 
               <p className="mt-3 leading-7">
@@ -74,7 +71,7 @@ export default function ContactPage() {
 
             <section>
               <h2 className="text-xl font-bold text-gray-900">
-                Third-Party Services
+                خدمات الجهات الخارجية
               </h2>
 
               <p className="mt-3 leading-7">
@@ -92,7 +89,7 @@ export default function ContactPage() {
 
             <section>
               <h2 className="text-xl font-bold text-gray-900">
-                Delete Your Account
+                حذف حسابك
               </h2>
 
               <p className="mt-3 leading-7">
@@ -117,7 +114,7 @@ export default function ContactPage() {
 
               <div className="mt-4 rounded-xl bg-gray-50 p-5">
                 <p className="text-sm font-medium text-gray-500">
-                  Account Deletion Requests
+                  طلبات حذف الحساب
                 </p>
 
                 <a
