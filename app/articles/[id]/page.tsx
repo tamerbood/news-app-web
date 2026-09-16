@@ -114,7 +114,7 @@ export default async function ArticlePage({
       url: siteUrl,
       logo: {
         '@type': 'ImageObject',
-        url: `${siteUrl.replace(/\/$/, '')}/favicon.ico`,
+        url: `${siteUrl.replace(/\/$/, '')}/icons/icon-512.png`,
       },
     },
   };

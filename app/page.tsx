@@ -158,7 +158,7 @@ export default async function HomePage({
         name: 'مدى العالم',
         alternateName: 'MADA ALALAM',
         url: normalizedSiteUrl,
-        logo: `${normalizedSiteUrl}/favicon.ico`,
+        logo: `${normalizedSiteUrl}/icons/icon-512.png`,
         description: 'مدى العالم منصة أخبار عربية تجمع أحدث الأخبار من مصادر متعددة في مكان واحد.',
         email: 'contact@madaalalam.com',
         contactPoint: {
