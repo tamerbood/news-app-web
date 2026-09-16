@@ -7,56 +7,43 @@ type Article = {
   publishedAt?: string; source?: { name: string }; category?: { name: string };
 };
 
-function formatRelative(value?: string) {
-  if (!value) return '';
-  const time = new Date(value).getTime();
-  if (!Number.isFinite(time)) return '';
-  const minutes = Math.max(0, Math.floor((Date.now() - time) / 60000));
-  if (minutes < 1) return 'الآن';
-  if (minutes < 60) return `منذ ${minutes} دقيقة`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `منذ ${hours} ساعة`;
-  return `منذ ${Math.floor(hours / 24)} يوم`;
-}
-
-function compactDescription(value?: string, limit = 105) {
-  const text = value?.replace(/\s+/g, ' ').trim();
-  if (!text) return '';
-  return text.length > limit ? `${text.slice(0, limit).trim()}…` : text;
-}
-
-export default function NewsCard({ article, variant = 'standard' }: { article: Article; variant?: 'standard' | 'compact' }) {
+export default function NewsCard({ article }: { article: Article }) {
   const image = article.imageUrl?.trim() || `${process.env.NEXT_PUBLIC_API_URL}/assets/images/news-placeholder.png`;
-  const summary = compactDescription(article.description, variant === 'compact' ? 80 : 105);
-
-  if (variant === 'compact') {
-    return (
-      <article className="mada-news-card mada-news-card-compact">
-        <Link href={`/articles/${article.id}`} className="mada-compact-image" aria-label={`قراءة: ${article.title}`}>
-          <img src={optimizeImageUrl(image, 420)} alt="" width="420" height="260" loading="lazy" decoding="async" sizes="180px" />
-        </Link>
-        <div className="mada-compact-copy">
-          <div className="mada-news-meta-line"><span>{article.category?.name || 'أخبار'}</span><i /><span>{formatRelative(article.publishedAt)}</span></div>
-          <h3><Link href={`/articles/${article.id}`}>{article.title}</Link></h3>
-          <span className="mada-compact-source">{article.source?.name || 'مصدر إخباري'}</span>
-        </div>
-      </article>
-    );
-  }
+  const date = article.publishedAt
+    ? new Date(article.publishedAt).toLocaleDateString('ar-JO', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Amman' })
+    : '';
 
   return (
     <article className="mada-news-card">
-      <Link href={`/articles/${article.id}`} className="mada-news-media" aria-label={`قراءة: ${article.title}`}>
-        <img src={optimizeImageUrl(image, 620)} alt="" width="620" height="350" loading="lazy" decoding="async" sizes="(max-width: 620px) 100vw, (max-width: 1100px) 50vw, 33vw" />
-        {article.category?.name && <span className="mada-news-category">{article.category.name}</span>}
-      </Link>
+      <div className="mada-news-media">
+        <img
+          src={optimizeImageUrl(image, 450)}
+          alt=""
+          width="450"
+          height="253"
+          loading="lazy"
+          decoding="async"
+          fetchPriority="low"
+          sizes="(max-width: 620px) 100vw, (max-width: 900px) 50vw, 25vw"
+        />
+        <div className="mada-news-overlay">
+          {article.category?.name && <span className="mada-pill">{article.category.name}</span>}
+          {article.source?.name && <span className="mada-pill mada-pill-dark">{article.source.name}</span>}
+        </div>
+      </div>
       <div className="mada-news-body">
-        <div className="mada-news-meta-line"><span>{article.source?.name || 'مصدر إخباري'}</span><i /><span>{formatRelative(article.publishedAt)}</span></div>
+        <div className="mada-news-meta">
+          {article.category?.name && <span className="mada-ui-badge mada-ui-badge-info">{article.category.name}</span>}
+          {article.publishedAt && <span className="mada-ui-badge mada-ui-badge-neutral">{date}</span>}
+        </div>
         <h3><Link href={`/articles/${article.id}`} className="mada-news-title-link">{article.title}</Link></h3>
-        {summary && <p className="mada-news-description">{summary}</p>}
+        {article.description && <p className="mada-news-description">{article.description}</p>}
         <div className="mada-news-footer">
-          <Link href={`/articles/${article.id}`} className="mada-card-read">قراءة الخبر <span>←</span></Link>
-          <FavoriteButton id={article.id} />
+          <span className="mada-news-date">{article.source?.name ?? 'مدى العالم'}</span>
+          <div className="flex gap-2">
+            <FavoriteButton id={article.id} />
+            <span className="mada-btn mada-btn-primary" aria-hidden="true">قراءة الخبر</span>
+          </div>
         </div>
       </div>
     </article>

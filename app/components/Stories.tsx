@@ -131,7 +131,7 @@ export default function Stories({ initialStories = [] }: { initialStories?: Stor
     return (
       <section
         dir="rtl"
-        className="mada-stories-shell"
+        className="mb-8 rounded-2xl bg-white p-4 shadow-sm"
       >
         <div className="flex gap-4 overflow-hidden">
           {[1, 2, 3, 4, 5].map((item) => (
@@ -156,28 +156,28 @@ export default function Stories({ initialStories = [] }: { initialStories?: Stor
     <>
       <section
         dir="rtl"
-        className="mada-stories-shell"
+        className="mb-8 overflow-hidden rounded-2xl bg-white p-4 shadow-sm"
       >
-        <div className="mada-stories-head">
-          <h2 className="mada-stories-title">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-gray-900">
             القصص
           </h2>
-          <span className="mada-stories-caption">
+          <span className="text-xs text-gray-500">
             أخبار من المصادر
           </span>
         </div>
 
-        <div className="mada-stories-list">
+        <div className="flex gap-4 overflow-x-auto pb-2">
           {stories.map((story, index) => (
             <button
               key={story.id}
               type="button"
               onClick={(event) => { lastTriggerRef.current = event.currentTarget; setSelected(index); }}
-              className="mada-story-source"
+              className="w-24 shrink-0 text-center outline-none"
               aria-label={`فتح قصة ${story.title}`}
             >
-              <span className="mada-story-source-ring">
-                <span className="mada-story-source-inner">
+              <span className="mx-auto block h-20 w-20 rounded-full bg-gradient-to-br from-black via-gray-700 to-gray-300 p-[3px]">
+                <span className="flex h-full w-full items-center justify-center overflow-hidden rounded-full border-2 border-white bg-gray-100">
                   {story.sourceLogoUrl ? (
                     <img
                       src={optimizeImageUrl(story.sourceLogoUrl, 160)}
@@ -209,7 +209,7 @@ export default function Stories({ initialStories = [] }: { initialStories?: Stor
                 </span>
               </span>
 
-              <span className="mada-story-source-name">
+              <span className="mt-2 block truncate text-xs font-semibold text-gray-800">
                 {story.sourceName || story.title}
               </span>
             </button>
