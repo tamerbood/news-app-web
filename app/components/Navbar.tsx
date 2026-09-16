@@ -16,6 +16,7 @@ export default function Navbar() {
   const [email, setEmail] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const [breakingArticles, setBreakingArticles] = useState<{ id: string; title: string }[]>([]);
   const touchStartX = useRef<number | null>(null);
   const touchCurrentX = useRef<number | null>(null);
   const mobileNavRef = useRef<HTMLDivElement | null>(null);
@@ -30,6 +31,27 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => { setMobileOpen(false); setCategoriesOpen(false); }, [pathname]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
+    if (!apiUrl) return;
+    fetch(`${apiUrl}/articles/breaking`, { cache: 'no-store' })
+      .then((response) => response.ok ? response.json() : null)
+      .then((data) => {
+        if (cancelled) return;
+        const raw = Array.isArray(data) ? data : Array.isArray(data?.items) ? data.items : Array.isArray(data?.data) ? data.data : [];
+        setBreakingArticles(
+          raw
+            .filter((item: { id?: string; title?: string }) => item?.id && typeof item.title === 'string' && item.title.trim())
+            .slice(0, 8)
+            .map((item: { id: string; title: string }) => ({ id: item.id, title: item.title.trim() })),
+        );
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
   useEffect(() => {
     if (!mobileOpen) return;
     const previousActive = document.activeElement as HTMLElement | null;
@@ -86,24 +108,26 @@ export default function Navbar() {
       <header className="mada-header">
         <div className="mada-container mada-header-inner">
           <Link href="/" className="mada-brand" aria-label="مدى العالم">
-            <span className="mada-brand-mark" aria-hidden="true">م</span>
+            <img className="mada-brand-logo" src="/icons/icon-512.png" alt="" width={44} height={44} />
             <span className="mada-brand-copy"><strong>مدى العالم</strong><span>MADA ALALAM</span></span>
           </Link>
 
           <nav className="mada-nav" aria-label="التنقل الرئيسي">
             <Link className={`mada-nav-link ${active('/') ? 'active' : ''}`} href="/">الرئيسية</Link>
-            <Link className={`mada-nav-link ${active('/sports') ? 'active' : ''}`} href="/sports">الرياضة</Link>
-            {loggedIn && <Link className={`mada-nav-link ${active('/favorites') ? 'active' : ''}`} href="/favorites">المفضلة</Link>}
-            <div className={`mada-dropdown ${categoriesOpen ? 'is-open' : ''}`}>
-              <button className="mada-nav-link" type="button" aria-haspopup="menu" aria-expanded={categoriesOpen} aria-controls="mada-categories-menu" onKeyDown={(event) => { if (event.key === 'Escape') setCategoriesOpen(false); }} onClick={() => setCategoriesOpen(v => !v)}>الأقسام <span aria-hidden="true">⌄</span></button>
-              <div id="mada-categories-menu" className="mada-dropdown-panel" role="menu">
-                {categories.map(([label, value]) => <Link key={value} href={`/categories?category=${encodeURIComponent(value)}`} role="menuitem">{label}</Link>)}
-              </div>
-            </div>
+            {categories.map(([label, value]) => (
+              <Link
+                key={value}
+                className={`mada-nav-link ${pathname === `/categories?category=${encodeURIComponent(value)}` ? 'active' : ''}`}
+                href={`/categories?category=${encodeURIComponent(value)}`}
+              >
+                {label}
+              </Link>
+            ))}
           </nav>
 
           <div className="mada-header-actions">
             <ThemeToggle />
+            <Link className="mada-header-search" href="/categories" aria-label="البحث في الأخبار">⌕</Link>
             {loggedIn ? (
               <>
                 <Link className="mada-btn mada-btn-soft" href="/account">الحساب</Link>
@@ -116,6 +140,20 @@ export default function Navbar() {
           </div>
         </div>
       </header>
+
+      <div className="mada-breaking-ticker" aria-label="آخر الأخبار العاجلة">
+        <div className="mada-breaking-label"><span className="mada-breaking-dot" aria-hidden="true" /> عاجل الآن</div>
+        <div className="mada-breaking-track">
+          <div className="mada-breaking-items">
+            {(breakingArticles.length ? breakingArticles : [{ id: 'fallback-1', title: 'تابع آخر الأخبار والتطورات لحظة بلحظة' }]).map((article) => (
+              <Link key={article.id} href="/" className="mada-breaking-item">{article.title}</Link>
+            ))}
+            {(breakingArticles.length ? breakingArticles : [{ id: 'fallback-2', title: 'تابع آخر الأخبار والتطورات لحظة بلحظة' }]).map((article) => (
+              <Link key={`copy-${article.id}`} href="/" className="mada-breaking-item" aria-hidden="true" tabIndex={-1}>{article.title}</Link>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {mobileOpen && <button type="button" className="mada-mobile-backdrop lg:hidden" aria-label="إغلاق القائمة" onClick={() => setMobileOpen(false)} />}
       {mobileOpen && <div

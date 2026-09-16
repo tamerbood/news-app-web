@@ -219,6 +219,41 @@ a { text-decoration: none; }
 }
 .mada-header-inner { min-height: 78px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
 .mada-brand { display: inline-flex; align-items: center; gap: 11px; color: var(--mada-foreground); min-width: 0; }
+ .mada-brand-logo {
+  width: 44px; height: 44px; flex: 0 0 44px; display: block; object-fit: cover; border-radius: 50%;
+}
+.mada-header-search {
+  width: var(--mada-touch); height: var(--mada-touch); min-width: var(--mada-touch);
+  display: grid; place-items: center; border: 1px solid var(--mada-border);
+  border-radius: var(--mada-radius-sm); background: var(--mada-surface);
+  color: var(--mada-foreground-soft); font-size: 21px; line-height: 1;
+  transition: background var(--mada-duration) var(--mada-ease), border-color var(--mada-duration) var(--mada-ease), transform var(--mada-duration-fast) var(--mada-ease);
+}
+.mada-header-search:hover { background: var(--mada-surface-soft); border-color: var(--mada-border-strong); transform: translateY(-1px); }
+.mada-breaking-ticker {
+  height: 40px; display: flex; align-items: stretch; width: min(calc(100% - 28px), var(--mada-container));
+  margin-inline: auto; overflow: hidden; border-bottom: 1px solid var(--mada-border); background: var(--mada-surface);
+}
+.mada-breaking-label {
+  flex: 0 0 auto; display: inline-flex; align-items: center; gap: 7px; padding: 0 14px;
+  color: var(--mada-danger); background: var(--mada-surface); border-left: 1px solid var(--mada-border);
+  font-size: 12px; font-weight: 950; white-space: nowrap;
+}
+.mada-breaking-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--mada-danger); display: inline-block; }
+.mada-breaking-track { min-width: 0; flex: 1; overflow: hidden; direction: ltr; }
+.mada-breaking-items {
+  width: max-content; min-height: 40px; display: flex; align-items: center;
+  animation: mada-breaking-scroll 34s linear infinite;
+}
+.mada-breaking-item {
+  direction: rtl; display: inline-flex; align-items: center; min-height: 40px;
+  padding: 0 28px; color: var(--mada-foreground-soft); font-size: 12px; font-weight: 800;
+  white-space: nowrap; position: relative;
+}
+.mada-breaking-item::before { content: "•"; position: absolute; right: 9px; color: var(--mada-danger); font-size: 13px; }
+.mada-breaking-item:hover { color: var(--mada-danger); }
+@keyframes mada-breaking-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
 .mada-brand-mark {
   position: relative; width: 44px; height: 44px; display: grid; place-items: center; overflow: hidden;
   border-radius: 14px; color: #fff; background: linear-gradient(145deg, var(--mada-brand-950), var(--mada-brand-500));
