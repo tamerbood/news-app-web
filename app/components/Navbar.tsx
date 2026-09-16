@@ -5,15 +5,13 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState, type TouchEvent } from 'react';
 import ThemeToggle from './ThemeToggle';
 
-const categories = [
-  ['العالم', 'العالم'], ['السعودية', 'السعودية'], ['أسواق', 'اقتصاد'], ['رياضة', 'الرياضة'],
-  ['العربية TV', 'العربية TV'], ['العربية برامج', 'العربية برامج'], ['تكنولوجيا', 'تكنولوجيا'],
-  ['منوعات', 'منوعات'], ['مقالات', 'مقالات'], ['سيارات', 'سيارات'],
-];
-
 const sectionMenu = [
-  ['العالم', 'العالم'], ['الرياضة', 'الرياضة'], ['تكنولوجيا', 'تكنولوجيا'],
-  ['اقتصاد', 'اقتصاد'], ['سيارات', 'سيارات'], ['منوعات', 'منوعات'],
+  ['العالم', 'العالم'],
+  ['الرياضة', 'الرياضة'],
+  ['تكنولوجيا', 'تكنولوجيا'],
+  ['اقتصاد', 'اقتصاد'],
+  ['سيارات', 'سيارات'],
+  ['منوعات', 'منوعات'],
 ];
 
 export default function Navbar() {
@@ -21,7 +19,6 @@ export default function Navbar() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [email, setEmail] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [categoriesOpen, setCategoriesOpen] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const touchCurrentX = useRef<number | null>(null);
   const mobileNavRef = useRef<HTMLDivElement | null>(null);
@@ -35,7 +32,7 @@ export default function Navbar() {
     catch { localStorage.removeItem('user_token'); localStorage.removeItem('user'); }
   }, []);
 
-  useEffect(() => { setMobileOpen(false); setCategoriesOpen(false); }, [pathname]);
+  useEffect(() => { setMobileOpen(false); }, [pathname]);
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -90,34 +87,11 @@ export default function Navbar() {
 
           <nav className="mada-nav" aria-label="التنقل الرئيسي">
             <Link className={`mada-nav-link ${active('/') ? 'active' : ''}`} href="/">الرئيسية</Link>
-            <Link className={`mada-nav-link ${active('/categories') ? 'active' : ''}`} href="/categories?category=الأخبار">الأخبار</Link>
-            <Link className="mada-nav-link" href="/categories?category=السعودية">السعودية</Link>
-            <div className="mada-dropdown">
-              <button className="mada-nav-link mada-nav-dropdown-trigger" type="button" aria-haspopup="menu">أسواق <span aria-hidden="true">⌄</span></button>
-              <div className="mada-dropdown-panel" role="menu">
-                <Link href="/categories?category=اقتصاد" role="menuitem">اقتصاد</Link>
-                <Link href="/categories?category=أسواق" role="menuitem">أسواق</Link>
-              </div>
-            </div>
-            <Link className={`mada-nav-link ${active('/sports') ? 'active' : ''}`} href="/sports">رياضة</Link>
-            <div className="mada-dropdown">
-              <button className="mada-nav-link mada-nav-dropdown-trigger" type="button" aria-haspopup="menu">العربية TV <span aria-hidden="true">⌄</span></button>
-              <div className="mada-dropdown-panel" role="menu">
-                <Link href="/categories?category=العربية%20TV" role="menuitem">العربية TV</Link>
-                <Link href="/categories?category=العربية%20برامج" role="menuitem">العربية برامج</Link>
-              </div>
-            </div>
-            <Link className="mada-nav-link" href="/categories?category=تكنولوجيا">تكنولوجيا</Link>
-            <div className={`mada-dropdown ${categoriesOpen ? 'is-open' : ''}`}>
-              <button className="mada-nav-link mada-nav-dropdown-trigger" type="button" aria-haspopup="menu" aria-expanded={categoriesOpen} onClick={() => setCategoriesOpen(v => !v)}>
-                الأقسام <span aria-hidden="true">⌄</span>
-              </button>
-              <div id="mada-categories-menu" className="mada-dropdown-panel mada-dropdown-wide" role="menu">
-                {sectionMenu.map(([label, value]) => <Link key={value} href={`/categories?category=${encodeURIComponent(value)}`} role="menuitem">{label}</Link>)}
-              </div>
-            </div>
-            <Link className="mada-nav-link" href="/categories?category=منوعات">منوعات</Link>
-            <Link className="mada-nav-link" href="/categories?category=مقالات">مقالات</Link>
+            {sectionMenu.map(([label, value]) => (
+              <Link key={value} className={`mada-nav-link ${pathname === '/categories' && new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '').get('category') === value ? 'active' : ''}`} href={`/categories?category=${encodeURIComponent(value)}`}>
+                {label}
+              </Link>
+            ))}
             {loggedIn && <Link className={`mada-nav-link ${active('/favorites') ? 'active' : ''}`} href="/favorites">المفضلة</Link>}
           </nav>
 
@@ -148,11 +122,9 @@ export default function Navbar() {
           </div>
           <div className="mada-mobile-nav-grid">
             <Link className={active('/') ? 'active' : ''} href="/">الرئيسية</Link>
-            <Link className={active('/sports') ? 'active' : ''} href="/sports">الرياضة</Link>
-            <Link className={active('/categories') ? 'active' : ''} href="/categories">الأقسام</Link>
+            {sectionMenu.map(([label, value]) => <Link key={value} href={`/categories?category=${encodeURIComponent(value)}`}>{label}</Link>)}
             <Link className={active('/favorites') ? 'active' : ''} href={loggedIn ? '/favorites' : '/login'}>المفضلة</Link>
             <Link className={active('/account') ? 'active' : ''} href={loggedIn ? '/account' : '/login'}>{loggedIn ? 'الحساب' : 'تسجيل الدخول'}</Link>
-            {categories.map(([label, value]) => <Link key={`${label}-${value}`} href={`/categories?category=${encodeURIComponent(value)}`}>{label}</Link>)}
           </div>
           <div className="mada-mobile-swipe-hint">اسحب القائمة لإغلاقها</div>
         </div>
