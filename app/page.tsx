@@ -11,6 +11,8 @@ type Article = {
   publishedAt?: string;
   source?: { name: string };
   category?: { name: string };
+  isFeatured?: boolean;
+  isPinned?: boolean;
 };
 
 type ArticlesResponse = {
@@ -104,6 +106,32 @@ async function getInitialArticles(page = 1, countryCode = 'NONE'): Promise<Artic
   }
 }
 
+async function getBreakingArticles(countryCode = 'NONE'): Promise<Article[]> {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
+  if (!apiUrl) return [];
+
+  try {
+    const response = await fetch(
+      `${apiUrl}/articles/breaking?limit=8&countryCode=${encodeURIComponent(countryCode)}`,
+      { cache: 'no-store', headers: { Accept: 'application/json' } },
+    );
+    if (!response.ok) return [];
+    const data = await response.json();
+    const rawItems = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.items)
+        ? data.items
+        : Array.isArray(data?.articles)
+          ? data.articles
+          : Array.isArray(data?.data)
+            ? data.data
+            : [];
+    return rawItems.filter((item: Article) => item?.id && item?.title).slice(0, 8);
+  } catch {
+    return [];
+  }
+}
+
 async function getInitialStories(): Promise<Story[]> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
   if (!apiUrl) return [];
@@ -144,10 +172,11 @@ export default async function HomePage({
 
   const countryCode = await getUserCountryCode();
 
-  const [initialArticles, topArticles, initialStories] = await Promise.all([
+  const [initialArticles, topArticles, initialStories, breakingArticles] = await Promise.all([
     getInitialArticles(page, countryCode),
     page === 1 ? Promise.resolve(undefined) : getInitialArticles(1, countryCode),
     getInitialStories(),
+    getBreakingArticles(countryCode),
   ]);
   const resolvedTopArticles = topArticles ?? initialArticles;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://madaalalam.com';
@@ -206,9 +235,11 @@ export default async function HomePage({
       <HomeClient
         initialArticles={initialArticles.items ?? []}
         topArticles={resolvedTopArticles.items ?? []}
+        breakingArticles={breakingArticles}
         initialTotalPages={initialArticles.totalPages ?? 1}
         initialStories={initialStories}
         page={page}
+        countryCode={countryCode}
       />
     </>
   );

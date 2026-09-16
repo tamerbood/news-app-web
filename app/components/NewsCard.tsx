@@ -7,43 +7,53 @@ type Article = {
   publishedAt?: string; source?: { name: string }; category?: { name: string };
 };
 
+function formatRelative(value?: string) {
+  if (!value) return '';
+  const time = new Date(value).getTime();
+  if (!Number.isFinite(time)) return '';
+  const minutes = Math.max(0, Math.floor((Date.now() - time) / 60000));
+  if (minutes < 1) return 'الآن';
+  if (minutes < 60) return `منذ ${minutes} دقيقة`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `منذ ${hours} ساعة`;
+  return `منذ ${Math.floor(hours / 24)} يوم`;
+}
+
+function compactDescription(value?: string) {
+  const text = value?.replace(/\s+/g, ' ').trim();
+  if (!text) return '';
+  return text.length > 110 ? `${text.slice(0, 110).trim()}…` : text;
+}
+
 export default function NewsCard({ article }: { article: Article }) {
   const image = article.imageUrl?.trim() || `${process.env.NEXT_PUBLIC_API_URL}/assets/images/news-placeholder.png`;
-  const date = article.publishedAt
-    ? new Date(article.publishedAt).toLocaleDateString('ar-JO', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Amman' })
-    : '';
+  const summary = compactDescription(article.description);
 
   return (
     <article className="mada-news-card">
-      <div className="mada-news-media">
+      <Link href={`/articles/${article.id}`} className="mada-news-media" aria-label={`قراءة: ${article.title}`}>
         <img
-          src={optimizeImageUrl(image, 450)}
+          src={optimizeImageUrl(image, 560)}
           alt=""
-          width="450"
-          height="253"
+          width="560"
+          height="315"
           loading="lazy"
           decoding="async"
           fetchPriority="low"
-          sizes="(max-width: 620px) 100vw, (max-width: 900px) 50vw, 25vw"
+          sizes="(max-width: 620px) 100vw, (max-width: 1100px) 50vw, 33vw"
         />
-        <div className="mada-news-overlay">
-          {article.category?.name && <span className="mada-pill">{article.category.name}</span>}
-          {article.source?.name && <span className="mada-pill mada-pill-dark">{article.source.name}</span>}
-        </div>
-      </div>
+        {article.category?.name && <span className="mada-news-category">{article.category.name}</span>}
+      </Link>
       <div className="mada-news-body">
-        <div className="mada-news-meta">
-          {article.category?.name && <span className="mada-ui-badge mada-ui-badge-info">{article.category.name}</span>}
-          {article.publishedAt && <span className="mada-ui-badge mada-ui-badge-neutral">{date}</span>}
+        <div className="mada-news-meta-line">
+          <span>{article.source?.name || 'مصدر إخباري'}</span>
+          {formatRelative(article.publishedAt) && <><i /> <span>{formatRelative(article.publishedAt)}</span></>}
         </div>
         <h3><Link href={`/articles/${article.id}`} className="mada-news-title-link">{article.title}</Link></h3>
-        {article.description && <p className="mada-news-description">{article.description}</p>}
+        {summary && <p className="mada-news-description">{summary}</p>}
         <div className="mada-news-footer">
-          <span className="mada-news-date">{article.source?.name ?? 'مدى العالم'}</span>
-          <div className="flex gap-2">
-            <FavoriteButton id={article.id} />
-            <span className="mada-btn mada-btn-primary" aria-hidden="true">قراءة الخبر</span>
-          </div>
+          <Link href={`/articles/${article.id}`} className="mada-card-read">قراءة الخبر <span aria-hidden="true">←</span></Link>
+          <FavoriteButton id={article.id} />
         </div>
       </div>
     </article>
