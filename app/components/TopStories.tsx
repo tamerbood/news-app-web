@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
 import { optimizeImageUrl } from '../lib/optimized-image-url';
 
 type Article = {
@@ -25,22 +28,32 @@ function formatRelative(value?: string) {
   return `منذ ${Math.floor(hours / 24)} يوم`;
 }
 
-function summary(value?: string, limit = 145) {
+function summary(value?: string, limit = 125) {
   const text = value?.replace(/\s+/g, ' ').trim();
   if (!text) return '';
   return text.length > limit ? `${text.slice(0, limit).trim()}…` : text;
 }
 
 export default function TopStories({ articles, countryLabel }: { articles: Article[]; countryLabel: string }) {
-  if (!articles.length) return null;
+  const ordered = useMemo(() => [...articles]
+    .sort((a, b) => ((b.isPinned ? 4 : 0) + (b.isFeatured ? 2 : 0)) - ((a.isPinned ? 4 : 0) + (a.isFeatured ? 2 : 0)))
+    .slice(0, 5), [articles]);
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  const ordered = [...articles].sort((a, b) => {
-    const score = (x: Article) => (x.isPinned ? 4 : 0) + (x.isFeatured ? 2 : 0);
-    return score(b) - score(a);
-  });
-  const lead = ordered[0];
-  const secondary = ordered.slice(1, 4);
-  const side = ordered.slice(4, 6);
+  useEffect(() => {
+    if (ordered.length < 2) return;
+    const timer = window.setInterval(() => setActiveIndex((current) => (current + 1) % ordered.length), 7000);
+    return () => window.clearInterval(timer);
+  }, [ordered.length]);
+
+  useEffect(() => {
+    if (activeIndex >= ordered.length) setActiveIndex(0);
+  }, [activeIndex, ordered.length]);
+
+  if (!ordered.length) return null;
+  const lead = ordered[activeIndex];
+  const side = ordered.filter((_, index) => index !== activeIndex).slice(0, 3);
+  const sidePool = side.length ? side : ordered.slice(1, 4);
 
   return (
     <section id="top-stories" className="mada-top-stories" aria-labelledby="top-stories-title">
@@ -53,22 +66,22 @@ export default function TopStories({ articles, countryLabel }: { articles: Artic
       </div>
 
       <div className="mada-hero-news-grid">
-        <Link href={`/articles/${lead.id}`} className="mada-hero-news">
+        <Link href={`/articles/${lead.id}`} className="mada-hero-news" aria-label={`فتح: ${lead.title}`}>
           <div className="mada-hero-news-image">
-            {lead.imageUrl ? <img src={optimizeImageUrl(lead.imageUrl, 1100)} alt="" width="1100" height="620" fetchPriority="high" loading="eager" sizes="(max-width: 800px) 100vw, 66vw" /> : <div className="mada-image-placeholder">MADA</div>}
+            {lead.imageUrl ? <img src={optimizeImageUrl(lead.imageUrl, 1200)} alt="" width="1200" height="675" fetchPriority={activeIndex === 0 ? 'high' : 'auto'} loading={activeIndex === 0 ? 'eager' : 'lazy'} sizes="(max-width: 800px) 100vw, 72vw" /> : <div className="mada-image-placeholder">MADA</div>}
             <div className="mada-hero-overlay" />
             <span className="mada-hero-live">الأبرز</span>
             <div className="mada-hero-copy">
-              <div className="mada-hero-meta"><span>{lead.category?.name || 'أخبار'}</span><i /> <span>{lead.source?.name || 'مصدر إخباري'}</span><i /> <span>{formatRelative(lead.publishedAt)}</span></div>
+              <div className="mada-hero-meta"><span>{lead.category?.name || 'أخبار'}</span><i /><span>{lead.source?.name || 'مصدر إخباري'}</span><i /><span>{formatRelative(lead.publishedAt)}</span></div>
               <h3>{lead.title}</h3>
-              {summary(lead.description, 175) && <p>{summary(lead.description, 175)}</p>}
+              {summary(lead.description) && <p>{summary(lead.description)}</p>}
               <span className="mada-hero-read">فتح الخبر <b>←</b></span>
             </div>
           </div>
         </Link>
 
         <div className="mada-news-side-column">
-          {secondary.map((article, index) => (
+          {sidePool.map((article, index) => (
             <Link href={`/articles/${article.id}`} key={article.id} className="mada-news-side-item">
               <span className="mada-news-side-number">0{index + 2}</span>
               <div className="mada-news-side-image">
@@ -81,17 +94,21 @@ export default function TopStories({ articles, countryLabel }: { articles: Artic
               </div>
             </Link>
           ))}
-          {side.length > 0 && (
-            <div className="mada-news-mini-row">
-              {side.map((article) => (
-                <Link href={`/articles/${article.id}`} key={article.id}>
-                  <span>{article.category?.name || 'خبر'}</span>
-                  <strong>{article.title}</strong>
-                </Link>
-              ))}
-            </div>
-          )}
+          <div className="mada-news-mini-row">
+            {ordered.slice(0, 2).map((article) => (
+              <Link href={`/articles/${article.id}`} key={`mini-${article.id}`}><span>خبر</span><strong>{article.title}</strong></Link>
+            ))}
+          </div>
         </div>
+      </div>
+
+      <div className="mada-hero-dots" aria-label="التنقل بين أهم الأخبار">
+        {ordered.map((article, index) => (
+          <button key={article.id} type="button" className={index === activeIndex ? 'is-active' : ''} onClick={() => setActiveIndex(index)} aria-label={`الخبر ${index + 1}`} aria-current={index === activeIndex ? 'true' : undefined}>
+            <span>{index + 1}</span>
+            <i />
+          </button>
+        ))}
       </div>
     </section>
   );

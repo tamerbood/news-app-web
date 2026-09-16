@@ -2,6 +2,7 @@ import Link from 'next/link';
 import NewsCard from './NewsCard';
 import FavoritesProvider from './FavoritesProvider';
 import NewsFeedRefresh from './NewsFeedRefresh';
+import PopularTopics from './PopularTopics';
 import Pagination from './Pagination';
 
 type Article = {
@@ -17,8 +18,8 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 function displayCategory(name: string) { return CATEGORY_LABELS[name] ?? name; }
 
-export default function NewsFeed({ articles, totalPages, page, countryCode, countryLabel }: {
-  articles: Article[]; totalPages: number; page: number; countryCode: string; countryLabel: string;
+export default function NewsFeed({ articles, totalPages, page, countryCode, countryLabel, popularArticles = [] }: {
+  articles: Article[]; totalPages: number; page: number; countryCode: string; countryLabel: string; popularArticles?: Article[];
 }) {
   const latest = articles.slice(0, LATEST_COUNT);
   const categoryGroups = Array.from(articles.slice(LATEST_COUNT).reduce((groups, article) => {
@@ -54,6 +55,8 @@ export default function NewsFeed({ articles, totalPages, page, countryCode, coun
           </>
         )}
       </section>
+
+      <PopularTopics articles={popularArticles.length ? popularArticles : articles} />
 
       {categoryGroups.length > 0 && (
         <section className="mada-category-sections" aria-label="الأخبار حسب الأقسام">

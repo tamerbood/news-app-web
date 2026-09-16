@@ -6,6 +6,12 @@ import { useEffect, useRef, useState, type TouchEvent } from 'react';
 import ThemeToggle from './ThemeToggle';
 
 const categories = [
+  ['العالم', 'العالم'], ['السعودية', 'السعودية'], ['أسواق', 'اقتصاد'], ['رياضة', 'الرياضة'],
+  ['العربية TV', 'العربية TV'], ['العربية برامج', 'العربية برامج'], ['تكنولوجيا', 'تكنولوجيا'],
+  ['منوعات', 'منوعات'], ['مقالات', 'مقالات'], ['سيارات', 'سيارات'],
+];
+
+const sectionMenu = [
   ['العالم', 'العالم'], ['الرياضة', 'الرياضة'], ['تكنولوجيا', 'تكنولوجيا'],
   ['اقتصاد', 'اقتصاد'], ['سيارات', 'سيارات'], ['منوعات', 'منوعات'],
 ];
@@ -78,21 +84,40 @@ export default function Navbar() {
       <header className="mada-header">
         <div className="mada-container mada-header-inner">
           <Link href="/" className="mada-brand" aria-label="مدى العالم - الصفحة الرئيسية">
-            <span className="mada-brand-mark" aria-hidden="true">م</span>
+            <span className="mada-brand-mark"><img src="/icons/apple-touch-icon.png" alt="" width="42" height="42" /></span>
             <span className="mada-brand-copy"><strong>مدى العالم</strong><span>MADA ALALAM</span></span>
           </Link>
 
           <nav className="mada-nav" aria-label="التنقل الرئيسي">
             <Link className={`mada-nav-link ${active('/') ? 'active' : ''}`} href="/">الرئيسية</Link>
-            <Link className={`mada-nav-link ${active('/sports') ? 'active' : ''}`} href="/sports">الرياضة</Link>
+            <Link className={`mada-nav-link ${active('/categories') ? 'active' : ''}`} href="/categories?category=الأخبار">الأخبار</Link>
+            <Link className="mada-nav-link" href="/categories?category=السعودية">السعودية</Link>
+            <div className="mada-dropdown">
+              <button className="mada-nav-link mada-nav-dropdown-trigger" type="button" aria-haspopup="menu">أسواق <span aria-hidden="true">⌄</span></button>
+              <div className="mada-dropdown-panel" role="menu">
+                <Link href="/categories?category=اقتصاد" role="menuitem">اقتصاد</Link>
+                <Link href="/categories?category=أسواق" role="menuitem">أسواق</Link>
+              </div>
+            </div>
+            <Link className={`mada-nav-link ${active('/sports') ? 'active' : ''}`} href="/sports">رياضة</Link>
+            <div className="mada-dropdown">
+              <button className="mada-nav-link mada-nav-dropdown-trigger" type="button" aria-haspopup="menu">العربية TV <span aria-hidden="true">⌄</span></button>
+              <div className="mada-dropdown-panel" role="menu">
+                <Link href="/categories?category=العربية%20TV" role="menuitem">العربية TV</Link>
+                <Link href="/categories?category=العربية%20برامج" role="menuitem">العربية برامج</Link>
+              </div>
+            </div>
+            <Link className="mada-nav-link" href="/categories?category=تكنولوجيا">تكنولوجيا</Link>
             <div className={`mada-dropdown ${categoriesOpen ? 'is-open' : ''}`}>
               <button className="mada-nav-link mada-nav-dropdown-trigger" type="button" aria-haspopup="menu" aria-expanded={categoriesOpen} onClick={() => setCategoriesOpen(v => !v)}>
                 الأقسام <span aria-hidden="true">⌄</span>
               </button>
-              <div id="mada-categories-menu" className="mada-dropdown-panel" role="menu">
-                {categories.map(([label, value]) => <Link key={value} href={`/categories?category=${encodeURIComponent(value)}`} role="menuitem">{label}</Link>)}
+              <div id="mada-categories-menu" className="mada-dropdown-panel mada-dropdown-wide" role="menu">
+                {sectionMenu.map(([label, value]) => <Link key={value} href={`/categories?category=${encodeURIComponent(value)}`} role="menuitem">{label}</Link>)}
               </div>
             </div>
+            <Link className="mada-nav-link" href="/categories?category=منوعات">منوعات</Link>
+            <Link className="mada-nav-link" href="/categories?category=مقالات">مقالات</Link>
             {loggedIn && <Link className={`mada-nav-link ${active('/favorites') ? 'active' : ''}`} href="/favorites">المفضلة</Link>}
           </nav>
 
@@ -114,8 +139,8 @@ export default function Navbar() {
         </div>
       </header>
 
-      {mobileOpen && <button type="button" className="mada-mobile-backdrop lg:hidden" aria-label="إغلاق القائمة" onClick={() => setMobileOpen(false)} />}
-      {mobileOpen && <div id="mada-mobile-nav" ref={mobileNavRef} className="mada-mobile-nav lg:hidden is-open" role="dialog" aria-modal="true" aria-label="قائمة التنقل على الهاتف" onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
+      {mobileOpen && <button type="button" className="mada-mobile-backdrop" aria-label="إغلاق القائمة" onClick={() => setMobileOpen(false)} />}
+      {mobileOpen && <div id="mada-mobile-nav" ref={mobileNavRef} className="mada-mobile-nav is-open" role="dialog" aria-modal="true" aria-label="قائمة التنقل على الهاتف" onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
         <div className="mada-mobile-nav-inner">
           <div className="mada-mobile-nav-header">
             <div><span className="mada-kicker">MADA ALALAM</span><strong>القائمة</strong></div>
@@ -127,7 +152,7 @@ export default function Navbar() {
             <Link className={active('/categories') ? 'active' : ''} href="/categories">الأقسام</Link>
             <Link className={active('/favorites') ? 'active' : ''} href={loggedIn ? '/favorites' : '/login'}>المفضلة</Link>
             <Link className={active('/account') ? 'active' : ''} href={loggedIn ? '/account' : '/login'}>{loggedIn ? 'الحساب' : 'تسجيل الدخول'}</Link>
-            {categories.map(([label, value]) => <Link key={value} href={`/categories?category=${encodeURIComponent(value)}`}>{label}</Link>)}
+            {categories.map(([label, value]) => <Link key={`${label}-${value}`} href={`/categories?category=${encodeURIComponent(value)}`}>{label}</Link>)}
           </div>
           <div className="mada-mobile-swipe-hint">اسحب القائمة لإغلاقها</div>
         </div>

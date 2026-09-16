@@ -54,20 +54,6 @@ export default function HomeClient({
   return (
     <main className="mada-page mada-home" id="home-content">
       <div className="mada-container">
-        <section className="mada-newsroom-masthead" aria-labelledby="newsroom-title">
-          <div className="mada-masthead-copy">
-            <span className="mada-kicker"><span className="mada-kicker-rule" /> MADA ALALAM · NEWSROOM</span>
-            <h1 id="newsroom-title">المشهد الإخباري، <em>الآن.</em></h1>
-            <p>الأخبار الأهم من حولك، مرتبة حسب الأولوية ومحدثة باستمرار.</p>
-          </div>
-          <div className="mada-masthead-status">
-            <span className="mada-status-live"><i /> مباشر</span>
-            <span>{localLabel === 'العالم' ? 'تغطية عالمية' : `تغطية ${localLabel}`}</span>
-            <span>·</span>
-            <span>تحديث مستمر</span>
-          </div>
-        </section>
-
         {hasBreaking && (
           <section className="mada-breaking-bar" aria-label="الأخبار العاجلة">
             <div className="mada-breaking-label"><span className="mada-live-dot" /> عاجل الآن</div>
@@ -96,6 +82,7 @@ export default function HomeClient({
           page={page}
           countryCode={countryCode}
           countryLabel={localLabel}
+          popularArticles={topArticles}
         />
       </div>
     </main>
