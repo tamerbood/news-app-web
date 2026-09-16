@@ -65,12 +65,12 @@ async function getCategories(): Promise<Category[]> {
   }
 }
 
-async function getArticles(categoryId: string): Promise<Article[]> {
+async function getArticles(categoryId?: string): Promise<Article[]> {
   if (!apiUrl) return [];
 
   try {
     const response = await fetch(
-      `${apiUrl}/articles?categoryId=${encodeURIComponent(categoryId)}&limit=24`,
+      `${apiUrl}/articles?${categoryId ? `categoryId=${encodeURIComponent(categoryId)}&` : ''}page=1&limit=24`,
       {
         next: { revalidate: 300 },
         headers: { Accept: 'application/json' },
@@ -166,7 +166,7 @@ export default async function CategoriesPage({
   const selectedCategory = categories.find(
     (category) => category.name.toLowerCase() === (rawCategory ?? '').toLowerCase(),
   );
-  const articles = selectedCategory ? await getArticles(selectedCategory.id) : [];
+  const articles = await getArticles(selectedCategory?.id);
   const selectedLabel = selectedCategory ? getCategoryLabel(selectedCategory.name) : '';
 
   return (
@@ -210,10 +210,9 @@ export default async function CategoriesPage({
           </div>
         </nav>
 
-        {selectedCategory && (
-          <section className="mt-8" aria-labelledby="category-articles-heading">
+        <section className="mt-8" aria-labelledby="category-articles-heading">
             <h2 id="category-articles-heading" className="mb-5 text-2xl font-bold text-gray-900">
-              أحدث أخبار {selectedLabel}
+              {selectedCategory ? `أحدث أخبار ${selectedLabel}` : 'أحدث الأخبار'}
             </h2>
 
             {articles.length === 0 ? (
@@ -277,7 +276,6 @@ export default async function CategoriesPage({
               </div>
             )}
           </section>
-        )}
       </section>
     </main>
   );
