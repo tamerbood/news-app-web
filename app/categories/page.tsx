@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { getUserCountryCode } from '../lib/user-country';
 
 interface Category {
   id: string;
@@ -65,14 +66,14 @@ async function getCategories(): Promise<Category[]> {
   }
 }
 
-async function getArticles(categoryId?: string): Promise<Article[]> {
+async function getArticles(categoryId?: string, countryCode = 'NONE'): Promise<Article[]> {
   if (!apiUrl) return [];
 
   try {
     const response = await fetch(
-      `${apiUrl}/articles?${categoryId ? `categoryId=${encodeURIComponent(categoryId)}&` : ''}page=1&limit=24`,
+      `${apiUrl}/articles?${categoryId ? `categoryId=${encodeURIComponent(categoryId)}&` : ''}page=1&limit=24&countryCode=${encodeURIComponent(countryCode)}`,
       {
-        next: { revalidate: 300 },
+        cache: 'no-store',
         headers: { Accept: 'application/json' },
       },
     );
@@ -163,10 +164,11 @@ export default async function CategoriesPage({
   const params = await searchParams;
   const rawCategory = Array.isArray(params.category) ? params.category[0] : params.category;
   const categories = await getCategories();
+  const countryCode = await getUserCountryCode();
   const selectedCategory = categories.find(
     (category) => category.name.toLowerCase() === (rawCategory ?? '').toLowerCase(),
   );
-  const articles = await getArticles(selectedCategory?.id);
+  const articles = await getArticles(selectedCategory?.id, countryCode);
   const selectedLabel = selectedCategory ? getCategoryLabel(selectedCategory.name) : '';
 
   return (

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import HomeClient from './HomeClient';
+import { getUserCountryCode } from './lib/user-country';
 
 type Article = {
   id: string;
@@ -73,13 +74,13 @@ export async function generateMetadata({
   };
 }
 
-async function getInitialArticles(page = 1): Promise<ArticlesResponse> {
+async function getInitialArticles(page = 1, countryCode = 'NONE'): Promise<ArticlesResponse> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
   if (!apiUrl) return {};
 
   try {
-    const response = await fetch(`${apiUrl}/articles?page=${page}&limit=20`, {
-      next: { revalidate: 60 },
+    const response = await fetch(`${apiUrl}/articles?page=${page}&limit=20&countryCode=${encodeURIComponent(countryCode)}`, {
+      cache: 'no-store',
     });
     if (!response.ok) return {};
     const data = await response.json();
@@ -141,9 +142,11 @@ export default async function HomePage({
   const parsedPage = Number.parseInt(rawPage ?? '1', 10);
   const page = Number.isSafeInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 
+  const countryCode = await getUserCountryCode();
+
   const [initialArticles, topArticles, initialStories] = await Promise.all([
-    getInitialArticles(page),
-    page === 1 ? Promise.resolve(undefined) : getInitialArticles(1),
+    getInitialArticles(page, countryCode),
+    page === 1 ? Promise.resolve(undefined) : getInitialArticles(1, countryCode),
     getInitialStories(),
   ]);
   const resolvedTopArticles = topArticles ?? initialArticles;
