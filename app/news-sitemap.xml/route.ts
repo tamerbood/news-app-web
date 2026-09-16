@@ -12,7 +12,6 @@ interface NewsArticle {
   id: string;
   title: string;
   publishedAt?: string;
-  createdAt?: string;
 }
 
 interface ArticlesResponse {
@@ -64,7 +63,7 @@ export async function GET() {
     for (const page of pages) {
       for (const article of page.items ?? []) {
         if (!article?.id || !article.title || seen.has(article.id)) continue;
-        const published = article.publishedAt || article.createdAt;
+        const published = article.publishedAt;
         if (!published) continue;
         const timestamp = Date.parse(published);
         if (!Number.isFinite(timestamp) || timestamp < cutoff) continue;
@@ -78,7 +77,7 @@ export async function GET() {
   }
 
   const urls = articles.map((article) => {
-    const published = article.publishedAt || article.createdAt!;
+    const published = article.publishedAt!;
     return `    <url>\n      <loc>${escapeXml(`${base}/articles/${encodeURIComponent(article.id)}`)}</loc>\n      <news:news>\n        <news:publication>\n          <news:name>مدى العالم</news:name>\n          <news:language>ar</news:language>\n        </news:publication>\n        <news:publication_date>${escapeXml(new Date(published).toISOString())}</news:publication_date>\n        <news:title>${escapeXml(article.title.trim())}</news:title>\n      </news:news>\n    </url>`;
   });
 

@@ -11,6 +11,7 @@ export interface Article {
   imageUrl?: string;
   publishedAt: string;
   createdAt?: string;
+  updatedAt?: string;
 
   source?: {
     id: string;

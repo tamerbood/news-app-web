@@ -1,7 +1,5 @@
-'use client';
-
-import { Suspense, useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import type { Metadata } from 'next';
+import Link from 'next/link';
 
 interface Category {
   id: string;
@@ -11,17 +9,17 @@ interface Category {
 interface Article {
   id: string;
   title: string;
-  description?: string;
+  description?: string | null;
   url: string;
-  imageUrl?: string;
-  publishedAt: string;
-  source?: {
-    name: string;
-  };
-  category?: {
-    id: string;
-    name: string;
-  };
+  imageUrl?: string | null;
+  publishedAt?: string | null;
+  source?: { name?: string | null } | null;
+  category?: { id?: string; name?: string } | null;
+}
+
+interface ArticlesResponse {
+  items?: Article[];
+  articles?: Article[];
 }
 
 const categoryLabels: Record<string, string> = {
@@ -42,259 +40,189 @@ const allowedCategories = [
   'Entertainment',
 ];
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://madaalalam.com';
+const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
+
 function getCategoryLabel(name: string): string {
   return categoryLabels[name] ?? name;
 }
 
-function CategoriesContent() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [articles, setArticles] = useState<Article[]>([]);
-  const [selectedCategory, setSelectedCategory] =
-    useState<string>('');
-  const [loadingCategories, setLoadingCategories] =
-    useState(true);
-  const [loadingArticles, setLoadingArticles] =
-    useState(false);
-  const [error, setError] = useState('');
+async function getCategories(): Promise<Category[]> {
+  if (!apiUrl) return [];
 
-  const searchParams = useSearchParams();
+  try {
+    const response = await fetch(`${apiUrl}/categories`, {
+      next: { revalidate: 300 },
+      headers: { Accept: 'application/json' },
+    });
+    if (!response.ok) return [];
 
-  const categoryFromUrl =
-    searchParams.get('category');
+    const data = await response.json();
+    const loaded = Array.isArray(data)
+      ? data
+      : data?.categories ?? data?.value ?? data?.data ?? [];
 
-  const apiUrl =
-    process.env.NEXT_PUBLIC_API_URL;
+    if (!Array.isArray(loaded)) return [];
 
-  async function loadArticles(
-    categoryId: string,
-  ) {
-    setSelectedCategory(categoryId);
-    setLoadingArticles(true);
-    setError('');
-
-    try {
-      if (!apiUrl) {
-        throw new Error(
-          'NEXT_PUBLIC_API_URL is not configured.',
-        );
-      }
-
-      const response = await fetch(
-        `${apiUrl}/articles?categoryId=${encodeURIComponent(
-          categoryId,
-        )}`,
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          `Failed to load articles (${response.status})`,
-        );
-      }
-
-      const data = await response.json();
-
-      setArticles(
-        Array.isArray(data)
-          ? data
-          : data.articles ?? [],
-      );
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Failed to load articles.',
-      );
-
-      setArticles([]);
-    } finally {
-      setLoadingArticles(false);
-    }
-  }
-
-  useEffect(() => {
-    async function loadCategories() {
-      try {
-        if (!apiUrl) {
-          throw new Error(
-            'NEXT_PUBLIC_API_URL is not configured.',
-          );
-        }
-
-        const response = await fetch(
-          `${apiUrl}/categories`,
-        );
-
-        if (!response.ok) {
-          throw new Error(
-            `Failed to load categories (${response.status})`,
-          );
-        }
-
-        const data = await response.json();
-
-        const loadedCategories: Category[] =
-          Array.isArray(data)
-            ? data
-            : data.categories ?? [];
-
-        /*
-         * Keep only the six categories used
-         * by the mobile application.
-         */
-        const filteredCategories =
-          loadedCategories.filter((category) =>
-            allowedCategories.includes(
-              category.name,
-            ),
-          );
-
-        /*
-         * Keep the same order as the mobile app.
-         */
-        const orderedCategories =
-          allowedCategories
-            .map((categoryName) =>
-              filteredCategories.find(
-                (category) =>
-                  category.name === categoryName,
-              ),
-            )
-            .filter(
-              (
-                category,
-              ): category is Category =>
-                category !== undefined,
-            );
-
-        setCategories(orderedCategories);
-
-        if (categoryFromUrl) {
-          const matchingCategory =
-            orderedCategories.find(
-              (category) =>
-                category.name.toLowerCase() ===
-                categoryFromUrl.toLowerCase(),
-            );
-
-          if (matchingCategory) {
-            loadArticles(matchingCategory.id);
-          }
-        }
-      } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : 'Failed to load categories.',
-        );
-      } finally {
-        setLoadingCategories(false);
-      }
-    }
-
-    loadCategories();
-  }, [apiUrl, categoryFromUrl]);
-
-  const selectedCategoryObject =
-    categories.find(
-      (category) =>
-        category.id === selectedCategory,
+    const filtered = loaded.filter((category: Category) =>
+      category?.id && allowedCategories.includes(category.name),
     );
 
+    return allowedCategories
+      .map((name) => filtered.find((category: Category) => category.name === name))
+      .filter((category): category is Category => Boolean(category));
+  } catch {
+    return [];
+  }
+}
+
+async function getArticles(categoryId: string): Promise<Article[]> {
+  if (!apiUrl) return [];
+
+  try {
+    const response = await fetch(
+      `${apiUrl}/articles?categoryId=${encodeURIComponent(categoryId)}&limit=24`,
+      {
+        next: { revalidate: 300 },
+        headers: { Accept: 'application/json' },
+      },
+    );
+    if (!response.ok) return [];
+
+    const data = (await response.json()) as ArticlesResponse | Article[];
+    const items = Array.isArray(data)
+      ? data
+      : data.items ?? data.articles ?? [];
+
+    return items.filter((article) => article?.id && article?.title);
+  } catch {
+    return [];
+  }
+}
+
+function categoryUrl(name: string): string {
+  return `/categories?category=${encodeURIComponent(name)}`;
+}
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string | string[] }>;
+}): Promise<Metadata> {
+  const params = await searchParams;
+  const rawCategory = Array.isArray(params.category) ? params.category[0] : params.category;
+  const categories = await getCategories();
+  const category = categories.find(
+    (item) => item.name.toLowerCase() === (rawCategory ?? '').toLowerCase(),
+  );
+
+  if (!category) {
+    return {
+      title: 'تصنيفات الأخبار',
+      description: 'تصفح الأخبار حسب التصنيف في مدى العالم.',
+      alternates: { canonical: `${siteUrl.replace(/\/$/, '')}/categories` },
+      robots: { index: true, follow: true },
+    };
+  }
+
+  const label = getCategoryLabel(category.name);
+  const canonical = `${siteUrl.replace(/\/$/, '')}${categoryUrl(category.name)}`;
+
+  return {
+    title: `${label} | أخبار مدى العالم`,
+    description: `أحدث أخبار ${label} من مدى العالم، مرتبة حسب التصنيف ومحدثة باستمرار.`,
+    alternates: { canonical },
+    robots: { index: true, follow: true },
+    openGraph: {
+      type: 'website',
+      url: canonical,
+      title: `${label} | أخبار مدى العالم`,
+      description: `أحدث أخبار ${label} من مدى العالم.`,
+      siteName: 'مدى العالم',
+      locale: 'ar_AR',
+    },
+  };
+}
+
+export default async function CategoriesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string | string[] }>;
+}) {
+  const params = await searchParams;
+  const rawCategory = Array.isArray(params.category) ? params.category[0] : params.category;
+  const categories = await getCategories();
+  const selectedCategory = categories.find(
+    (category) => category.name.toLowerCase() === (rawCategory ?? '').toLowerCase(),
+  );
+  const articles = selectedCategory ? await getArticles(selectedCategory.id) : [];
+  const selectedLabel = selectedCategory ? getCategoryLabel(selectedCategory.name) : '';
+
   return (
-    <main
-      dir="rtl"
-      className="mada-page min-h-screen bg-transparent"
-    >
+    <main dir="rtl" className="mada-page min-h-screen bg-transparent">
       <section className="mx-auto max-w-7xl px-6 py-10">
-        <div className="mb-8">
+        <header className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            أقسام الأخبار
+            {selectedCategory ? `أخبار ${selectedLabel}` : 'أقسام الأخبار'}
           </h1>
-
           <p className="mt-2 text-gray-500">
-            تصفح أحدث الأخبار حسب القسم.
+            {selectedCategory
+              ? `أحدث الأخبار في قسم ${selectedLabel} من مدى العالم.`
+              : 'تصفح أحدث الأخبار حسب القسم.'}
           </p>
-        </div>
+        </header>
 
-        {error && (
-          <div className="mb-6 rounded-xl bg-red-50 p-4 text-sm text-red-700">
-            {error}
+        <nav aria-label="تصنيفات الأخبار" className="rounded-2xl bg-white p-6 shadow-sm">
+          <h2 className="mb-5 text-xl font-bold text-gray-900">الأقسام</h2>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/categories"
+              className={`rounded-xl px-5 py-3 text-sm font-semibold transition ${
+                !selectedCategory ? 'bg-black text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+              }`}
+            >
+              الكل
+            </Link>
+            {categories.map((category) => (
+              <Link
+                key={category.id}
+                href={categoryUrl(category.name)}
+                className={`rounded-xl px-5 py-3 text-sm font-semibold transition ${
+                  selectedCategory?.id === category.id
+                    ? 'bg-black text-white'
+                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                }`}
+              >
+                {getCategoryLabel(category.name)}
+              </Link>
+            ))}
           </div>
-        )}
-
-        <section className="rounded-2xl bg-white p-6 shadow-sm">
-          <h2 className="mb-5 text-xl font-bold text-gray-900">
-            الأقسام
-          </h2>
-
-          {loadingCategories ? (
-            <p className="text-gray-500">
-              جارٍ تحميل الأقسام...
-            </p>
-          ) : categories.length === 0 ? (
-            <p className="text-gray-500">
-              لا توجد أقسام متاحة.
-            </p>
-          ) : (
-            <div className="flex flex-wrap gap-3">
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  type="button"
-                  onClick={() =>
-                    loadArticles(category.id)
-                  }
-                  className={`rounded-xl px-5 py-3 text-sm font-semibold transition ${
-                    selectedCategory ===
-                    category.id
-                      ? 'bg-black text-white'
-                      : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                  }`}
-                >
-                  {getCategoryLabel(
-                    category.name,
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
-        </section>
+        </nav>
 
         {selectedCategory && (
-          <section className="mt-8">
-            <h2 className="mb-5 text-2xl font-bold text-gray-900">
-              {selectedCategoryObject
-                ? getCategoryLabel(
-                    selectedCategoryObject.name,
-                  )
-                : 'الأخبار'}
+          <section className="mt-8" aria-labelledby="category-articles-heading">
+            <h2 id="category-articles-heading" className="mb-5 text-2xl font-bold text-gray-900">
+              أحدث أخبار {selectedLabel}
             </h2>
 
-            {loadingArticles ? (
-              <p className="text-gray-500">
-                جارٍ تحميل الأخبار...
-              </p>
-            ) : articles.length === 0 ? (
+            {articles.length === 0 ? (
               <div className="rounded-2xl bg-white p-8 text-center shadow-sm">
-                <p className="text-gray-500">
-                  لا توجد أخبار في هذا القسم.
-                </p>
+                <p className="text-gray-500">لا توجد أخبار في هذا القسم حاليًا.</p>
               </div>
             ) : (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {articles.map((article) => (
-                  <article
-                    key={article.id}
-                    className="overflow-hidden rounded-2xl bg-white shadow-sm"
-                  >
+                  <article key={article.id} className="overflow-hidden rounded-2xl bg-white shadow-sm">
                     {article.imageUrl && (
                       <img
                         src={article.imageUrl}
                         alt={article.title}
+                        width={600}
+                        height={338}
+                        loading="lazy"
                         className="h-52 w-full object-cover"
                       />
                     )}
-
                     <div className="p-5">
                       <div className="mb-3 flex flex-wrap gap-2">
                         {article.source?.name && (
@@ -302,43 +230,32 @@ function CategoriesContent() {
                             {article.source.name}
                           </span>
                         )}
-
-                        {article.category?.name && (
-                          <span className="rounded-full bg-blue-50 px-3 py-1 text-xs text-blue-700">
-                            {getCategoryLabel(
-                              article.category.name,
-                            )}
-                          </span>
-                        )}
+                        <span className="rounded-full bg-blue-50 px-3 py-1 text-xs text-blue-700">
+                          {selectedLabel}
+                        </span>
                       </div>
-
-                      <h3 className="text-lg font-bold text-gray-900">
-                        {article.title}
+                      <h3 className="text-lg font-bold leading-8 text-gray-900">
+                        <Link href={`/articles/${encodeURIComponent(article.id)}`} className="hover:underline">
+                          {article.title}
+                        </Link>
                       </h3>
-
                       {article.description && (
                         <p className="mt-3 line-clamp-3 text-sm leading-6 text-gray-600">
                           {article.description}
                         </p>
                       )}
-
-                      <div className="mt-5 flex items-center justify-between">
-                        <span className="text-xs text-gray-500">
-                          {new Date(
-                            article.publishedAt,
-                          ).toLocaleDateString(
-                            'ar-JO',
-                          )}
-                        </span>
-
-                        <a
-                          href={article.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                      <div className="mt-5 flex items-center justify-between gap-4">
+                        {article.publishedAt ? (
+                          <time dateTime={article.publishedAt} className="text-xs text-gray-500">
+                            {new Date(article.publishedAt).toLocaleDateString('ar-JO')}
+                          </time>
+                        ) : <span />}
+                        <Link
+                          href={`/articles/${encodeURIComponent(article.id)}`}
                           className="rounded-xl bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800"
                         >
                           قراءة الخبر
-                        </a>
+                        </Link>
                       </div>
                     </div>
                   </article>
@@ -349,26 +266,5 @@ function CategoriesContent() {
         )}
       </section>
     </main>
-  );
-}
-
-export default function CategoriesPage() {
-  return (
-    <Suspense
-      fallback={
-        <main
-          dir="rtl"
-          className="mada-page min-h-screen bg-transparent"
-        >
-          <section className="mx-auto max-w-7xl px-6 py-10">
-            <p className="text-gray-500">
-              جارٍ تحميل الأقسام...
-            </p>
-          </section>
-        </main>
-      }
-    >
-      <CategoriesContent />
-    </Suspense>
   );
 }

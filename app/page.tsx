@@ -35,9 +35,6 @@ type Story = {
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://madaalalam.com';
 
-const homeDescription =
-  'أحدث أخبار العالم والعرب والرياضة والتكنولوجيا والاقتصاد من مصادر متعددة في تجربة عربية حديثة وسريعة.';
-
 export async function generateMetadata({
   searchParams,
 }: {
@@ -46,27 +43,29 @@ export async function generateMetadata({
   const params = await searchParams;
   const rawPage = Array.isArray(params.page) ? params.page[0] : params.page;
   const parsedPage = Number.parseInt(rawPage ?? '1', 10);
-  const page = Number.isFinite(parsedPage) && parsedPage > 0 ? Math.min(parsedPage, 1000) : 1;
+  const page = Number.isSafeInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
   const normalizedSiteUrl = siteUrl.replace(/\/$/, '');
-  const canonical = page === 1 ? `${normalizedSiteUrl}/` : `${normalizedSiteUrl}/?page=${page}`;
-  const pageTitle = page === 1 ? 'مدى العالم | أخبار العالم لحظة بلحظة' : `أخبار العالم - الصفحة ${page}`;
+  const canonical = page === 1 ? normalizedSiteUrl : `${normalizedSiteUrl}/?page=${page}`;
+  const title = page === 1
+    ? 'مدى العالم | أخبار العالم لحظة بلحظة'
+    : `أخبار مدى العالم | الصفحة ${page}`;
 
   return {
-    title: pageTitle,
-    description: homeDescription,
+    title: { absolute: title },
+    description: 'أحدث أخبار العالم والعرب والرياضة والتكنولوجيا والاقتصاد من مصادر متعددة في تجربة عربية حديثة وسريعة.',
     alternates: { canonical },
     robots: { index: true, follow: true },
     openGraph: {
       type: 'website',
       url: canonical,
-      title: pageTitle,
+      title,
       description: 'أحدث الأخبار من مصادر متعددة في تجربة عربية حديثة وسريعة.',
       siteName: 'مدى العالم',
       locale: 'ar_AR',
     },
     twitter: {
       card: 'summary',
-      title: pageTitle,
+      title,
       description: 'أحدث الأخبار من مصادر متعددة في تجربة عربية حديثة وسريعة.',
     },
   };
@@ -138,7 +137,7 @@ export default async function HomePage({
   const params = await searchParams;
   const rawPage = Array.isArray(params.page) ? params.page[0] : params.page;
   const parsedPage = Number.parseInt(rawPage ?? '1', 10);
-  const page = Number.isFinite(parsedPage) && parsedPage > 0 ? Math.min(parsedPage, 1000) : 1;
+  const page = Number.isSafeInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 
   const [initialArticles, topArticles, initialStories] = await Promise.all([
     getInitialArticles(page),
@@ -148,8 +147,7 @@ export default async function HomePage({
   const resolvedTopArticles = topArticles ?? initialArticles;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://madaalalam.com';
   const normalizedSiteUrl = siteUrl.replace(/\/$/, '');
-  const currentUrl = page === 1 ? `${normalizedSiteUrl}/` : `${normalizedSiteUrl}/?page=${page}`;
-  const currentPageName = page === 1 ? 'مدى العالم | أخبار العالم لحظة بلحظة' : `أخبار العالم - الصفحة ${page}`;
+  const canonical = page === 1 ? normalizedSiteUrl : `${normalizedSiteUrl}/?page=${page}`;
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -181,10 +179,10 @@ export default async function HomePage({
       },
       {
         '@type': 'WebPage',
-        '@id': `${currentUrl}#webpage`,
-        url: currentUrl,
-        name: currentPageName,
-        description: homeDescription,
+        '@id': `${canonical}/#webpage`,
+        url: canonical,
+        name: page === 1 ? 'مدى العالم | أخبار العالم لحظة بلحظة' : `أخبار مدى العالم | الصفحة ${page}`,
+        description: 'أحدث أخبار العالم والعرب والرياضة والتكنولوجيا والاقتصاد من مصادر متعددة في تجربة عربية حديثة وسريعة.',
         isPartOf: { '@id': `${normalizedSiteUrl}/#website` },
         about: { '@id': `${normalizedSiteUrl}/#organization` },
         inLanguage: 'ar',

@@ -67,7 +67,7 @@ export async function generateMetadata({
       locale: 'ar_AR',
       ...(article.imageUrl ? { images: [{ url: article.imageUrl, alt: title }] } : {}),
       publishedTime: article.publishedAt,
-      modifiedTime: article.createdAt || article.publishedAt,
+      modifiedTime: article.updatedAt || article.publishedAt,
       authors: article.source?.name ? [article.source.name] : ['مدى العالم'],
       section: article.category?.name,
     },
@@ -100,7 +100,7 @@ export default async function ArticlePage({
     url: canonical,
     mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
     datePublished: article.publishedAt,
-    dateModified: article.createdAt || article.publishedAt,
+    dateModified: article.updatedAt || article.publishedAt,
     image: article.imageUrl ? [article.imageUrl] : undefined,
     articleSection: article.category?.name,
     author: {
