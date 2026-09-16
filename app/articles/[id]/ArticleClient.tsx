@@ -230,6 +230,12 @@ export default function ArticleClient({ initialArticle }: { initialArticle: Arti
             <img
               src={article.imageUrl}
               alt={article.title}
+              width={1200}
+              height={675}
+              fetchPriority="high"
+              loading="eager"
+              decoding="async"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 1200px"
               className="h-[260px] w-full object-cover sm:h-[340px] md:h-[450px]"
             />
           )}

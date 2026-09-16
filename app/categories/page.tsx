@@ -233,7 +233,7 @@ export default async function CategoriesPage({
               </div>
             ) : (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {articles.map((article) => (
+                {articles.map((article, index) => (
                   <article key={article.id} className="overflow-hidden rounded-2xl bg-white shadow-sm">
                     {article.imageUrl && (
                       <img
@@ -241,7 +241,10 @@ export default async function CategoriesPage({
                         alt={article.title}
                         width={600}
                         height={338}
-                        loading="lazy"
+                        fetchPriority={index === 0 ? 'high' : 'low'}
+                        loading={index === 0 ? 'eager' : 'lazy'}
+                        decoding="async"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         className="h-52 w-full object-cover"
                       />
                     )}
