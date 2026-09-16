@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans_Arabic } from "next/font/google";
+import { Noto_Sans_Arabic } from "next/font/google";
 import "./globals.css";
 import SiteChrome from "./components/SiteChrome";
 
-const madaSans = IBM_Plex_Sans_Arabic({
+const madaSans = Noto_Sans_Arabic({
   variable: "--font-mada-sans",
   subsets: ["arabic", "latin"],
   display: "swap",
-  weight: ["400", "700"],
+  weight: ["400", "500", "600", "700", "800", "900"],
   preload: true,
 });
 
