@@ -4,11 +4,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState, type TouchEvent } from 'react';
 import ThemeToggle from './ThemeToggle';
+import { PUBLIC_CATEGORIES } from '../lib/public-categories';
 
-const categories = [
-  ['العالم', 'العالم'], ['الرياضة', 'الرياضة'], ['تكنولوجيا', 'تكنولوجيا'],
-  ['اقتصاد', 'اقتصاد'], ['سيارات', 'سيارات'], ['منوعات', 'منوعات'],
-];
+const categories = PUBLIC_CATEGORIES.map(({ label, key }) => [label, key] as const);
 
 export default function Navbar() {
   const pathname = usePathname();

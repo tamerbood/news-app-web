@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+import { PUBLIC_CATEGORIES } from './lib/public-categories';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://madaalalam.com';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
@@ -18,11 +19,6 @@ interface ArticlesResponse {
   totalPages?: number;
 }
 
-interface SitemapCategory {
-  id?: string;
-  name?: string;
-}
-
 async function getArticlesPage(page: number): Promise<ArticlesResponse> {
   if (!apiUrl) return {};
 
@@ -39,25 +35,6 @@ async function getArticlesPage(page: number): Promise<ArticlesResponse> {
   }
 }
 
-
-async function getCategories(): Promise<SitemapCategory[]> {
-  if (!apiUrl) return [];
-
-  try {
-    const response = await fetch(`${apiUrl}/categories`, {
-      next: { revalidate: 3600 },
-      headers: { Accept: 'application/json' },
-    });
-    if (!response.ok) return [];
-    const data = await response.json();
-    const items = Array.isArray(data) ? data : data?.categories ?? data?.value ?? data?.data ?? [];
-    return Array.isArray(items)
-      ? items.filter((category: SitemapCategory) => Boolean(category?.name))
-      : [];
-  } catch {
-    return [];
-  }
-}
 
 function validDate(value?: string | null): Date | undefined {
   if (!value) return undefined;
@@ -80,9 +57,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   if (!apiUrl) return staticRoutes;
 
-  const categories = await getCategories();
-  const categoryRoutes: MetadataRoute.Sitemap = categories.map((category) => ({
-    url: `${base}/categories?category=${encodeURIComponent(category.name!)}`,
+  const categoryRoutes: MetadataRoute.Sitemap = PUBLIC_CATEGORIES.map((category) => ({
+    url: `${base}/categories?category=${encodeURIComponent(category.key)}`,
     priority: 0.8,
     changeFrequency: 'hourly',
   }));

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getUserCountryCode } from '../lib/user-country';
+import { PUBLIC_CATEGORIES, getPublicCategory, matchesPublicCategory } from '../lib/public-categories';
 
 interface Category {
   id: string;
@@ -23,21 +24,8 @@ interface ArticlesResponse {
   articles?: Article[];
 }
 
-const categoryLabels: Record<string, string> = {
-  World: 'مصادر عالمية',
-  Sports: 'رياضة',
-  Technology: 'تكنولوجيا',
-  Business: 'اقتصاد',
-  Entertainment: 'منوعات',
-  Cars: 'سيارات',
-};
-
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://madaalalam.com';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
-
-function getCategoryLabel(name: string): string {
-  return categoryLabels[name] ?? name;
-}
 
 async function getCategories(): Promise<Category[]> {
   if (!apiUrl) return [];
@@ -69,29 +57,44 @@ async function getCategories(): Promise<Category[]> {
 async function getArticles(categoryId?: string, countryCode = 'NONE'): Promise<Article[]> {
   if (!apiUrl) return [];
 
-  try {
-    const response = await fetch(
-      `${apiUrl}/articles?${categoryId ? `categoryId=${encodeURIComponent(categoryId)}&` : ''}page=1&limit=24${process.env.NODE_ENV === 'development' ? '' : `&countryCode=${encodeURIComponent(countryCode)}`}`,
-      {
-        cache: 'no-store',
-        headers: { Accept: 'application/json' },
-      },
-    );
+  const fetchArticles = async (includeCountry: boolean): Promise<Article[]> => {
+    const params = new URLSearchParams({ page: '1', limit: '24' });
+    if (categoryId) params.set('categoryId', categoryId);
+    if (includeCountry && process.env.NODE_ENV !== 'development' && countryCode) {
+      params.set('countryCode', countryCode);
+    }
+
+    const response = await fetch(`${apiUrl}/articles?${params.toString()}`, {
+      cache: 'no-store',
+      headers: { Accept: 'application/json' },
+    });
     if (!response.ok) return [];
 
     const data = (await response.json()) as ArticlesResponse | Article[];
-    const items = Array.isArray(data)
-      ? data
-      : data.items ?? data.articles ?? [];
-
+    const items = Array.isArray(data) ? data : data.items ?? data.articles ?? [];
     return items.filter((article) => article?.id && article?.title);
+  };
+
+  try {
+    const localized = await fetchArticles(true);
+    // A section must not appear empty merely because the visitor-country feed
+    // has no matching stories. Preserve localization first, then use the same
+    // section without the country filter.
+    if (localized.length > 0 || process.env.NODE_ENV === 'development') return localized;
+    return fetchArticles(false);
   } catch {
     return [];
   }
 }
 
-function categoryUrl(name: string): string {
-  return `/categories?category=${encodeURIComponent(name)}`;
+function categoryUrl(key: string): string {
+  return `/categories?category=${encodeURIComponent(key)}`;
+}
+
+function resolveApiCategory(categories: Category[], requested?: string | null): Category | undefined {
+  const publicCategory = getPublicCategory(requested);
+  if (!publicCategory) return undefined;
+  return categories.find((category) => matchesPublicCategory(category.name, publicCategory));
 }
 
 export async function generateMetadata({
@@ -102,11 +105,10 @@ export async function generateMetadata({
   const params = await searchParams;
   const rawCategory = Array.isArray(params.category) ? params.category[0] : params.category;
   const categories = await getCategories();
-  const category = categories.find(
-    (item) => item.name.toLowerCase() === (rawCategory ?? '').toLowerCase(),
-  );
+  const publicCategory = getPublicCategory(rawCategory);
+  const category = resolveApiCategory(categories, rawCategory);
 
-  if (!category) {
+  if (!publicCategory || !category) {
     return {
       title: 'تصنيفات الأخبار',
       description: 'تصفح الأخبار حسب التصنيف في مدى العالم.',
@@ -130,8 +132,8 @@ export async function generateMetadata({
     };
   }
 
-  const label = getCategoryLabel(category.name);
-  const canonical = `${siteUrl.replace(/\/$/, '')}${categoryUrl(category.name)}`;
+  const label = publicCategory.label;
+  const canonical = `${siteUrl.replace(/\/$/, '')}${categoryUrl(publicCategory.key)}`;
 
   return {
     title: `${label} | أخبار مدى العالم`,
@@ -165,21 +167,22 @@ export default async function CategoriesPage({
   const rawCategory = Array.isArray(params.category) ? params.category[0] : params.category;
   const categories = await getCategories();
   const countryCode = await getUserCountryCode();
-  const selectedCategory = categories.find(
-    (category) => category.name.toLowerCase() === (rawCategory ?? '').toLowerCase(),
-  );
-  const articles = await getArticles(selectedCategory?.id, countryCode);
-  const selectedLabel = selectedCategory ? getCategoryLabel(selectedCategory.name) : '';
+  const selectedPublicCategory = getPublicCategory(rawCategory);
+  const selectedCategory = resolveApiCategory(categories, rawCategory);
+  const articles = selectedPublicCategory && !selectedCategory
+    ? []
+    : await getArticles(selectedCategory?.id, countryCode);
+  const selectedLabel = selectedPublicCategory?.label ?? '';
 
   return (
-    <main dir="rtl" className="mada-page min-h-screen bg-transparent">
+    <main dir="rtl" className="mada-page bg-transparent">
       <section className="mx-auto max-w-7xl px-6 py-10">
         <header className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            {selectedCategory ? `أخبار ${selectedLabel}` : 'أقسام الأخبار'}
+            {selectedPublicCategory && selectedCategory ? `أخبار ${selectedLabel}` : 'أقسام الأخبار'}
           </h1>
           <p className="mt-2 text-gray-500">
-            {selectedCategory
+            {selectedPublicCategory && selectedCategory
               ? `أحدث الأخبار في قسم ${selectedLabel} من مدى العالم.`
               : 'تصفح أحدث الأخبار حسب القسم.'}
           </p>
@@ -191,22 +194,22 @@ export default async function CategoriesPage({
             <Link
               href="/categories"
               className={`rounded-xl px-5 py-3 text-sm font-semibold transition ${
-                !selectedCategory ? 'bg-black text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                !selectedPublicCategory ? 'bg-black text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
               }`}
             >
               الكل
             </Link>
-            {categories.map((category) => (
+            {PUBLIC_CATEGORIES.map((category) => (
               <Link
-                key={category.id}
-                href={categoryUrl(category.name)}
+                key={category.key}
+                href={categoryUrl(category.key)}
                 className={`rounded-xl px-5 py-3 text-sm font-semibold transition ${
-                  selectedCategory?.id === category.id
+                  selectedPublicCategory?.key === category.key
                     ? 'bg-black text-white'
                     : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                 }`}
               >
-                {getCategoryLabel(category.name)}
+                {category.label}
               </Link>
             ))}
           </div>
@@ -214,12 +217,15 @@ export default async function CategoriesPage({
 
         <section className="mt-8" aria-labelledby="category-articles-heading">
             <h2 id="category-articles-heading" className="mb-5 text-2xl font-bold text-gray-900">
-              {selectedCategory ? `أحدث أخبار ${selectedLabel}` : 'أحدث الأخبار'}
+              {selectedPublicCategory && selectedCategory ? `أحدث أخبار ${selectedLabel}` : 'أحدث الأخبار'}
             </h2>
 
             {articles.length === 0 ? (
-              <div className="rounded-2xl bg-white p-8 text-center shadow-sm">
+              <div className="rounded-2xl bg-white p-6 text-center shadow-sm">
                 <p className="text-gray-500">لا توجد أخبار في هذا القسم حاليًا.</p>
+                <Link href="/categories" className="mt-4 inline-flex rounded-xl bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-200">
+                  عرض أحدث الأخبار
+                </Link>
               </div>
             ) : (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
