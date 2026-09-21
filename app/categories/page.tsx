@@ -71,7 +71,7 @@ async function getArticles(categoryId?: string, countryCode = 'NONE'): Promise<A
 
   try {
     const response = await fetch(
-      `${apiUrl}/articles?${categoryId ? `categoryId=${encodeURIComponent(categoryId)}&` : ''}page=1&limit=24&countryCode=${encodeURIComponent(countryCode)}`,
+      `${apiUrl}/articles?${categoryId ? `categoryId=${encodeURIComponent(categoryId)}&` : ''}page=1&limit=24${process.env.NODE_ENV === 'development' ? '' : `&countryCode=${encodeURIComponent(countryCode)}`}`,
       {
         cache: 'no-store',
         headers: { Accept: 'application/json' },

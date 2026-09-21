@@ -79,7 +79,10 @@ async function getInitialArticles(page = 1, countryCode = 'NONE'): Promise<Artic
   if (!apiUrl) return {};
 
   try {
-    const response = await fetch(`${apiUrl}/articles?page=${page}&limit=20&countryCode=${encodeURIComponent(countryCode)}`, {
+    const countryQuery = process.env.NODE_ENV === 'development'
+      ? ''
+      : `&countryCode=${encodeURIComponent(countryCode)}`;
+    const response = await fetch(`${apiUrl}/articles?page=${page}&limit=20${countryQuery}`, {
       cache: 'no-store',
     });
     if (!response.ok) return {};

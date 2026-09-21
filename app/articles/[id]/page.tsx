@@ -29,7 +29,7 @@ async function getArticle(id: string): Promise<Article | null> {
 function articleDescription(article: Article) {
   return (
     article.description?.trim() ||
-    `اقرأ تفاصيل خبر ${article.title} عبر مدى العالم، منصة الأخبار التي تجمع الأخبار من مصادر متعددة.`
+    `تفاصيل الخبر من المصدر الأصلي عبر مدى العالم: ${article.title}`
   ).slice(0, 160);
 }
 
@@ -52,12 +52,18 @@ export async function generateMetadata({
   const title = article.title.trim();
   const description = articleDescription(article);
   const canonical = `${siteUrl.replace(/\/$/, '')}/articles/${encodeURIComponent(article.id)}`;
+  const isOriginal = article.isOriginal === true;
 
   return {
     title,
     description,
     alternates: { canonical },
-    robots: { index: true, follow: true },
+    // Only editorial/original articles are eligible for search indexing.
+    // Syndicated RSS items remain usable inside the app but are deliberately
+    // excluded from Google indexing until they contain original editorial value.
+    robots: isOriginal
+      ? { index: true, follow: true }
+      : { index: false, follow: true },
     openGraph: {
       type: 'article',
       url: canonical,
@@ -90,48 +96,60 @@ export default async function ArticlePage({
 
   if (!article) notFound();
 
-  const canonical = `${siteUrl.replace(/\/$/, '')}/articles/${encodeURIComponent(article.id)}`;
+  const baseUrl = siteUrl.replace(/\/$/, '');
+  const canonical = `${baseUrl}/articles/${encodeURIComponent(article.id)}`;
   const description = articleDescription(article);
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'NewsArticle',
-    headline: article.title,
-    description,
-    url: canonical,
-    mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
-    datePublished: article.publishedAt,
-    dateModified: article.updatedAt || article.publishedAt,
-    image: article.imageUrl ? [article.imageUrl] : undefined,
-    articleSection: article.category?.name,
-    author: {
-      '@type': 'Organization',
-      name: article.source?.name || 'مدى العالم',
-      ...(article.source?.websiteUrl ? { url: article.source.websiteUrl } : {}),
-    },
-    publisher: {
-      '@type': 'Organization',
-      name: 'مدى العالم',
-      url: siteUrl,
-      logo: {
-        '@type': 'ImageObject',
-        url: `${siteUrl.replace(/\/$/, '')}/icons/icon-512.png`,
-      },
-    },
-  };
+  const isOriginal = article.isOriginal === true;
+
+  const structuredData = isOriginal
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'NewsArticle',
+        headline: article.title,
+        description,
+        url: canonical,
+        mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
+        datePublished: article.publishedAt,
+        dateModified: article.updatedAt || article.publishedAt,
+        image: article.imageUrl ? [article.imageUrl] : undefined,
+        articleSection: article.category?.name,
+        publisher: {
+          '@type': 'Organization',
+          name: 'مدى العالم',
+          url: baseUrl,
+          logo: {
+            '@type': 'ImageObject',
+            url: `${baseUrl}/icons/icon-512.png`,
+          },
+        },
+      }
+    : {
+        '@context': 'https://schema.org',
+        '@type': 'WebPage',
+        name: article.title,
+        description,
+        url: canonical,
+        isPartOf: {
+          '@type': 'WebSite',
+          name: 'مدى العالم',
+          url: baseUrl,
+        },
+        mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
+      };
 
   const breadcrumbItems = [
     {
       '@type': 'ListItem',
       position: 1,
       name: 'الرئيسية',
-      item: `${siteUrl.replace(/\/$/, '')}/`,
+      item: `${baseUrl}/`,
     },
     ...(article.category?.name
       ? [{
           '@type': 'ListItem',
           position: 2,
           name: article.category.name,
-          item: `${siteUrl.replace(/\/$/, '')}/categories?category=${encodeURIComponent(article.category.name)}`,
+          item: `${baseUrl}/categories?category=${encodeURIComponent(article.category.name)}`,
         }]
       : []),
     {
@@ -153,7 +171,7 @@ export default async function ArticlePage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c'),
+          __html: JSON.stringify(structuredData).replace(/</g, '\\u003c'),
         }}
       />
       <script

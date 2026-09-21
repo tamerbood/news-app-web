@@ -12,6 +12,7 @@ export interface Article {
   publishedAt: string;
   createdAt?: string;
   updatedAt?: string;
+  isOriginal?: boolean;
 
   source?: {
     id: string;

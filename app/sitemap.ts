@@ -10,6 +10,7 @@ interface SitemapArticle {
   id: string;
   publishedAt?: string | null;
   updatedAt?: string | null;
+  isOriginal?: boolean;
 }
 
 interface ArticlesResponse {
@@ -75,7 +76,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   for (const response of responses) {
     for (const article of response.items ?? []) {
-      if (!article?.id || seen.has(article.id)) continue;
+      if (!article?.id || article.isOriginal !== true || seen.has(article.id)) continue;
       if (articles.length + staticRoutes.length >= MAX_URLS) break;
       seen.add(article.id);
 

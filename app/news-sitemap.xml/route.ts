@@ -12,6 +12,7 @@ interface NewsArticle {
   id: string;
   title: string;
   publishedAt?: string;
+  isOriginal?: boolean;
 }
 
 interface ArticlesResponse {
@@ -62,7 +63,7 @@ export async function GET() {
 
     for (const page of pages) {
       for (const article of page.items ?? []) {
-        if (!article?.id || !article.title || seen.has(article.id)) continue;
+        if (!article?.id || !article.title || article.isOriginal !== true || seen.has(article.id)) continue;
         const published = article.publishedAt;
         if (!published) continue;
         const timestamp = Date.parse(published);

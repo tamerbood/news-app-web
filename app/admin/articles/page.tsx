@@ -83,6 +83,7 @@ export default function ArticlesPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [deletingAll, setDeletingAll] = useState(false);
 
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -605,6 +606,65 @@ setArticles(
       );
     } finally {
       setSyncing(false);
+    }
+  }
+
+  async function deleteAllArticles() {
+    const confirmed = window.confirm(
+      'تحذير: سيتم حذف جميع المواضيع/الأخبار نهائيًا من قاعدة البيانات. هل تريد المتابعة؟',
+    );
+
+    if (!confirmed) return;
+
+    const confirmedAgain = window.confirm(
+      'تأكيد أخير: لا يمكن التراجع عن حذف جميع المواضيع. هل أنت متأكد؟',
+    );
+
+    if (!confirmedAgain) return;
+
+    try {
+      setDeletingAll(true);
+      setError('');
+      setMessage('');
+
+      const token = localStorage.getItem('admin_token');
+
+      if (!token) {
+        window.location.href = '/admin/login';
+        return;
+      }
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/articles/all`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(
+          data?.message ?? `Delete all failed: ${response.status}`,
+        );
+      }
+
+      setMessage(
+        `تم حذف جميع المواضيع بنجاح. عدد المواضيع المحذوفة: ${Number(data?.deleted ?? 0)}.`,
+      );
+
+      await loadData();
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'تعذر حذف جميع المواضيع',
+      );
+    } finally {
+      setDeletingAll(false);
     }
   }
 
@@ -1137,13 +1197,23 @@ setArticles(
               </p>
             </div>
 
-            <button
-              onClick={loadData}
-              disabled={loading}
-              className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-            >
-              Refresh
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={deleteAllArticles}
+                disabled={loading || deletingAll || articles.length === 0}
+                className="rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-sm font-bold text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {deletingAll ? 'جاري حذف جميع المواضيع...' : 'حذف جميع المواضيع'}
+              </button>
+
+              <button
+                onClick={loadData}
+                disabled={loading || deletingAll}
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              >
+                Refresh
+              </button>
+            </div>
           </div>
 
           {loading ? (
