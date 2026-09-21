@@ -78,10 +78,10 @@ async function getInitialArticles(page = 1, countryCode = 'NONE'): Promise<Artic
   const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
   if (!apiUrl) return {};
 
-  try {
-    const countryQuery = process.env.NODE_ENV === 'development'
+  const fetchArticles = async (code?: string): Promise<ArticlesResponse> => {
+    const countryQuery = process.env.NODE_ENV === 'development' || !code
       ? ''
-      : `&countryCode=${encodeURIComponent(countryCode)}`;
+      : `&countryCode=${encodeURIComponent(code)}`;
     const response = await fetch(`${apiUrl}/articles?page=${page}&limit=20${countryQuery}`, {
       cache: 'no-store',
     });
@@ -102,6 +102,23 @@ async function getInitialArticles(page = 1, countryCode = 'NONE'): Promise<Artic
       items,
       totalPages: Number.isFinite(data.totalPages) ? data.totalPages : 1,
     };
+  };
+
+  try {
+    const primary = await fetchArticles(countryCode);
+
+    // If a supported country currently has no matching articles, keep the
+    // homepage useful by showing only independent/global sources rather than
+    // mixing in another country's feed.
+    if (
+      process.env.NODE_ENV !== 'development' &&
+      countryCode !== 'NONE' &&
+      (!primary.items || primary.items.length === 0)
+    ) {
+      return fetchArticles('NONE');
+    }
+
+    return primary;
   } catch {
     return {};
   }
