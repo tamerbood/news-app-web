@@ -55,7 +55,7 @@ export async function generateMetadata({
     title: { absolute: title },
     description: 'أحدث أخبار العالم والعرب والرياضة والتكنولوجيا والاقتصاد من مصادر متعددة في تجربة عربية حديثة وسريعة.',
     alternates: { canonical },
-    robots: { index: false, follow: true },
+    robots: { index: page === 1, follow: true },
     openGraph: {
       type: 'website',
       url: canonical,

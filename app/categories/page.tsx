@@ -111,7 +111,7 @@ export async function generateMetadata({
       title: 'تصنيفات الأخبار',
       description: 'تصفح الأخبار حسب التصنيف في مدى العالم.',
       alternates: { canonical: `${siteUrl.replace(/\/$/, '')}/categories` },
-      robots: { index: false, follow: true },
+      robots: { index: true, follow: true },
       openGraph: {
         type: 'website',
         url: `${siteUrl.replace(/\/$/, '')}/categories`,
@@ -137,7 +137,7 @@ export async function generateMetadata({
     title: `${label} | أخبار مدى العالم`,
     description: `أحدث أخبار ${label} من مدى العالم، مرتبة حسب التصنيف ومحدثة باستمرار.`,
     alternates: { canonical },
-    robots: { index: false, follow: true },
+    robots: { index: true, follow: true },
     openGraph: {
       type: 'website',
       url: canonical,

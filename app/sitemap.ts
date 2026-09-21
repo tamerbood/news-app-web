@@ -18,6 +18,11 @@ interface ArticlesResponse {
   totalPages?: number;
 }
 
+interface SitemapCategory {
+  id?: string;
+  name?: string;
+}
+
 async function getArticlesPage(page: number): Promise<ArticlesResponse> {
   if (!apiUrl) return {};
 
@@ -34,6 +39,26 @@ async function getArticlesPage(page: number): Promise<ArticlesResponse> {
   }
 }
 
+
+async function getCategories(): Promise<SitemapCategory[]> {
+  if (!apiUrl) return [];
+
+  try {
+    const response = await fetch(`${apiUrl}/categories`, {
+      next: { revalidate: 3600 },
+      headers: { Accept: 'application/json' },
+    });
+    if (!response.ok) return [];
+    const data = await response.json();
+    const items = Array.isArray(data) ? data : data?.categories ?? data?.value ?? data?.data ?? [];
+    return Array.isArray(items)
+      ? items.filter((category: SitemapCategory) => Boolean(category?.name))
+      : [];
+  } catch {
+    return [];
+  }
+}
+
 function validDate(value?: string | null): Date | undefined {
   if (!value) return undefined;
   const timestamp = Date.parse(value);
@@ -43,6 +68,8 @@ function validDate(value?: string | null): Date | undefined {
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteUrl.replace(/\/$/, '');
   const staticRoutes: MetadataRoute.Sitemap = [
+    { url: `${base}/`, priority: 1, changeFrequency: 'hourly' },
+    { url: `${base}/categories`, priority: 0.8, changeFrequency: 'hourly' },
     { url: `${base}/sports`, priority: 0.7, changeFrequency: 'hourly' },
     { url: `${base}/sources`, priority: 0.6, changeFrequency: 'daily' },
     { url: `${base}/about`, priority: 0.4, changeFrequency: 'monthly' },
@@ -53,9 +80,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   if (!apiUrl) return staticRoutes;
 
+  const categories = await getCategories();
+  const categoryRoutes: MetadataRoute.Sitemap = categories.map((category) => ({
+    url: `${base}/categories?category=${encodeURIComponent(category.name!)}`,
+    priority: 0.8,
+    changeFrequency: 'hourly',
+  }));
+
+  const baseRoutes = [...staticRoutes, ...categoryRoutes];
   const firstPage = await getArticlesPage(1);
   const totalPages = Math.max(Number(firstPage.totalPages) || 1, 1);
-  const maxArticlePages = Math.ceil(Math.max(MAX_URLS - staticRoutes.length, 0) / PAGE_SIZE);
+  const maxArticlePages = Math.ceil(Math.max(MAX_URLS - baseRoutes.length, 0) / PAGE_SIZE);
   const pagesToFetch = Math.min(totalPages, maxArticlePages);
 
   const responses: ArticlesResponse[] = [];
@@ -75,7 +110,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const response of responses) {
     for (const article of response.items ?? []) {
       if (!article?.id || article.isOriginal !== true || seen.has(article.id)) continue;
-      if (articles.length + staticRoutes.length >= MAX_URLS) break;
+      if (articles.length + baseRoutes.length >= MAX_URLS) break;
       seen.add(article.id);
 
       const lastModified = validDate(article.updatedAt || article.publishedAt);
@@ -86,8 +121,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.7,
       });
     }
-    if (articles.length + staticRoutes.length >= MAX_URLS) break;
+    if (articles.length + baseRoutes.length >= MAX_URLS) break;
   }
 
-  return [...staticRoutes, ...articles];
+  return [...baseRoutes, ...articles];
 }
