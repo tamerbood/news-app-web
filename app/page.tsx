@@ -107,15 +107,15 @@ async function getInitialArticles(page = 1, countryCode = 'NONE'): Promise<Artic
   try {
     const primary = await fetchArticles(countryCode);
 
-    // If a supported country currently has no matching articles, keep the
-    // homepage useful by showing only independent/global sources rather than
-    // mixing in another country's feed.
+    // Production must never render an empty homepage only because the
+    // country-specific filter has no matches (or an older API deployment does
+    // not understand the NONE fallback). Keep country filtering as the first
+    // choice, then fall back to the normal unfiltered feed when it is empty.
     if (
       process.env.NODE_ENV !== 'development' &&
-      countryCode !== 'NONE' &&
       (!primary.items || primary.items.length === 0)
     ) {
-      return fetchArticles('NONE');
+      return fetchArticles();
     }
 
     return primary;
