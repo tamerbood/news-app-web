@@ -13,37 +13,61 @@ export interface Article {
   createdAt?: string;
   updatedAt?: string;
   isOriginal?: boolean;
-
   source?: {
     id: string;
     name: string;
     websiteUrl?: string;
     logoUrl?: string;
   };
-
   category?: {
     id: string;
     name: string;
   };
 }
 
-export default function ArticleClient({ initialArticle }: { initialArticle: Article }) {
-  const id = initialArticle.id;
 
-  const [article] = useState<Article>(initialArticle);
+const CATEGORY_LABELS: Record<string, string> = {
+  World: 'العالم',
+  Sports: 'الرياضة',
+  Economy: 'اقتصاد',
+  Technology: 'تكنولوجيا',
+  Cars: 'سيارات',
+  Variety: 'منوعات',
+};
 
-  const [isFavorite, setIsFavorite] =
-    useState(false);
+function categoryLabel(name?: string) {
+  if (!name) return '';
+  return CATEGORY_LABELS[name] ?? name;
+}
 
-  const [favoriteLoading, setFavoriteLoading] =
-    useState(false);
+function formatPublishedAt(value?: string) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
 
-  const [favoriteMessage, setFavoriteMessage] =
-    useState('');
+  return date.toLocaleString('ar-JO', {
+    timeZone: 'Asia/Amman',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+}
 
-  /*
-   * Check Favorite
-   */
+export default function ArticleClient({
+  initialArticle,
+  relatedArticles = [],
+}: {
+  initialArticle: Article;
+  relatedArticles?: Article[];
+}) {
+  const article = initialArticle;
+  const id = article.id;
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [favoriteMessage, setFavoriteMessage] = useState('');
+
   useEffect(() => {
     async function checkFavorite() {
       const token = localStorage.getItem('user_token');
@@ -51,13 +75,10 @@ export default function ArticleClient({ initialArticle }: { initialArticle: Arti
       if (!token || !apiUrl) return;
 
       try {
-        const response = await fetch(
-          `${apiUrl}/bookmarks/${encodeURIComponent(id)}/check`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-            cache: 'no-store',
-          },
-        );
+        const response = await fetch(`${apiUrl}/bookmarks/${encodeURIComponent(id)}/check`, {
+          headers: { Authorization: `Bearer ${token}` },
+          cache: 'no-store',
+        });
 
         if (response.status === 401) {
           localStorage.removeItem('user_token');
@@ -77,28 +98,16 @@ export default function ArticleClient({ initialArticle }: { initialArticle: Arti
     checkFavorite();
   }, [id]);
 
-  /*
-   * Add / Remove Favorite
-   */
   async function toggleFavorite() {
-    const token =
-      localStorage.getItem('user_token');
-
-    /*
-     * User is not logged in
-     */
+    const token = localStorage.getItem('user_token');
     if (!token) {
       window.location.href = '/login';
       return;
     }
 
-    const apiUrl =
-      process.env.NEXT_PUBLIC_API_URL;
-
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     if (!apiUrl) {
-      setFavoriteMessage(
-        'API URL is not configured.',
-      );
+      setFavoriteMessage('تعذر الاتصال بالخدمة حاليًا.');
       return;
     }
 
@@ -106,252 +115,169 @@ export default function ArticleClient({ initialArticle }: { initialArticle: Arti
     setFavoriteMessage('');
 
     try {
-      const method = isFavorite
-        ? 'DELETE'
-        : 'POST';
+      const response = await fetch(`${apiUrl}/bookmarks/${encodeURIComponent(id)}`, {
+        method: isFavorite ? 'DELETE' : 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json().catch(() => null);
 
-      const response =
-        await fetch(
-          `${apiUrl}/bookmarks/${encodeURIComponent(id)}`,
-          {
-            method,
-            headers: {
-              Authorization:
-                `Bearer ${token}`,
-            },
-          },
-        );
-
-      const data =
-        await response
-          .json()
-          .catch(() => null);
-
-      /*
-       * Invalid / expired token
-       */
-      if (
-        response.status === 401
-      ) {
-        localStorage.removeItem(
-          'user_token',
-        );
-
-        localStorage.removeItem(
-          'user',
-        );
-
-        window.location.href =
-          '/login';
-
+      if (response.status === 401) {
+        localStorage.removeItem('user_token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
         return;
       }
 
-      if (!response.ok) {
-        throw new Error(
-          data?.message ??
-            'Failed to update favorites.',
-        );
-      }
+      if (!response.ok) throw new Error(data?.message ?? 'تعذر تحديث المفضلة.');
 
-      /*
-       * Update UI
-       */
-      const newFavoriteState =
-        !isFavorite;
-
-      setIsFavorite(
-        newFavoriteState,
-      );
-
-      setFavoriteMessage(
-        newFavoriteState
-          ? 'Article added to favorites.'
-          : 'Article removed from favorites.',
-      );
-    } catch (err) {
-      setFavoriteMessage(
-        err instanceof Error
-          ? err.message
-          : 'Failed to update favorites.',
-      );
+      const nextState = !isFavorite;
+      setIsFavorite(nextState);
+      setFavoriteMessage(nextState ? 'تمت إضافة الخبر إلى المفضلة.' : 'تمت إزالة الخبر من المفضلة.');
+    } catch (error) {
+      setFavoriteMessage(error instanceof Error ? error.message : 'تعذر تحديث المفضلة.');
     } finally {
       setFavoriteLoading(false);
     }
   }
 
-  /*
-   * Article Page
-   */
   return (
-    <main className="mada-page min-h-screen bg-transparent">
-      <article className="mx-auto max-w-5xl px-4 py-8 sm:px-6 md:py-10">
-        {/* Breadcrumb navigation */}
-        <nav aria-label="Breadcrumb" className="mb-5 text-sm text-gray-500">
-          <ol className="flex flex-wrap items-center gap-2">
-            <li>
-              <Link href="/" className="transition hover:text-blue-700">
-                الرئيسية
-              </Link>
-            </li>
-            {article.category?.name && (
-              <>
-                <li aria-hidden="true">/</li>
-                <li>
-                  <Link
-                    href={`/categories?category=${encodeURIComponent(article.category.name)}`}
-                    className="transition hover:text-blue-700"
-                  >
-                    {article.category.name}
-                  </Link>
-                </li>
-              </>
-            )}
-            <li aria-hidden="true">/</li>
-            <li aria-current="page" className="max-w-full truncate text-gray-700">
-              {article.title}
-            </li>
-          </ol>
-        </nav>
-
-        {/* Back */}
-        <Link
-          href="/"
-          className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition hover:text-blue-800"
-        >
-          <span aria-hidden="true">
-            ←
-          </span>
-          Back to News
-        </Link>
-
-        <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
-          {/* Article Image */}
-          {article.imageUrl && (
-            <img
-              src={article.imageUrl}
-              alt={article.title}
-              width={1200}
-              height={675}
-              fetchPriority="high"
-              loading="eager"
-              decoding="async"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 1200px"
-              className="h-[260px] w-full object-cover sm:h-[340px] md:h-[450px]"
-            />
-          )}
-
-          <div className="p-6 sm:p-8 md:p-10">
-            {/* Source + Category */}
-            <div className="mb-5 flex flex-wrap gap-2">
-              {article.source?.name && (
-                <span className="rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700">
-                  {article.source.name}
-                </span>
-              )}
-
+    <main className="mada-page min-h-screen bg-transparent" dir="rtl">
+      <article className="mx-auto w-full max-w-6xl px-4 py-7 sm:px-6 lg:py-10">
+        <div className="mx-auto max-w-4xl">
+          <nav aria-label="مسار الصفحة" className="mb-6 text-sm font-medium text-slate-500">
+            <ol className="flex flex-wrap items-center gap-2">
+              <li><Link href="/" className="transition hover:text-blue-700">الرئيسية</Link></li>
               {article.category?.name && (
-                <span className="rounded-full bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700">
-                  {article.category.name}
-                </span>
+                <>
+                  <li aria-hidden="true" className="text-slate-300">←</li>
+                  <li>
+                    <Link href={`/categories?category=${encodeURIComponent(article.category.name)}`} className="transition hover:text-blue-700">
+                      {categoryLabel(article.category.name)}
+                    </Link>
+                  </li>
+                </>
               )}
+            </ol>
+          </nav>
+
+          <header className="border-b border-slate-200 pb-7">
+            <div className="mb-4 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm text-slate-500">
+              {article.source?.name && <span className="font-bold text-blue-700">{article.source.name}</span>}
+              {article.source?.name && article.publishedAt && <span className="text-slate-300" aria-hidden="true">•</span>}
+              {article.publishedAt && <time dateTime={article.publishedAt}>{formatPublishedAt(article.publishedAt)}</time>}
             </div>
 
-            {/* Title */}
-            <h1 className="text-3xl font-bold leading-tight text-gray-900 sm:text-4xl md:text-5xl">
+            <h1 className="text-3xl font-extrabold leading-[1.35] tracking-tight text-slate-950 sm:text-4xl lg:text-5xl">
               {article.title}
             </h1>
+          </header>
 
-            {/* Date */}
-            {article.publishedAt && (
-              <div className="mt-5 text-sm text-gray-500">
-                Published on{' '}
-                {new Date(
-                  article.publishedAt,
-                ).toLocaleDateString('ar-JO', { timeZone: 'Asia/Amman', day: 'numeric', month: 'long', year: 'numeric' })}
-              </div>
-            )}
+          {article.description && (
+            <p className="mt-7 text-lg font-medium leading-9 text-slate-700 sm:text-xl sm:leading-10">
+              {article.description}
+            </p>
+          )}
 
-            {/* Description */}
-            {article.description && (
-              <div className="mt-8">
-                <p className="text-lg leading-8 text-gray-700">
-                  {article.description}
-                </p>
-              </div>
-            )}
+          {article.imageUrl && (
+            <figure className="mt-7 overflow-hidden rounded-2xl bg-slate-100 shadow-sm ring-1 ring-slate-200/70">
+              <img
+                src={article.imageUrl}
+                alt={article.title}
+                width={1200}
+                height={675}
+                fetchPriority="high"
+                loading="eager"
+                decoding="async"
+                sizes="(max-width: 1024px) 100vw, 896px"
+                className="aspect-video w-full object-cover"
+              />
+            </figure>
+          )}
 
-            {/* Actions */}
-            <div className="mt-8 flex flex-col gap-3 border-t pt-6 sm:flex-row sm:flex-wrap sm:items-center">
-              {/* Favorite */}
+          <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6" aria-label="خيارات الخبر">
+            <p className="leading-8 text-slate-600">
+              {article.isOriginal
+                ? 'يمكنك حفظ هذا الخبر في المفضلة للعودة إليه لاحقًا.'
+                : 'هذا الخبر منقول من مصدره الإخباري. يمكنك متابعة التفاصيل الكاملة من المصدر الأصلي.'}
+            </p>
+
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+              {!article.isOriginal && article.url && (
+                <a
+                  href={article.url}
+                  target="_blank"
+                  rel="noopener noreferrer nofollow"
+                  className="inline-flex min-h-12 items-center justify-center rounded-xl bg-blue-700 px-6 py-3 font-bold text-white transition hover:bg-blue-800"
+                >
+                  متابعة قراءة الخبر من المصدر
+                  <span className="mr-2" aria-hidden="true">↗</span>
+                </a>
+              )}
+
               <button
                 type="button"
                 onClick={toggleFavorite}
                 disabled={favoriteLoading}
-                className={`rounded-xl px-6 py-3 font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                className={`inline-flex min-h-12 items-center justify-center rounded-xl border px-5 py-3 font-bold transition disabled:cursor-not-allowed disabled:opacity-50 ${
                   isFavorite
-                    ? 'border border-yellow-400 bg-yellow-50 text-yellow-700 hover:bg-yellow-100'
-                    : 'bg-black text-white hover:bg-gray-800'
+                    ? 'border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100'
+                    : 'border-slate-300 bg-white text-slate-800 hover:bg-slate-50'
                 }`}
               >
-                {favoriteLoading
-                  ? 'Updating...'
-                  : isFavorite
-                    ? '★ Remove from Favorites'
-                    : '☆ Add to Favorites'}
+                {favoriteLoading ? 'جارٍ التحديث...' : isFavorite ? '★ إزالة من المفضلة' : '☆ إضافة إلى المفضلة'}
               </button>
-
-              {/* Original Article */}
-              <a
-                href={article.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-xl border border-gray-300 bg-white px-6 py-3 text-center font-semibold text-gray-900 transition hover:bg-gray-50"
-              >
-                Read Original Article →
-              </a>
             </div>
 
-            {/* Favorite Message */}
             {favoriteMessage && (
-              <div
-                className={`mt-4 rounded-xl px-4 py-3 text-sm ${
-                  favoriteMessage.includes(
-                    'added',
-                  )
-                    ? 'bg-green-50 text-green-700'
-                    : favoriteMessage.includes(
-                          'removed',
-                        )
-                      ? 'bg-gray-100 text-gray-700'
-                      : 'bg-red-50 text-red-700'
-                }`}
-              >
-                {favoriteMessage}
-              </div>
+              <p className="mt-4 text-sm text-slate-600" role="status">{favoriteMessage}</p>
             )}
-
-            {/* Source Website */}
-            {article.source?.websiteUrl && (
-              <div className="mt-8 border-t pt-6">
-                <p className="text-sm text-gray-500">
-                  Source
-                </p>
-
-                <a
-                  href={
-                    article.source.websiteUrl
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-1 inline-block font-semibold text-blue-600 transition hover:text-blue-800"
-                >
-                  {article.source.name}
-                </a>
-              </div>
-            )}
-          </div>
+          </section>
         </div>
+
+        {relatedArticles.length > 0 && (
+          <section className="mt-14 border-t border-slate-200 pt-9" aria-labelledby="more-news-heading">
+            <div className="mb-6 flex items-end justify-between gap-4">
+              <div>
+                <p className="mb-1 text-sm font-bold text-blue-700">مدى العالم</p>
+                <h2 id="more-news-heading" className="text-2xl font-extrabold text-slate-950 sm:text-3xl">المزيد من الأخبار</h2>
+              </div>
+              <Link href="/" className="text-sm font-bold text-blue-700 transition hover:text-blue-900">عرض أحدث الأخبار</Link>
+            </div>
+
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {relatedArticles.map((item) => (
+                <Link
+                  key={item.id}
+                  href={`/articles/${encodeURIComponent(item.id)}`}
+                  className="group overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:-translate-y-0.5 hover:shadow-lg"
+                >
+                  <div className="aspect-[16/10] overflow-hidden bg-slate-100">
+                    {item.imageUrl ? (
+                      <img
+                        src={item.imageUrl}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center px-4 text-center text-sm font-bold text-slate-400">مدى العالم</div>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <div className="mb-2 flex items-center gap-2 text-xs text-slate-500">
+                      {item.source?.name && <span className="font-semibold text-blue-700">{item.source.name}</span>}
+                      {item.publishedAt && <span>• {new Date(item.publishedAt).toLocaleDateString('ar-JO', { timeZone: 'Asia/Amman', day: 'numeric', month: 'short' })}</span>}
+                    </div>
+                    <h3 className="line-clamp-3 text-base font-bold leading-7 text-slate-900 transition group-hover:text-blue-700">
+                      {item.title}
+                    </h3>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
       </article>
     </main>
   );

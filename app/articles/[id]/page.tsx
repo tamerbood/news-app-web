@@ -26,6 +26,31 @@ async function getArticle(id: string): Promise<Article | null> {
   }
 }
 
+
+async function getRelatedArticles(article: Article): Promise<Article[]> {
+  if (!apiUrl) return [];
+
+  try {
+    const categoryQuery = article.category?.id
+      ? `&categoryId=${encodeURIComponent(article.category.id)}`
+      : '';
+    const response = await fetch(
+      `${apiUrl}/articles?page=1&limit=12${categoryQuery}`,
+      { cache: 'no-store' },
+    );
+
+    if (!response.ok) return [];
+    const data = await response.json();
+    const items = Array.isArray(data?.items) ? data.items : [];
+
+    return items
+      .filter((item: Article) => item?.id && item.id !== article.id)
+      .slice(0, 8);
+  } catch {
+    return [];
+  }
+}
+
 function articleDescription(article: Article) {
   return (
     article.description?.trim() ||
@@ -95,6 +120,8 @@ export default async function ArticlePage({
   const article = await getArticle(id);
 
   if (!article) notFound();
+
+  const relatedArticles = await getRelatedArticles(article);
 
   const baseUrl = siteUrl.replace(/\/$/, '');
   const canonical = `${baseUrl}/articles/${encodeURIComponent(article.id)}`;
@@ -180,7 +207,7 @@ export default async function ArticlePage({
           __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, '\\u003c'),
         }}
       />
-      <ArticleClient initialArticle={article} />
+      <ArticleClient initialArticle={article} relatedArticles={relatedArticles} />
     </>
   );
 }

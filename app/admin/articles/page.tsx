@@ -40,6 +40,7 @@ type Article = {
   url: string;
   imageUrl: string | null;
   publishedAt: string | null;
+  isOriginal?: boolean;
   source?: Source | null;
 };
 
@@ -50,6 +51,7 @@ type ArticleForm = {
   url: string;
   imageUrl: string;
   publishedAt: string;
+  isOriginal: boolean;
 };
 
 const emptyForm: ArticleForm = {
@@ -59,6 +61,7 @@ const emptyForm: ArticleForm = {
   url: '',
   imageUrl: '',
   publishedAt: '',
+  isOriginal: false,
 };
 
 export default function ArticlesPage() {
@@ -294,6 +297,7 @@ setArticles(
       publishedAt: article.publishedAt
         ? toDateTimeLocal(article.publishedAt)
         : '',
+      isOriginal: article.isOriginal === true,
     });
 
     setError('');
@@ -311,7 +315,7 @@ setArticles(
 
   function updateForm(
     field: keyof ArticleForm,
-    value: string,
+    value: string | boolean,
   ) {
     setForm((current) => ({
       ...current,
@@ -350,6 +354,7 @@ setArticles(
   : editingArticle
     ? undefined
     : new Date().toISOString(),
+        isOriginal: form.isOriginal,
       };
 
       const url = editingArticle
@@ -985,6 +990,19 @@ setArticles(
                   />
                 </div>
               </div>
+
+              <label className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                <input
+                  type="checkbox"
+                  checked={form.isOriginal}
+                  onChange={(event) => updateForm('isOriginal', event.target.checked)}
+                  className="mt-1 h-4 w-4"
+                />
+                <span>
+                  <span className="block text-sm font-bold text-gray-900">محتوى أصلي لمدى العالم</span>
+                  <span className="mt-1 block text-xs leading-5 text-gray-600">فعّل هذا الخيار فقط للمحتوى الذي أعدّه فريق مدى العالم. أخبار RSS يجب أن تبقى غير مفعّلة.</span>
+                </span>
+              </label>
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700">

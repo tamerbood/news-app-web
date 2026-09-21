@@ -43,8 +43,6 @@ function validDate(value?: string | null): Date | undefined {
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteUrl.replace(/\/$/, '');
   const staticRoutes: MetadataRoute.Sitemap = [
-    { url: base, priority: 1, changeFrequency: 'hourly' },
-    { url: `${base}/categories`, priority: 0.8, changeFrequency: 'hourly' },
     { url: `${base}/sports`, priority: 0.7, changeFrequency: 'hourly' },
     { url: `${base}/sources`, priority: 0.6, changeFrequency: 'daily' },
     { url: `${base}/about`, priority: 0.4, changeFrequency: 'monthly' },
