@@ -74,8 +74,8 @@ export async function generateMetadata({
     };
   }
 
-  const title = article.title.trim();
-  const description = articleDescription(article);
+  const title = (article.seoTitle?.trim() || article.title.trim());
+  const description = (article.seoDescription?.trim() || articleDescription(article));
   const canonical = `${siteUrl.replace(/\/$/, '')}/articles/${encodeURIComponent(article.id)}`;
   const isOriginal = article.isOriginal === true;
 

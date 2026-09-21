@@ -9,6 +9,7 @@ interface Category {
 }
 
 interface Article {
+  isOriginal?: boolean;
   id: string;
   title: string;
   description?: string | null;
@@ -85,6 +86,16 @@ async function getArticles(categoryId?: string, countryCode = 'NONE'): Promise<A
   } catch {
     return [];
   }
+}
+
+async function getOriginalArticles(categoryId?: string): Promise<Article[]> {
+  if (!apiUrl || !categoryId) return [];
+  try {
+    const response = await fetch(`${apiUrl}/articles/original?categoryId=${encodeURIComponent(categoryId)}&page=1&limit=6`, { cache: 'no-store' });
+    if (!response.ok) return [];
+    const data = await response.json();
+    return Array.isArray(data?.items) ? data.items : [];
+  } catch { return []; }
 }
 
 function categoryUrl(key: string): string {
@@ -172,6 +183,7 @@ export default async function CategoriesPage({
   const articles = selectedPublicCategory && !selectedCategory
     ? []
     : await getArticles(selectedCategory?.id, countryCode);
+  const originalArticles = selectedCategory ? await getOriginalArticles(selectedCategory.id) : [];
   const selectedLabel = selectedPublicCategory?.label ?? '';
 
   return (
@@ -214,6 +226,13 @@ export default async function CategoriesPage({
             ))}
           </div>
         </nav>
+
+        {originalArticles.length > 0 && (
+          <section className="mt-8 rounded-2xl border border-blue-100 bg-white p-6 shadow-sm" aria-labelledby="category-original-heading">
+            <div className="mb-5"><span className="text-xs font-black text-blue-700">خاص مدى العالم</span><h2 id="category-original-heading" className="mt-1 text-2xl font-black">من إعداد مدى العالم</h2></div>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">{originalArticles.map(article => <article key={article.id} className="rounded-2xl border border-slate-100 p-4"><span className="text-[11px] font-black text-blue-700">خاص مدى العالم</span><h3 className="mt-2 font-black leading-7"><Link href={`/articles/${encodeURIComponent(article.id)}`}>{article.title}</Link></h3>{article.description&&<p className="mt-2 line-clamp-2 text-sm text-slate-500">{article.description}</p>}</article>)}</div>
+          </section>
+        )}
 
         <section className="mt-8" aria-labelledby="category-articles-heading">
             <h2 id="category-articles-heading" className="mb-5 text-2xl font-bold text-gray-900">

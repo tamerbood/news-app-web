@@ -17,6 +17,7 @@ export const adminNavigation: NavSection[] = [
   ]},
   { title: 'المحتوى', items: [
     { label: 'الأخبار', href: '/admin/articles', icon: '▤' },
+    { label: 'خاص مدى العالم', href: '/admin/original-content', icon: '★' },
     { label: 'الأخبار العاجلة', href: '/admin/breaking-news', icon: '!' },
     { label: 'التحكم التحريري', href: '/admin/editorial', icon: '✎' },
     { label: 'القصص', href: '/admin/stories', icon: '◉' },

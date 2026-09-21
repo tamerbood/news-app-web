@@ -3,6 +3,7 @@ import HomeClient from './HomeClient';
 import { getUserCountryCode } from './lib/user-country';
 
 type Article = {
+  isOriginal?: boolean;
   id: string;
   title: string;
   description?: string;
@@ -124,6 +125,18 @@ async function getInitialArticles(page = 1, countryCode = 'NONE'): Promise<Artic
   }
 }
 
+
+async function getOriginalArticles(limit = 6): Promise<Article[]> {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
+  if (!apiUrl) return [];
+  try {
+    const response = await fetch(`${apiUrl}/articles/original?page=1&limit=${limit}`, { cache: 'no-store' });
+    if (!response.ok) return [];
+    const data = await response.json();
+    return Array.isArray(data?.items) ? data.items : [];
+  } catch { return []; }
+}
+
 async function getInitialStories(): Promise<Story[]> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
   if (!apiUrl) return [];
@@ -164,10 +177,11 @@ export default async function HomePage({
 
   const countryCode = await getUserCountryCode();
 
-  const [initialArticles, topArticles, initialStories] = await Promise.all([
+  const [initialArticles, topArticles, initialStories, originalArticles] = await Promise.all([
     getInitialArticles(page, countryCode),
     page === 1 ? Promise.resolve(undefined) : getInitialArticles(1, countryCode),
     getInitialStories(),
+    page === 1 ? getOriginalArticles(6) : Promise.resolve([]),
   ]);
   const resolvedTopArticles = topArticles ?? initialArticles;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://madaalalam.com';
@@ -228,6 +242,7 @@ export default async function HomePage({
         topArticles={resolvedTopArticles.items ?? []}
         initialTotalPages={initialArticles.totalPages ?? 1}
         initialStories={initialStories}
+        originalArticles={originalArticles}
         page={page}
       />
     </>

@@ -7,12 +7,16 @@ export interface Article {
   id: string;
   title: string;
   description?: string;
+  content?: string | null;
   url: string;
   imageUrl?: string;
   publishedAt: string;
   createdAt?: string;
   updatedAt?: string;
   isOriginal?: boolean;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+  status?: string;
   source?: {
     id: string;
     name: string;
@@ -161,6 +165,7 @@ export default function ArticleClient({
           </nav>
 
           <header className="border-b border-slate-200 pb-7">
+            {article.isOriginal && <div className="mb-3"><span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-black text-blue-700">خاص مدى العالم</span></div>}
             <div className="mb-4 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm text-slate-500">
               {article.source?.name && <span className="font-bold text-blue-700">{article.source.name}</span>}
               {article.source?.name && article.publishedAt && <span className="text-slate-300" aria-hidden="true">•</span>}
@@ -194,10 +199,16 @@ export default function ArticleClient({
             </figure>
           )}
 
+          {article.isOriginal && article.content && (
+            <section className="mt-8 whitespace-pre-wrap rounded-2xl bg-white text-[17px] leading-9 text-slate-800" aria-label="محتوى خاص مدى العالم">
+              {article.content}
+            </section>
+          )}
+
           <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6" aria-label="خيارات الخبر">
             <p className="leading-8 text-slate-600">
               {article.isOriginal
-                ? 'يمكنك حفظ هذا الخبر في المفضلة للعودة إليه لاحقًا.'
+                ? 'هذه مادة خاصة من إعداد مدى العالم. يمكنك حفظها في المفضلة للعودة إليها لاحقًا.'
                 : 'هذا الخبر منقول من مصدره الإخباري. يمكنك متابعة التفاصيل الكاملة من المصدر الأصلي.'}
             </p>
 

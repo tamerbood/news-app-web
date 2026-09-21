@@ -23,7 +23,7 @@ async function getArticlesPage(page: number): Promise<ArticlesResponse> {
   if (!apiUrl) return {};
 
   try {
-    const response = await fetch(`${apiUrl}/articles?page=${page}&limit=${PAGE_SIZE}`, {
+    const response = await fetch(`${apiUrl}/articles/original?page=${page}&limit=${PAGE_SIZE}`, {
       next: { revalidate: 3600 },
       headers: { Accept: 'application/json' },
     });
@@ -63,8 +63,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: 'hourly',
   }));
 
-  const baseRoutes = [...staticRoutes, ...categoryRoutes];
   const firstPage = await getArticlesPage(1);
+  const originalLandingRoute: MetadataRoute.Sitemap = (firstPage.items?.length ?? 0) > 0 ? [{ url: `${base}/original`, priority: 0.8, changeFrequency: 'daily' }] : [];
+  const baseRoutes = [...staticRoutes, ...categoryRoutes, ...originalLandingRoute];
   const totalPages = Math.max(Number(firstPage.totalPages) || 1, 1);
   const maxArticlePages = Math.ceil(Math.max(MAX_URLS - baseRoutes.length, 0) / PAGE_SIZE);
   const pagesToFetch = Math.min(totalPages, maxArticlePages);

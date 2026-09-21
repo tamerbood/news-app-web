@@ -34,7 +34,7 @@ async function getArticlesPage(page: number): Promise<ArticlesResponse> {
 
   try {
     const response = await fetch(
-      `${apiUrl}/articles?page=${page}&limit=${PAGE_SIZE}`,
+      `${apiUrl}/articles/original?page=${page}&limit=${PAGE_SIZE}`,
       { next: { revalidate } },
     );
 
