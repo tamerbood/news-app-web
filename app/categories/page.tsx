@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { getUserCountryCode } from '../lib/user-country';
 import { PUBLIC_CATEGORIES, getPublicCategory, matchesPublicCategory } from '../lib/public-categories';
 import { cleanRssDescription } from '../lib/rss-description';
 
@@ -56,15 +55,12 @@ async function getCategories(): Promise<Category[]> {
   }
 }
 
-async function getArticles(categoryId?: string, countryCode = 'NONE'): Promise<Article[]> {
+async function getArticles(categoryId?: string): Promise<Article[]> {
   if (!apiUrl) return [];
 
-  const fetchArticles = async (includeCountry: boolean): Promise<Article[]> => {
+  try {
     const params = new URLSearchParams({ page: '1', limit: '24' });
     if (categoryId) params.set('categoryId', categoryId);
-    if (includeCountry && process.env.NODE_ENV !== 'development' && countryCode) {
-      params.set('countryCode', countryCode);
-    }
 
     const response = await fetch(`${apiUrl}/articles?${params.toString()}`, {
       cache: 'no-store',
@@ -79,15 +75,6 @@ async function getArticles(categoryId?: string, countryCode = 'NONE'): Promise<A
       .map((article) => article.isOriginal === true
         ? article
         : { ...article, description: cleanRssDescription(article.description) });
-  };
-
-  try {
-    const localized = await fetchArticles(true);
-    // A section must not appear empty merely because the visitor-country feed
-    // has no matching stories. Preserve localization first, then use the same
-    // section without the country filter.
-    if (localized.length > 0 || process.env.NODE_ENV === 'development') return localized;
-    return fetchArticles(false);
   } catch {
     return [];
   }
@@ -182,12 +169,11 @@ export default async function CategoriesPage({
   const params = await searchParams;
   const rawCategory = Array.isArray(params.category) ? params.category[0] : params.category;
   const categories = await getCategories();
-  const countryCode = await getUserCountryCode();
   const selectedPublicCategory = getPublicCategory(rawCategory);
   const selectedCategory = resolveApiCategory(categories, rawCategory);
   const articles = selectedPublicCategory && !selectedCategory
     ? []
-    : await getArticles(selectedCategory?.id, countryCode);
+    : await getArticles(selectedCategory?.id);
   const originalArticles = selectedCategory ? await getOriginalArticles(selectedCategory.id) : [];
   const selectedLabel = selectedPublicCategory?.label ?? '';
 

@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import HomeClient from './HomeClient';
-import { getUserCountryCode } from './lib/user-country';
 import { cleanRssDescription } from './lib/rss-description';
 
 type Article = {
@@ -76,15 +75,12 @@ export async function generateMetadata({
   };
 }
 
-async function getInitialArticles(page = 1, countryCode = 'NONE'): Promise<ArticlesResponse> {
+async function getInitialArticles(page = 1): Promise<ArticlesResponse> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
   if (!apiUrl) return {};
 
-  const fetchArticles = async (code?: string): Promise<ArticlesResponse> => {
-    const countryQuery = process.env.NODE_ENV === 'development' || !code
-      ? ''
-      : `&countryCode=${encodeURIComponent(code)}`;
-    const response = await fetch(`${apiUrl}/articles?page=${page}&limit=20${countryQuery}`, {
+  try {
+    const response = await fetch(`${apiUrl}/articles?page=${page}&limit=20`, {
       cache: 'no-store',
     });
     if (!response.ok) return {};
@@ -109,28 +105,10 @@ async function getInitialArticles(page = 1, countryCode = 'NONE'): Promise<Artic
       items,
       totalPages: Number.isFinite(data.totalPages) ? data.totalPages : 1,
     };
-  };
-
-  try {
-    const primary = await fetchArticles(countryCode);
-
-    // Production must never render an empty homepage only because the
-    // country-specific filter has no matches (or an older API deployment does
-    // not understand the NONE fallback). Keep country filtering as the first
-    // choice, then fall back to the normal unfiltered feed when it is empty.
-    if (
-      process.env.NODE_ENV !== 'development' &&
-      (!primary.items || primary.items.length === 0)
-    ) {
-      return fetchArticles();
-    }
-
-    return primary;
   } catch {
     return {};
   }
 }
-
 
 async function getOriginalArticles(limit = 6): Promise<Article[]> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
@@ -181,11 +159,9 @@ export default async function HomePage({
   const parsedPage = Number.parseInt(rawPage ?? '1', 10);
   const page = Number.isSafeInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
 
-  const countryCode = await getUserCountryCode();
-
   const [initialArticles, topArticles, initialStories, originalArticles] = await Promise.all([
-    getInitialArticles(page, countryCode),
-    page === 1 ? Promise.resolve(undefined) : getInitialArticles(1, countryCode),
+    getInitialArticles(page),
+    page === 1 ? Promise.resolve(undefined) : getInitialArticles(1),
     getInitialStories(),
     page === 1 ? getOriginalArticles(6) : Promise.resolve([]),
   ]);
