@@ -200,8 +200,23 @@ export default function ArticleClient({
           )}
 
           {article.isOriginal && article.content && (
-            <section className="mt-8 whitespace-pre-wrap rounded-2xl bg-white text-[17px] leading-9 text-slate-800" aria-label="محتوى خاص مدى العالم">
-              {article.content}
+            <section className="mt-8 rounded-2xl bg-white text-[17px] leading-9 text-slate-800" aria-label="محتوى خاص مدى العالم">
+              {article.content
+                .replace(/\r\n/g, '\n')
+                .split(/\n\s*\n/)
+                .map((block) => block.trim())
+                .filter(Boolean)
+                .map((block, index) =>
+                  block.startsWith('## ') ? (
+                    <h2 key={index} className="mb-3 mt-8 text-2xl font-black leading-10 text-slate-950 first:mt-0">
+                      {block.slice(3).trim()}
+                    </h2>
+                  ) : (
+                    <p key={index} className="mb-5 whitespace-pre-wrap leading-9 last:mb-0">
+                      {block}
+                    </p>
+                  ),
+                )}
             </section>
           )}
 
