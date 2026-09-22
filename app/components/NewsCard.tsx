@@ -1,27 +1,12 @@
 import Link from 'next/link';
 import FavoriteButton from './FavoriteButton';
 import { optimizeImageUrl } from '../lib/optimized-image-url';
+import { cleanRssDescription } from '../lib/rss-description';
 
 type Article = {
   id: string; title: string; description?: string; url?: string; imageUrl?: string;
   publishedAt?: string; source?: { name: string }; category?: { name: string };
 };
-
-function cleanExcerpt(value?: string, maxLength = 180) {
-  if (!value) return '';
-
-  const cleaned = value
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/The post[\s\S]*?appeared first on[\s\S]*?(?:\.|$)/gi, ' ')
-    .replace(/(?:أكمل القراءة|اقرأ المزيد|قراءة المزيد)\s*[←→»›…]*/gi, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  if (cleaned.length <= maxLength) return cleaned;
-  const shortened = cleaned.slice(0, maxLength + 1);
-  const lastSpace = shortened.lastIndexOf(' ');
-  return `${shortened.slice(0, lastSpace > maxLength * 0.7 ? lastSpace : maxLength).trim()}…`;
-}
 
 export default function NewsCard({ article }: { article: Article }) {
   const image = article.imageUrl?.trim() || `${process.env.NEXT_PUBLIC_API_URL}/assets/images/news-placeholder.png`;
@@ -29,7 +14,7 @@ export default function NewsCard({ article }: { article: Article }) {
     ? new Date(article.publishedAt).toLocaleDateString('ar-JO', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Amman' })
     : '';
 
-  const excerpt = cleanExcerpt(article.description);
+  const excerpt = cleanRssDescription(article.description, 180);
 
   return (
     <article className="mada-news-card">

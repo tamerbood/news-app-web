@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import HomeClient from './HomeClient';
 import { getUserCountryCode } from './lib/user-country';
+import { cleanRssDescription } from './lib/rss-description';
 
 type Article = {
   isOriginal?: boolean;
@@ -95,7 +96,12 @@ async function getInitialArticles(page = 1, countryCode = 'NONE'): Promise<Artic
       new Map<string, Article>(
         rawItems
           .filter((item: Article) => item?.id)
-          .map((item: Article) => [item.id, item]),
+          .map((item: Article) => [
+            item.id,
+            item.isOriginal === true
+              ? item
+              : { ...item, description: cleanRssDescription(item.description) },
+          ]),
       ).values(),
     );
 

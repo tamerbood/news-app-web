@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import ArticleClient, { type Article } from './ArticleClient';
+import { cleanRssDescription } from '../../lib/rss-description';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://madaalalam.com';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -20,7 +21,11 @@ async function getArticle(id: string): Promise<Article | null> {
     if (!contentType.includes('application/json')) return null;
 
     const data = await response.json();
-    return data && typeof data === 'object' ? (data as Article) : null;
+    if (!data || typeof data !== 'object') return null;
+    const article = data as Article;
+    return article.isOriginal === true
+      ? article
+      : { ...article, description: cleanRssDescription(article.description) };
   } catch {
     return null;
   }
@@ -45,6 +50,9 @@ async function getRelatedArticles(article: Article): Promise<Article[]> {
 
     return items
       .filter((item: Article) => item?.id && item.id !== article.id)
+      .map((item: Article) => item.isOriginal === true
+        ? item
+        : { ...item, description: cleanRssDescription(item.description) })
       .slice(0, 8);
   } catch {
     return [];

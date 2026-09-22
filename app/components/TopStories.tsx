@@ -1,5 +1,6 @@
 import { optimizeImageUrl } from '../lib/optimized-image-url';
 import Link from 'next/link';
+import { cleanRssDescription } from '../lib/rss-description';
 
 type Article = {
   id: string;
@@ -11,28 +12,12 @@ type Article = {
   category?: { name: string };
 };
 
-function cleanExcerpt(value?: string, maxLength = 220) {
-  if (!value) return '';
-
-  const cleaned = value
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/The post[\s\S]*?appeared first on[\s\S]*?(?:\.|$)/gi, ' ')
-    .replace(/(?:أكمل القراءة|اقرأ المزيد|قراءة المزيد)\s*[←→»›…]*/gi, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  if (cleaned.length <= maxLength) return cleaned;
-  const shortened = cleaned.slice(0, maxLength + 1);
-  const lastSpace = shortened.lastIndexOf(' ');
-  return `${shortened.slice(0, lastSpace > maxLength * 0.7 ? lastSpace : maxLength).trim()}…`;
-}
-
 export default function TopStories({ articles }: { articles: Article[] }) {
   if (!articles.length) return null;
 
   const leadArticle = articles[0];
   const supportingArticles = articles.slice(1, 5);
-  const leadExcerpt = cleanExcerpt(leadArticle.description);
+  const leadExcerpt = cleanRssDescription(leadArticle.description, 220);
 
   function formatDate(value?: string) {
     if (!value) return '';

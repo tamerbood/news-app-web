@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getUserCountryCode } from '../lib/user-country';
 import { PUBLIC_CATEGORIES, getPublicCategory, matchesPublicCategory } from '../lib/public-categories';
+import { cleanRssDescription } from '../lib/rss-description';
 
 interface Category {
   id: string;
@@ -73,7 +74,11 @@ async function getArticles(categoryId?: string, countryCode = 'NONE'): Promise<A
 
     const data = (await response.json()) as ArticlesResponse | Article[];
     const items = Array.isArray(data) ? data : data.items ?? data.articles ?? [];
-    return items.filter((article) => article?.id && article?.title);
+    return items
+      .filter((article) => article?.id && article?.title)
+      .map((article) => article.isOriginal === true
+        ? article
+        : { ...article, description: cleanRssDescription(article.description) });
   };
 
   try {
