@@ -7,11 +7,29 @@ type Article = {
   publishedAt?: string; source?: { name: string }; category?: { name: string };
 };
 
+function cleanExcerpt(value?: string, maxLength = 180) {
+  if (!value) return '';
+
+  const cleaned = value
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/The post[\s\S]*?appeared first on[\s\S]*?(?:\.|$)/gi, ' ')
+    .replace(/(?:أكمل القراءة|اقرأ المزيد|قراءة المزيد)\s*[←→»›…]*/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (cleaned.length <= maxLength) return cleaned;
+  const shortened = cleaned.slice(0, maxLength + 1);
+  const lastSpace = shortened.lastIndexOf(' ');
+  return `${shortened.slice(0, lastSpace > maxLength * 0.7 ? lastSpace : maxLength).trim()}…`;
+}
+
 export default function NewsCard({ article }: { article: Article }) {
   const image = article.imageUrl?.trim() || `${process.env.NEXT_PUBLIC_API_URL}/assets/images/news-placeholder.png`;
   const date = article.publishedAt
     ? new Date(article.publishedAt).toLocaleDateString('ar-JO', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Amman' })
     : '';
+
+  const excerpt = cleanExcerpt(article.description);
 
   return (
     <article className="mada-news-card">
@@ -37,7 +55,7 @@ export default function NewsCard({ article }: { article: Article }) {
           {article.publishedAt && <span className="mada-ui-badge mada-ui-badge-neutral">{date}</span>}
         </div>
         <h3><Link href={`/articles/${article.id}`} className="mada-news-title-link">{article.title}</Link></h3>
-        {article.description && <p className="mada-news-description">{article.description}</p>}
+        {excerpt && <p className="mada-news-description">{excerpt}</p>}
         <div className="mada-news-footer">
           <span className="mada-news-date">{article.source?.name ?? 'مدى العالم'}</span>
           <div className="flex gap-2">
