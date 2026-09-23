@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import SafeImage from '../components/SafeImage';
 import { PUBLIC_CATEGORIES, getPublicCategory, matchesPublicCategory } from '../lib/public-categories';
 import { cleanRssDescription } from '../lib/rss-description';
 
@@ -180,25 +179,25 @@ export default async function CategoriesPage({
 
   return (
     <main dir="rtl" className="mada-page bg-transparent">
-      <section className="mada-listing-shell">
-        <header className="mada-listing-header">
-          <h1 className="mada-listing-title">
+      <section className="mx-auto max-w-7xl px-6 py-10">
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">
             {selectedPublicCategory && selectedCategory ? `أخبار ${selectedLabel}` : 'أقسام الأخبار'}
           </h1>
-          <p className="mada-listing-subtitle">
+          <p className="mt-2 text-gray-500">
             {selectedPublicCategory && selectedCategory
               ? `أحدث الأخبار في قسم ${selectedLabel} من مدى العالم.`
               : 'تصفح أحدث الأخبار حسب القسم.'}
           </p>
         </header>
 
-        <nav aria-label="تصنيفات الأخبار" className="mada-filter-bar">
-          <h2 className="mada-filter-title">الأقسام</h2>
-          <div className="mada-filter-pills">
+        <nav aria-label="تصنيفات الأخبار" className="rounded-2xl bg-white p-6 shadow-sm">
+          <h2 className="mb-5 text-xl font-bold text-gray-900">الأقسام</h2>
+          <div className="flex flex-wrap gap-3">
             <Link
               href="/categories"
-              className={`mada-filter-pill ${
-                !selectedPublicCategory ? 'active' : ''
+              className={`rounded-xl px-5 py-3 text-sm font-semibold transition ${
+                !selectedPublicCategory ? 'bg-black text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
               }`}
             >
               الكل
@@ -207,8 +206,10 @@ export default async function CategoriesPage({
               <Link
                 key={category.key}
                 href={categoryUrl(category.key)}
-                className={`mada-filter-pill ${
-                  selectedPublicCategory?.key === category.key ? 'active' : ''
+                className={`rounded-xl px-5 py-3 text-sm font-semibold transition ${
+                  selectedPublicCategory?.key === category.key
+                    ? 'bg-black text-white'
+                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                 }`}
               >
                 {category.label}
@@ -224,8 +225,8 @@ export default async function CategoriesPage({
           </section>
         )}
 
-        <section className="mada-listing-content" aria-labelledby="category-articles-heading">
-            <h2 id="category-articles-heading" className="mada-listing-section-title">
+        <section className="mt-8" aria-labelledby="category-articles-heading">
+            <h2 id="category-articles-heading" className="mb-5 text-2xl font-bold text-gray-900">
               {selectedPublicCategory && selectedCategory ? `أحدث أخبار ${selectedLabel}` : 'أحدث الأخبار'}
             </h2>
 
@@ -237,21 +238,23 @@ export default async function CategoriesPage({
                 </Link>
               </div>
             ) : (
-              <div className="mada-news-grid">
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {articles.map((article, index) => (
-                  <article key={article.id} className="mada-listing-card">
+                  <article key={article.id} className="overflow-hidden rounded-2xl bg-white shadow-sm">
                     {article.imageUrl && (
-                      <SafeImage
+                      <img
                         src={article.imageUrl}
                         alt={article.title}
                         width={600}
                         height={338}
-                        priority={index === 0}
+                        fetchPriority={index === 0 ? 'high' : 'low'}
+                        loading={index === 0 ? 'eager' : 'lazy'}
+                        decoding="async"
                         sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        className="mada-listing-card-image"
+                        className="h-52 w-full object-cover"
                       />
                     )}
-                    <div className="mada-listing-card-copy">
+                    <div className="p-5">
                       <div className="mb-3 flex flex-wrap gap-2">
                         {article.source?.name && (
                           <span className="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-700">
@@ -262,13 +265,13 @@ export default async function CategoriesPage({
                           {selectedLabel}
                         </span>
                       </div>
-                      <h3 className="mada-listing-card-title">
+                      <h3 className="text-lg font-bold leading-8 text-gray-900">
                         <Link href={`/articles/${encodeURIComponent(article.id)}`} className="hover:underline">
                           {article.title}
                         </Link>
                       </h3>
                       {article.description && (
-                        <p className="mada-listing-card-desc">
+                        <p className="mt-3 line-clamp-3 text-sm leading-6 text-gray-600">
                           {article.description}
                         </p>
                       )}
@@ -280,7 +283,7 @@ export default async function CategoriesPage({
                         ) : <span />}
                         <Link
                           href={`/articles/${encodeURIComponent(article.id)}`}
-                          className="mada-card-link"
+                          className="rounded-xl bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800"
                         >
                           قراءة الخبر
                         </Link>

@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import SafeImage from './SafeImage';
 import FavoriteButton from './FavoriteButton';
 import { optimizeImageUrl } from '../lib/optimized-image-url';
 import { cleanRssDescription } from '../lib/rss-description';
@@ -9,38 +8,31 @@ type Article = {
   publishedAt?: string; source?: { name: string }; category?: { name: string };
 };
 
-export default function NewsCard({ article, variant = 'standard' }: { article: Article; variant?: 'standard' | 'feature' | 'compact' }) {
-  const image = article.imageUrl?.trim();
+export default function NewsCard({ article }: { article: Article }) {
+  const image = article.imageUrl?.trim() || `${process.env.NEXT_PUBLIC_API_URL}/assets/images/news-placeholder.png`;
   const date = article.publishedAt
     ? new Date(article.publishedAt).toLocaleDateString('ar-JO', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Amman' })
     : '';
 
-  const rawExcerpt = cleanRssDescription(article.description, 180);
-  const normalizeCopy = (value: string) => value
-    .toLocaleLowerCase('ar')
-    .replace(/[\s\u200f\u200e]+/g, ' ')
-    .replace(/[.!؟?،,:؛;…\-–—]+$/g, '')
-    .trim();
-  const excerpt = rawExcerpt && normalizeCopy(rawExcerpt) !== normalizeCopy(article.title) ? rawExcerpt : '';
+  const excerpt = cleanRssDescription(article.description, 180);
 
   return (
-    <article className={`mada-news-card mada-news-card-${variant}`}>
+    <article className="mada-news-card">
       <div className="mada-news-media">
-        <SafeImage
-          src={image ? optimizeImageUrl(image, 900) : undefined}
+        <img
+          src={optimizeImageUrl(image, 450)}
           alt=""
-          fill
+          width="450"
+          height="253"
           loading="lazy"
           decoding="async"
           fetchPriority="low"
-          className="object-cover"
           sizes="(max-width: 620px) 100vw, (max-width: 900px) 50vw, 25vw"
         />
-        {variant !== 'compact' && (article.category?.name || article.source?.name) && (
-          <div className="mada-news-overlay">
-            <span className="mada-pill mada-pill-dark">{article.category?.name || article.source?.name}</span>
-          </div>
-        )}
+        <div className="mada-news-overlay">
+          {article.category?.name && <span className="mada-pill">{article.category.name}</span>}
+          {article.source?.name && <span className="mada-pill mada-pill-dark">{article.source.name}</span>}
+        </div>
       </div>
       <div className="mada-news-body">
         <div className="mada-news-meta">
