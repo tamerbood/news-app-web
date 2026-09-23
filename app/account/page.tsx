@@ -15,7 +15,7 @@ export default function AccountPage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Change Email
+  // تغيير البريد الإلكتروني
   const [newEmail, setNewEmail] = useState('');
   const [emailPassword, setEmailPassword] = useState('');
   const [emailLoading, setEmailLoading] = useState(false);
@@ -24,7 +24,7 @@ export default function AccountPage() {
   const [showEmailPassword, setShowEmailPassword] =
     useState(false);
 
-  // Change Password
+  // تغيير كلمة المرور
   const [currentPassword, setCurrentPassword] =
     useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -44,7 +44,7 @@ export default function AccountPage() {
   const [showConfirmPassword, setShowConfirmPassword] =
     useState(false);
 
-  // Delete Account
+  // حذف الحساب
   const [deletePassword, setDeletePassword] =
     useState('');
   const [deleteLoading, setDeleteLoading] =
@@ -152,7 +152,7 @@ const data = await response.json();
           Array.isArray(data.message)
             ? data.message.join(', ')
             : data.message ??
-                'Failed to change email.',
+                'تعذر تغيير البريد الإلكتروني.',
         );
       }
 
@@ -172,13 +172,13 @@ const data = await response.json();
       setShowEmailPassword(false);
 
       setEmailMessage(
-        'Email changed successfully.',
+        'تم تغيير البريد الإلكتروني بنجاح.',
       );
     } catch (error) {
       setEmailError(
         error instanceof Error
           ? error.message
-          : 'Failed to change email.',
+          : 'تعذر تغيير البريد الإلكتروني.',
       );
     } finally {
       setEmailLoading(false);
@@ -196,7 +196,7 @@ const data = await response.json();
 
     if (newPassword !== confirmPassword) {
       setPasswordError(
-        'New passwords do not match.',
+        'كلمتا المرور الجديدتان غير متطابقتين.',
       );
       setPasswordLoading(false);
       return;
@@ -237,7 +237,7 @@ const data = await response.json();
           Array.isArray(data.message)
             ? data.message.join(', ')
             : data.message ??
-                'Failed to change password.',
+                'تعذر تغيير كلمة المرور.',
         );
       }
 
@@ -250,13 +250,13 @@ const data = await response.json();
       setShowConfirmPassword(false);
 
       setPasswordMessage(
-        'Password changed successfully.',
+        'تم تغيير كلمة المرور بنجاح.',
       );
     } catch (error) {
       setPasswordError(
         error instanceof Error
           ? error.message
-          : 'Failed to change password.',
+          : 'تعذر تغيير كلمة المرور.',
       );
     } finally {
       setPasswordLoading(false);
@@ -272,7 +272,7 @@ const data = await response.json();
 
   async function handleDeleteAccount() {
     const confirmed = window.confirm(
-      'Are you sure you want to permanently delete your account? This action cannot be undone.',
+      'هل أنت متأكد من حذف حسابك نهائيًا؟ لا يمكن التراجع عن هذا الإجراء.',
     );
 
     if (!confirmed) {
@@ -281,7 +281,7 @@ const data = await response.json();
 
     if (!deletePassword) {
       setDeleteError(
-        'Enter your password to delete your account.',
+        'أدخل كلمة المرور لحذف حسابك.',
       );
       return;
     }
@@ -319,7 +319,7 @@ const data = await response.json();
           Array.isArray(data.message)
             ? data.message.join(', ')
             : data.message ??
-                'Failed to delete account.',
+                'تعذر حذف الحساب.',
         );
       }
 
@@ -331,7 +331,7 @@ const data = await response.json();
       setDeleteError(
         error instanceof Error
           ? error.message
-          : 'Failed to delete account.',
+          : 'تعذر حذف الحساب.',
       );
     } finally {
       setDeleteLoading(false);
@@ -341,9 +341,9 @@ const data = await response.json();
   if (loading) {
     return (
       <main className="mada-page min-h-screen bg-transparent">
-        <div className="mx-auto max-w-4xl px-6 py-12">
+        <div className="mada-account-shell">
           <div className="rounded-2xl bg-white p-8 text-center">
-            Loading account...
+            جارٍ تحميل الحساب...
           </div>
         </div>
       </main>
@@ -356,30 +356,30 @@ const data = await response.json();
 
   return (
     <main className="mada-page min-h-screen bg-transparent">
-      <section className="mx-auto max-w-4xl px-6 py-10">
+      <section className="mada-account-shell">
 
         {/* Header */}
-        <div className="mb-8">
+        <div className="mada-account-header">
           <Link
             href="/"
             className="text-sm font-semibold text-blue-600 hover:text-blue-800"
           >
-            ← Back to News
+            العودة إلى الأخبار ←
           </Link>
 
-          <h1 className="mt-4 text-3xl font-bold text-gray-900">
-            My Account
+          <h1 className="mada-listing-title">
+            حسابي
           </h1>
 
-          <p className="mt-2 text-gray-500">
-            Manage your account and security settings.
+          <p className="mada-listing-subtitle">
+            إدارة بيانات الحساب وإعدادات الأمان.
           </p>
         </div>
 
-        {/* Account Information */}
-        <section className="mb-6 rounded-2xl bg-white p-6 shadow-sm">
+        {/* معلومات الحساب */}
+        <section className="mada-account-card">
           <h2 className="text-xl font-bold text-gray-900">
-            Account Information
+            معلومات الحساب
           </h2>
 
           <div className="mt-5 space-y-4">
@@ -395,7 +395,7 @@ const data = await response.json();
 
             <div>
               <p className="text-sm text-gray-500">
-                Account Type
+                نوع الحساب
               </p>
 
               <p className="mt-1 font-medium text-gray-900">
@@ -405,7 +405,7 @@ const data = await response.json();
 
             <div>
               <p className="text-sm text-gray-500">
-                Member Since
+                عضو منذ
               </p>
 
               <p className="mt-1 font-medium text-gray-900">
@@ -418,27 +418,27 @@ const data = await response.json();
         </section>
 
         {/* Favorites */}
-        <section className="mb-6 rounded-2xl bg-white p-6 shadow-sm">
+        <section className="mada-account-card">
           <h2 className="text-xl font-bold text-gray-900">
             Favorites
           </h2>
 
           <p className="mt-2 text-sm text-gray-500">
-            View and manage your saved articles.
+            عرض وإدارة الأخبار التي حفظتها.
           </p>
 
           <Link
             href="/favorites"
-            className="mt-5 inline-block rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800"
+            className="mada-primary-button"
           >
-            View My Favorites
+            عرض المفضلة
           </Link>
         </section>
 
-        {/* Change Email */}
-        <section className="mb-6 rounded-2xl bg-white p-6 shadow-sm">
+        {/* تغيير البريد الإلكتروني */}
+        <section className="mada-account-card">
           <h2 className="text-xl font-bold text-gray-900">
-            Change Email
+            تغيير البريد الإلكتروني
           </h2>
 
           <form
@@ -450,7 +450,7 @@ const data = await response.json();
                 htmlFor="newEmail"
                 className="mb-2 block text-sm font-medium text-gray-700"
               >
-                New Email
+                البريد الإلكتروني الجديد
               </label>
 
               <input
@@ -461,7 +461,7 @@ const data = await response.json();
                   setNewEmail(event.target.value)
                 }
                 required
-                className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-black"
+                className="mada-form-input"
               />
             </div>
 
@@ -488,7 +488,7 @@ const data = await response.json();
                     )
                   }
                   required
-                  className="w-full rounded-xl border border-gray-300 px-4 py-3 pr-12 outline-none focus:border-black"
+                  className="mada-form-input mada-form-input-password"
                 />
 
                 <button
@@ -527,19 +527,19 @@ const data = await response.json();
             <button
               type="submit"
               disabled={emailLoading}
-              className="rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50"
+              className="mada-primary-button"
             >
               {emailLoading
-                ? 'Changing...'
-                : 'Change Email'}
+                ? 'جارٍ التغيير...'
+                : 'تغيير البريد الإلكتروني'}
             </button>
           </form>
         </section>
 
-        {/* Change Password */}
-        <section className="mb-6 rounded-2xl bg-white p-6 shadow-sm">
+        {/* تغيير كلمة المرور */}
+        <section className="mada-account-card">
           <h2 className="text-xl font-bold text-gray-900">
-            Change Password
+            تغيير كلمة المرور
           </h2>
 
           <form
@@ -571,7 +571,7 @@ const data = await response.json();
                     )
                   }
                   required
-                  className="w-full rounded-xl border border-gray-300 px-4 py-3 pr-12 outline-none focus:border-black"
+                  className="mada-form-input mada-form-input-password"
                 />
 
                 <button
@@ -595,13 +595,13 @@ const data = await response.json();
               </div>
             </div>
 
-            {/* New Password */}
+            {/* كلمة المرور الجديدة */}
             <div>
               <label
                 htmlFor="newPassword"
                 className="mb-2 block text-sm font-medium text-gray-700"
               >
-                New Password
+                كلمة المرور الجديدة
               </label>
 
               <div className="relative">
@@ -620,7 +620,7 @@ const data = await response.json();
                   }
                   minLength={6}
                   required
-                  className="w-full rounded-xl border border-gray-300 px-4 py-3 pr-12 outline-none focus:border-black"
+                  className="mada-form-input mada-form-input-password"
                 />
 
                 <button
@@ -644,13 +644,13 @@ const data = await response.json();
               </div>
             </div>
 
-            {/* Confirm New Password */}
+            {/* Confirm كلمة المرور الجديدة */}
             <div>
               <label
                 htmlFor="confirmPassword"
                 className="mb-2 block text-sm font-medium text-gray-700"
               >
-                Confirm New Password
+                Confirm كلمة المرور الجديدة
               </label>
 
               <div className="relative">
@@ -669,7 +669,7 @@ const data = await response.json();
                   }
                   minLength={6}
                   required
-                  className="w-full rounded-xl border border-gray-300 px-4 py-3 pr-12 outline-none focus:border-black"
+                  className="mada-form-input mada-form-input-password"
                 />
 
                 <button
@@ -708,17 +708,17 @@ const data = await response.json();
             <button
               type="submit"
               disabled={passwordLoading}
-              className="rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50"
+              className="mada-primary-button"
             >
               {passwordLoading
-                ? 'Changing...'
-                : 'Change Password'}
+                ? 'جارٍ التغيير...'
+                : 'تغيير كلمة المرور'}
             </button>
           </form>
         </section>
 
         {/* Account */}
-        <section className="mb-6 rounded-2xl bg-white p-6 shadow-sm">
+        <section className="mada-account-card">
           <h2 className="text-xl font-bold text-gray-900">
             Account
           </h2>
@@ -802,8 +802,8 @@ const data = await response.json();
               className="mt-5 rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
             >
               {deleteLoading
-                ? 'Deleting...'
-                : 'Delete My Account'}
+                ? 'جارٍ الحذف...'
+                : 'حذف حسابي'}
             </button>
           </div>
         </section>

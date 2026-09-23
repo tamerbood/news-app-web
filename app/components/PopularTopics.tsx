@@ -1,5 +1,7 @@
 'use client';
 
+import SafeImage from './SafeImage';
+
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { optimizeImageUrl } from '../lib/optimized-image-url';
@@ -61,7 +63,7 @@ export default function PopularTopics({ articles }: { articles: Article[] }) {
             <Link href={`/articles/${article.id}`} className="mada-popular-item" key={article.id}>
               <span className="mada-popular-number">{index + 1}</span>
               <div className="mada-popular-image">
-                {article.imageUrl ? <img src={optimizeImageUrl(article.imageUrl, 260)} alt="" width="260" height="160" loading="lazy" sizes="120px" /> : <span>M</span>}
+                <SafeImage src={article.imageUrl ? optimizeImageUrl(article.imageUrl, 260) : '/icons/icon-512.png'} alt="" width={172} height={128} loading="lazy" sizes="86px" />
               </div>
               <div className="mada-popular-copy">
                 <div className="mada-popular-meta"><span>{article.category?.name || 'أخبار'}</span><i /><span>{article.source?.name || 'مصدر إخباري'}</span></div>

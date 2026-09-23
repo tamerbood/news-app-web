@@ -1,5 +1,7 @@
 'use client';
 
+import SafeImage from './SafeImage';
+
 import { optimizeImageUrl } from '../lib/optimized-image-url';
 
 import { useEffect, useRef, useState } from 'react';
@@ -154,63 +156,20 @@ export default function Stories({ initialStories = [] }: { initialStories?: Stor
 
   return (
     <>
-      <section
-        dir="rtl"
-        className="mb-8 overflow-hidden rounded-2xl bg-white p-4 shadow-sm"
-      >
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900">
-            القصص
-          </h2>
-          <span className="text-xs text-gray-500">
-            أخبار من المصادر
-          </span>
+      <section dir="rtl" className="mada-stories-section" aria-labelledby="stories-heading">
+        <div className="mada-stories-head">
+          <div><span className="mada-kicker">لقطات سريعة</span><h2 id="stories-heading">القصص</h2></div>
+          <span>اسحب لمشاهدة المزيد ←</span>
         </div>
-
-        <div className="flex gap-4 overflow-x-auto pb-2">
+        <div className="mada-stories-rail">
           {stories.map((story, index) => (
-            <button
-              key={story.id}
-              type="button"
-              onClick={(event) => { lastTriggerRef.current = event.currentTarget; setSelected(index); }}
-              className="w-24 shrink-0 text-center outline-none"
-              aria-label={`فتح قصة ${story.title}`}
-            >
-              <span className="mx-auto block h-20 w-20 rounded-full bg-gradient-to-br from-black via-gray-700 to-gray-300 p-[3px]">
-                <span className="flex h-full w-full items-center justify-center overflow-hidden rounded-full border-2 border-white bg-gray-100">
-                  {story.sourceLogoUrl ? (
-                    <img
-                      src={optimizeImageUrl(story.sourceLogoUrl, 160)}
-                      alt=""
-                      width="80"
-                      height="80"
-                      sizes="80px"
-                      className="h-full w-full object-contain bg-white p-2"
-                      loading="lazy"
-                      decoding="async"
-                      fetchPriority="low"
-                      onError={(event) => {
-                        event.currentTarget.style.display = 'none';
-                      }}
-                    />
-                  ) : (
-                    <img
-                      src={optimizeImageUrl(story.mediaUrl, 160)}
-                      alt=""
-                      width="80"
-                      height="80"
-                      sizes="80px"
-                      className="h-full w-full object-cover"
-                      loading="lazy"
-                      decoding="async"
-                      fetchPriority="low"
-                    />
-                  )}
-                </span>
-              </span>
-
-              <span className="mt-2 block truncate text-xs font-semibold text-gray-800">
-                {story.sourceName || story.title}
+            <button key={story.id} type="button" onClick={(event) => { lastTriggerRef.current = event.currentTarget; setSelected(index); }} className="mada-story-tile" aria-label={`فتح قصة ${story.title}`}>
+              <span className="mada-story-tile-media">
+                <SafeImage src={optimizeImageUrl(story.mediaUrl, 360)} alt="" width="210" height="300" sizes="(max-width:620px) 42vw, 180px" loading="lazy" decoding="async" />
+                <span className="mada-story-tile-shade" />
+                {story.sourceLogoUrl && <SafeImage src={optimizeImageUrl(story.sourceLogoUrl, 64)} alt="" className="mada-story-source-logo" loading="lazy" decoding="async" />}
+                <span className="mada-story-play">▶</span>
+                <span className="mada-story-tile-copy"><small>{story.sourceName || 'مدى العالم'}</small><strong>{story.title}</strong></span>
               </span>
             </button>
           ))}
@@ -297,7 +256,7 @@ export default function Stories({ initialStories = [] }: { initialStories?: Stor
                 playsInline
               />
             ) : (
-              <img
+              <SafeImage
                 src={optimizeImageUrl(activeStory.mediaUrl, 860)}
                 alt={activeStory.title}
                 width="430"
@@ -309,7 +268,7 @@ export default function Stories({ initialStories = [] }: { initialStories?: Stor
             <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent p-5 pt-24 text-white">
               <div className="mb-2 flex items-center gap-2">
                 {activeStory.sourceLogoUrl && (
-                  <img
+                  <SafeImage
                     src={optimizeImageUrl(activeStory.sourceLogoUrl, 64)}
                     alt=""
                     className="h-7 w-7 rounded-full bg-white object-contain p-1"

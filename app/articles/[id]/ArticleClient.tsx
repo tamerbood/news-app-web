@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import SafeImage from '../../components/SafeImage';
 import { useEffect, useState } from 'react';
 
 export interface Article {
@@ -71,6 +72,7 @@ export default function ArticleClient({
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
   const [favoriteMessage, setFavoriteMessage] = useState('');
+  const [shareMessage, setShareMessage] = useState('');
 
   useEffect(() => {
     async function checkFavorite() {
@@ -101,6 +103,19 @@ export default function ArticleClient({
 
     checkFavorite();
   }, [id]);
+
+  async function shareArticle() {
+    const shareData = { title: article.title, url: window.location.href };
+    try {
+      if (navigator.share) await navigator.share(shareData);
+      else { await navigator.clipboard.writeText(window.location.href); setShareMessage('تم نسخ رابط الخبر.'); }
+    } catch { /* Sharing is optional. */ }
+  }
+
+  async function copyArticleLink() {
+    try { await navigator.clipboard.writeText(window.location.href); setShareMessage('تم نسخ رابط الخبر.'); }
+    catch { setShareMessage('تعذر نسخ الرابط.'); }
+  }
 
   async function toggleFavorite() {
     const token = localStorage.getItem('user_token');
@@ -145,165 +160,61 @@ export default function ArticleClient({
   }
 
   return (
-    <main className="mada-page min-h-screen bg-transparent" dir="rtl">
-      <article className="mx-auto w-full max-w-6xl px-4 py-7 sm:px-6 lg:py-10">
-        <div className="mx-auto max-w-4xl">
-          <nav aria-label="مسار الصفحة" className="mb-6 text-sm font-medium text-slate-500">
-            <ol className="flex flex-wrap items-center gap-2">
-              <li><Link href="/" className="transition hover:text-blue-700">الرئيسية</Link></li>
-              {article.category?.name && (
-                <>
-                  <li aria-hidden="true" className="text-slate-300">←</li>
-                  <li>
-                    <Link href={`/categories?category=${encodeURIComponent(article.category.name)}`} className="transition hover:text-blue-700">
-                      {categoryLabel(article.category.name)}
-                    </Link>
-                  </li>
-                </>
-              )}
-            </ol>
-          </nav>
+    <main className="mada-page mada-article-page" dir="rtl">
+      <article className="mada-article-shell">
+        <nav aria-label="مسار الصفحة" className="mada-breadcrumb">
+          <Link href="/">الرئيسية</Link><span>←</span>
+          {article.category?.name && <Link href={`/categories?category=${encodeURIComponent(article.category.name)}`}>{categoryLabel(article.category.name)}</Link>}
+        </nav>
 
-          <header className="border-b border-slate-200 pb-7">
-            {article.isOriginal && <div className="mb-3"><span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-black text-blue-700">خاص مدى العالم</span></div>}
-            <div className="mb-4 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm text-slate-500">
-              {article.source?.name && <span className="font-bold text-blue-700">{article.source.name}</span>}
-              {article.source?.name && article.publishedAt && <span className="text-slate-300" aria-hidden="true">•</span>}
-              {article.publishedAt && <time dateTime={article.publishedAt}>{formatPublishedAt(article.publishedAt)}</time>}
-            </div>
+        <div className="mada-article-layout">
+          <aside className="mada-share-rail" aria-label="مشاركة الخبر">
+            <span>مشاركة</span>
+            <button type="button" onClick={shareArticle} aria-label="مشاركة الخبر">↗</button>
+            <button type="button" onClick={copyArticleLink} aria-label="نسخ رابط الخبر">⛓</button>
+            <button type="button" onClick={toggleFavorite} disabled={favoriteLoading} aria-label="حفظ في المفضلة">{isFavorite ? '★' : '☆'}</button>
+          </aside>
 
-            <h1 className="text-3xl font-extrabold leading-[1.35] tracking-tight text-slate-950 sm:text-4xl lg:text-5xl">
-              {article.title}
-            </h1>
-          </header>
+          <div className="mada-article-main">
+            <header className="mada-article-header">
+              <div className="mada-article-kicker">
+                {article.category?.name && <Link href={`/categories?category=${encodeURIComponent(article.category.name)}`}>{categoryLabel(article.category.name)}</Link>}
+                {article.isOriginal && <span>خاص مدى العالم</span>}
+              </div>
+              <h1>{article.title}</h1>
+              {article.description && <p className="mada-article-deck">{article.description}</p>}
+              <div className="mada-article-meta">
+                {article.source?.logoUrl && <SafeImage src={article.source.logoUrl} alt="" width={36} height={36} />}
+                <div><strong>{article.source?.name || 'مدى العالم'}</strong>{article.publishedAt && <time dateTime={article.publishedAt}>{formatPublishedAt(article.publishedAt)}</time>}</div>
+                <span className="mada-reading-time">قراءة سريعة</span>
+              </div>
+            </header>
 
-          {article.description && (
-            <p className="mt-7 text-lg font-medium leading-9 text-slate-700 sm:text-xl sm:leading-10">
-              {article.description}
-            </p>
-          )}
+            {article.imageUrl && <figure className="mada-article-cover"><SafeImage src={article.imageUrl} alt={article.title} width={1200} height={675} priority sizes="(max-width: 1024px) 100vw, 920px" /></figure>}
 
-          {article.imageUrl && (
-            <figure className="mt-7 overflow-hidden rounded-2xl bg-slate-100 shadow-sm ring-1 ring-slate-200/70">
-              <img
-                src={article.imageUrl}
-                alt={article.title}
-                width={1200}
-                height={675}
-                fetchPriority="high"
-                loading="eager"
-                decoding="async"
-                sizes="(max-width: 1024px) 100vw, 896px"
-                className="aspect-video w-full object-cover"
-              />
-            </figure>
-          )}
+            {article.isOriginal && article.content && <section className="mada-article-body" aria-label="محتوى خاص مدى العالم">
+              {article.content.replace(/\r\n/g, '\n').split(/\n\s*\n/).map((block) => block.trim()).filter(Boolean).map((block, index) => block.startsWith('## ') ? <h2 key={index}>{block.slice(3).trim()}</h2> : <p key={index}>{block}</p>)}
+            </section>}
 
-          {article.isOriginal && article.content && (
-            <section className="mt-8 rounded-2xl bg-white text-[17px] leading-9 text-slate-800" aria-label="محتوى خاص مدى العالم">
-              {article.content
-                .replace(/\r\n/g, '\n')
-                .split(/\n\s*\n/)
-                .map((block) => block.trim())
-                .filter(Boolean)
-                .map((block, index) =>
-                  block.startsWith('## ') ? (
-                    <h2 key={index} className="mb-3 mt-8 text-2xl font-black leading-10 text-slate-950 first:mt-0">
-                      {block.slice(3).trim()}
-                    </h2>
-                  ) : (
-                    <p key={index} className="mb-5 whitespace-pre-wrap leading-9 last:mb-0">
-                      {block}
-                    </p>
-                  ),
-                )}
+            <section className="mada-article-actions" aria-label="خيارات الخبر">
+              <div><strong>{article.isOriginal ? 'مادة خاصة من مدى العالم' : `المصدر: ${article.source?.name || 'المصدر الإخباري'}`}</strong><p>{article.isOriginal ? 'احفظ الخبر للعودة إليه لاحقًا أو شاركه مع الآخرين.' : 'يمكنك متابعة التفاصيل الكاملة من المصدر الأصلي أو حفظ الخبر في المفضلة.'}</p></div>
+              <div className="mada-article-action-buttons">
+                {!article.isOriginal && article.url && <a href={article.url} target="_blank" rel="noopener noreferrer nofollow">قراءة الخبر من المصدر ↗</a>}
+                <button type="button" onClick={toggleFavorite} disabled={favoriteLoading}>{favoriteLoading ? 'جارٍ التحديث...' : isFavorite ? '★ محفوظ' : '☆ حفظ الخبر'}</button>
+                <button type="button" onClick={shareArticle}>مشاركة</button>
+              </div>
+              {(favoriteMessage || shareMessage) && <p className="mada-status-message" role="status">{favoriteMessage || shareMessage}</p>}
             </section>
-          )}
-
-          <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6" aria-label="خيارات الخبر">
-            <p className="leading-8 text-slate-600">
-              {article.isOriginal
-                ? 'هذه مادة خاصة من إعداد مدى العالم. يمكنك حفظها في المفضلة للعودة إليها لاحقًا.'
-                : 'هذا الخبر منقول من مصدره الإخباري. يمكنك متابعة التفاصيل الكاملة من المصدر الأصلي.'}
-            </p>
-
-            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
-              {!article.isOriginal && article.url && (
-                <a
-                  href={article.url}
-                  target="_blank"
-                  rel="noopener noreferrer nofollow"
-                  className="inline-flex min-h-12 items-center justify-center rounded-xl bg-blue-700 px-6 py-3 font-bold text-white transition hover:bg-blue-800"
-                >
-                  متابعة قراءة الخبر من المصدر
-                  <span className="mr-2" aria-hidden="true">↗</span>
-                </a>
-              )}
-
-              <button
-                type="button"
-                onClick={toggleFavorite}
-                disabled={favoriteLoading}
-                className={`inline-flex min-h-12 items-center justify-center rounded-xl border px-5 py-3 font-bold transition disabled:cursor-not-allowed disabled:opacity-50 ${
-                  isFavorite
-                    ? 'border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100'
-                    : 'border-slate-300 bg-white text-slate-800 hover:bg-slate-50'
-                }`}
-              >
-                {favoriteLoading ? 'جارٍ التحديث...' : isFavorite ? '★ إزالة من المفضلة' : '☆ إضافة إلى المفضلة'}
-              </button>
-            </div>
-
-            {favoriteMessage && (
-              <p className="mt-4 text-sm text-slate-600" role="status">{favoriteMessage}</p>
-            )}
-          </section>
+          </div>
         </div>
 
-        {relatedArticles.length > 0 && (
-          <section className="mt-14 border-t border-slate-200 pt-9" aria-labelledby="more-news-heading">
-            <div className="mb-6 flex items-end justify-between gap-4">
-              <div>
-                <p className="mb-1 text-sm font-bold text-blue-700">مدى العالم</p>
-                <h2 id="more-news-heading" className="text-2xl font-extrabold text-slate-950 sm:text-3xl">المزيد من الأخبار</h2>
-              </div>
-              <Link href="/" className="text-sm font-bold text-blue-700 transition hover:text-blue-900">عرض أحدث الأخبار</Link>
-            </div>
-
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {relatedArticles.map((item) => (
-                <Link
-                  key={item.id}
-                  href={`/articles/${encodeURIComponent(item.id)}`}
-                  className="group overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:-translate-y-0.5 hover:shadow-lg"
-                >
-                  <div className="aspect-[16/10] overflow-hidden bg-slate-100">
-                    {item.imageUrl ? (
-                      <img
-                        src={item.imageUrl}
-                        alt=""
-                        loading="lazy"
-                        decoding="async"
-                        className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center px-4 text-center text-sm font-bold text-slate-400">مدى العالم</div>
-                    )}
-                  </div>
-                  <div className="p-4">
-                    <div className="mb-2 flex items-center gap-2 text-xs text-slate-500">
-                      {item.source?.name && <span className="font-semibold text-blue-700">{item.source.name}</span>}
-                      {item.publishedAt && <span>• {new Date(item.publishedAt).toLocaleDateString('ar-JO', { timeZone: 'Asia/Amman', day: 'numeric', month: 'short' })}</span>}
-                    </div>
-                    <h3 className="line-clamp-3 text-base font-bold leading-7 text-slate-900 transition group-hover:text-blue-700">
-                      {item.title}
-                    </h3>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </section>
-        )}
+        {relatedArticles.length > 0 && <section className="mada-related" aria-labelledby="more-news-heading">
+          <div className="mada-section-heading"><div><span>تابع التغطية</span><h2 id="more-news-heading">أخبار ذات صلة</h2></div><Link href="/">كل الأخبار ←</Link></div>
+          <div className="mada-related-grid">{relatedArticles.map((item) => <Link key={item.id} href={`/articles/${encodeURIComponent(item.id)}`} className="mada-related-card">
+            <div className="mada-related-image">{item.imageUrl ? <SafeImage src={item.imageUrl} alt="" width={480} height={300} sizes="(max-width: 620px) 120px, (max-width: 900px) 50vw, 25vw" /> : <span>مدى العالم</span>}</div>
+            <div className="mada-related-copy"><span>{item.source?.name || categoryLabel(item.category?.name)}</span><h3>{item.title}</h3>{item.publishedAt && <time>{new Date(item.publishedAt).toLocaleDateString('ar-JO', { timeZone: 'Asia/Amman', day: 'numeric', month: 'short' })}</time>}</div>
+          </Link>)}</div>
+        </section>}
       </article>
     </main>
   );
