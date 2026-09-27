@@ -133,6 +133,46 @@ export default function ContactPage() {
               </p>
             </section>
 
+
+            <section>
+              <h2 className="text-xl font-bold text-gray-900">
+                LUMZIQ Account Deletion
+              </h2>
+
+              <p className="mt-3 leading-7">
+                To request deletion of your LUMZIQ account and associated data,
+                contact us at: contact@madaalalam.com
+              </p>
+
+              <p className="mt-3 leading-7">
+                Please send your request from the email address associated with
+                your LUMZIQ account.
+              </p>
+
+              <p className="mt-3 leading-7">
+                We will delete your account data, including profile information
+                and synced project metadata.
+              </p>
+
+              <p className="mt-3 leading-7">
+                Some records may be retained only when required for security,
+                fraud prevention, legal, or regulatory obligations.
+              </p>
+
+              <div className="mt-4 rounded-xl bg-gray-50 p-5">
+                <p className="text-sm font-medium text-gray-500">
+                  LUMZIQ Account Deletion Requests
+                </p>
+
+                <a
+                  href="mailto:contact@madaalalam.com?subject=LUMZIQ%20Account%20Deletion%20Request"
+                  className="mt-1 inline-block font-semibold text-blue-600 hover:text-blue-800"
+                >
+                  contact@madaalalam.com
+                </a>
+              </div>
+            </section>
+
             <section>
               <h2 className="text-xl font-bold text-gray-900">
                 Account and Privacy Requests
