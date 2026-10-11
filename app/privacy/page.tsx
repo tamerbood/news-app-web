@@ -280,6 +280,184 @@ export default function PrivacyPolicyPage() {
                 provided on our Contact Us page.
               </p>
             </section>
+            {/* App-specific policy: this section is an addition; Mada Alalam policy above remains unchanged. */}
+            <section className="border-t border-gray-200 pt-8" id="riwaq-pdf-privacy">
+              <h2 className="text-2xl font-bold text-gray-900">
+                13. Riwaq PDF — App-Specific Privacy Policy
+              </h2>
+
+              <p className="mt-3 text-sm text-gray-500">
+                Last updated for Riwaq PDF: October 11, 2026
+              </p>
+
+              <p className="mt-4 leading-7">
+                This section applies specifically to Riwaq PDF (Android),
+                package name <strong>com.riwaq.riwaq_pdf</strong>. The sections
+                above describe Mada Alalam&apos;s news and website services.
+                Features described there, such as news personalization,
+                weather, and news notifications, should not be understood
+                as features of Riwaq PDF merely because both services share
+                this privacy-policy page.
+              </p>
+
+              <h3 className="mt-6 text-lg font-semibold text-gray-900">
+                13.1. Documents and On-Device Processing
+              </h3>
+              <p className="mt-3 leading-7">
+                Riwaq PDF is designed to open, create, scan, convert, edit,
+                organize, and analyze documents on your Android device.
+                PDF processing and OCR (including supported Arabic and English
+                text recognition) are performed locally. Document contents,
+                scanned pages, and extracted OCR text are not uploaded to our
+                servers as part of normal document processing.
+              </p>
+              <p className="mt-3 leading-7">
+                The app may keep locally stored files, temporary working
+                copies, thumbnails, recent-file references, preferences,
+                and editing drafts as needed for the features you use.
+                If you choose to share, export, or print a document,
+                the destination app, printer, or service you select may
+                receive that document at your direction.
+              </p>
+
+              <h3 className="mt-6 text-lg font-semibold text-gray-900">
+                13.2. Camera, Photos, and File Access
+              </h3>
+              <p className="mt-3 leading-7">
+                The document scanner uses the camera when you choose to scan.
+                Riwaq PDF may also request access to photos or documents
+                that you select or authorize through Android&apos;s file and
+                photo selection interfaces. These permissions are used for
+                scanning, importing, processing, saving, and sharing files.
+                You can manage applicable permissions in Android settings.
+              </p>
+
+              <h3 className="mt-6 text-lg font-semibold text-gray-900">
+                13.3. Advertising and Consent
+              </h3>
+              <p className="mt-3 leading-7">
+                The free version of Riwaq PDF may show advertisements
+                delivered by Google AdMob. Depending on your device,
+                region, consent choices, and applicable settings,
+                Google and its advertising partners may process information
+                such as advertising identifiers, IP address, device and app
+                information, ad interactions, and diagnostic data for ad
+                delivery, measurement, security, and, where permitted,
+                personalization. Consent options may be presented through
+                Google&apos;s consent-management tools where required.
+              </p>
+              <p className="mt-3 leading-7">
+                A qualifying active Premium subscription is intended to
+                remove ads within Riwaq PDF. You can review Google&apos;s
+                data practices in its{' '}
+                <a
+                  href="https://policies.google.com/privacy"
+                  className="font-semibold text-blue-600 hover:text-blue-800"
+                >
+                  Privacy Policy
+                </a>
+                {' '}and{' '}
+                <a
+                  href="https://policies.google.com/technologies/ads"
+                  className="font-semibold text-blue-600 hover:text-blue-800"
+                >
+                  advertising information
+                </a>
+                .
+              </p>
+
+              <h3 className="mt-6 text-lg font-semibold text-gray-900">
+                13.4. Premium Subscriptions and Purchases
+              </h3>
+              <p className="mt-3 leading-7">
+                If you choose a Premium subscription, purchases and payments
+                are handled by Google Play. We do not receive your complete
+                payment-card details from Google Play. To verify a purchase
+                and manage Premium access, the app and our subscription
+                verification service may process purchase tokens,
+                subscription product identifiers, transaction status,
+                the application package identifier, and an account or
+                entitlement identifier where applicable. Purchase status
+                may also be temporarily stored on your device.
+              </p>
+              <p className="mt-3 leading-7">
+                Subscription availability and verification depend on the
+                Google Play and app-backend integration enabled for your
+                version of Riwaq PDF. Google Play handles payment processing
+                under its own policies.
+              </p>
+
+              <h3 className="mt-6 text-lg font-semibold text-gray-900">
+                13.5. Other Services and Network Access
+              </h3>
+              <p className="mt-3 leading-7">
+                Core document-processing tools are designed for offline use.
+                An internet connection may be used for advertising,
+                consent management, Google Play billing, and subscription
+                validation. Third-party SDKs may process limited technical
+                or diagnostic information in accordance with their own
+                privacy practices. These connections are separate from
+                the local processing of your document contents.
+              </p>
+
+              <h3 className="mt-6 text-lg font-semibold text-gray-900">
+                13.6. Storage, Retention, and Deletion
+              </h3>
+              <p className="mt-3 leading-7">
+                You can delete documents and drafts that you no longer need.
+                Files saved in locations you choose, including shared device
+                storage, may remain there after uninstalling Riwaq PDF until
+                you delete them. App-private local data is generally managed
+                by Android when the app is uninstalled. Purchase-verification
+                records, if processed by our service, may be retained as
+                necessary to maintain entitlements, resolve disputes,
+                prevent misuse, or meet legal obligations.
+              </p>
+
+              <h3 className="mt-6 text-lg font-semibold text-gray-900">
+                13.7. Your Choices and Privacy Requests
+              </h3>
+              <p className="mt-3 leading-7">
+                You control which documents you select, scan, export, or
+                share. You can change device permissions through Android
+                settings and manage available ad-privacy options through
+                the controls presented to you and your device settings.
+                You can contact us to ask questions about personal
+                information associated with subscription verification,
+                request access or deletion where applicable, or raise
+                a privacy concern. Some records may need to be retained
+                for legitimate or legal reasons.
+              </p>
+
+              <h3 className="mt-6 text-lg font-semibold text-gray-900">
+                13.8. Security and Children&apos;s Privacy
+              </h3>
+              <p className="mt-3 leading-7">
+                We aim to protect information processed by Riwaq PDF using
+                reasonable safeguards. No software or storage system is
+                entirely free from risk. Riwaq PDF is a general-purpose
+                document utility; if you believe a child&apos;s personal
+                information has been collected improperly in connection
+                with the app, please contact us.
+              </p>
+
+              <h3 className="mt-6 text-lg font-semibold text-gray-900">
+                13.9. Changes and Contact
+              </h3>
+              <p className="mt-3 leading-7">
+                We may update this Riwaq PDF section to reflect changes
+                to the app, its integrations, or applicable requirements.
+                The revision date above will be updated when this section
+                changes. For Riwaq PDF privacy inquiries, contact{' '}
+                <a
+                  href="mailto:contact@madaalalam.com"
+                  className="font-semibold text-blue-600 hover:text-blue-800"
+                >
+                  contact@madaalalam.com
+                </a>
+                .
+              </p>
+            </section>
           </div>
         </div>
       </div>
