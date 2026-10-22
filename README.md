@@ -2,6 +2,8 @@
 
 An Arabic-language news website built with **Next.js 16**, **React 19**, **TypeScript**, and **Tailwind CSS 4**. This repository contains the web frontend for Mada Alalam (مدى العالم).
 
+**Website:** https://madaalalam.com/
+
 ## Features
 
 - Arabic news browsing with article pages and category navigation
@@ -22,7 +24,7 @@ An Arabic-language news website built with **Next.js 16**, **React 19**, **TypeS
 
 ## Getting started
 
-Prerequisites: Node.js compatible with Next.js 16 and npm.
+Prerequisites: a Node.js version compatible with Next.js 16 and npm.
 
 ```bash
 git clone https://github.com/tamerbood/news-app-web.git
@@ -43,7 +45,7 @@ Visit http://localhost:3000. Set your backend URL in `.env.local` if you want AP
 | `NEXT_PUBLIC_API_URL` | Base URL for the backend API used by the frontend |
 | `NEXT_PUBLIC_SITE_URL` | Public website URL for canonical metadata and sitemaps |
 
-Variables beginning with `NEXT_PUBLIC_` are exposed to browsers. Do not put secrets in them. Additional configuration may be needed for your own deployment.
+Variables beginning with `NEXT_PUBLIC_` are exposed to browsers. Do not put secrets in them. Additional configuration may be needed for your deployment.
 
 ## Development
 
@@ -53,6 +55,8 @@ npm run lint
 npm run build
 npm run start
 ```
+
+Run these commands separately as needed. Available scripts may depend on the current `package.json`.
 
 ## Project structure
 
@@ -71,7 +75,7 @@ See [SECURITY.md](SECURITY.md) for responsible vulnerability reporting. Never po
 
 ## License
 
-**No open-source license has been selected yet.** Public visibility alone does not grant reuse rights. The maintainer should choose and add an appropriate `LICENSE` file before inviting redistribution or reuse under open-source terms.
+The source code in this repository is licensed under the [MIT License](LICENSE), except for third-party materials and content subject to separate rights. News articles, photographs, logos, and other editorial content are not automatically licensed under MIT.
 
 ## Maintainer
 
