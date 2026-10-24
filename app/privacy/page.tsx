@@ -11,6 +11,15 @@ export default function PrivacyPolicyPage() {
             Last updated: August 26, 2026
           </p>
 
+          <nav aria-label="App-specific privacy policies" className="mt-5 flex flex-wrap gap-3 text-sm">
+            <a href="#riwaq-pdf-privacy" className="font-semibold text-blue-600 underline-offset-4 hover:underline">
+              Riwaq PDF privacy
+            </a>
+            <a href="#cvmada-privacy" className="font-semibold text-blue-600 underline-offset-4 hover:underline">
+              CVMada privacy / خصوصية CVMada
+            </a>
+          </nav>
+
           <div className="mt-8 space-y-8 text-gray-700">
             <section>
               <h2 className="text-xl font-bold text-gray-900">
@@ -457,6 +466,208 @@ export default function PrivacyPolicyPage() {
                 </a>
                 .
               </p>
+            </section>
+
+            {/* Additive, app-specific CVMada policy. Policies above are preserved. */}
+            <section className="border-t border-gray-200 pt-8" id="cvmada-privacy" aria-labelledby="cvmada-privacy-heading">
+              <h2 id="cvmada-privacy-heading" className="text-2xl font-bold text-gray-900">
+                14. CVMada — App-Specific Privacy Policy / سياسة خصوصية CVMada
+              </h2>
+              <p className="mt-3 text-sm text-gray-500">
+                Last updated for CVMada: October 24, 2026 / آخر تحديث: 24 أكتوبر 2026
+              </p>
+
+              <div lang="en">
+                <h3 className="mt-6 text-xl font-bold text-gray-900">
+                  CVMada Privacy Policy — English
+                </h3>
+                <p className="mt-3 leading-7">
+                  This section applies specifically to CVMada (CV Mada), the Android
+                  resume and cover-letter application with package name{' '}
+                  <strong>com.mada.cvmada</strong>. It is separate from the Mada
+                  Alalam news/website policy and the Riwaq PDF policy above.
+                  Features described for those services do not automatically apply
+                  to CVMada.
+                </p>
+
+                <h4 className="mt-6 text-lg font-semibold text-gray-900">14.1. Documents and Local Processing</h4>
+                <p className="mt-3 leading-7">
+                  CVMada helps you create and edit resumes and cover letters,
+                  extract text from selected PDF, DOCX and image files (including
+                  on-device OCR), and export PDF documents. Information you enter
+                  or import may include your name, email address, phone number,
+                  education, work history, skills and other personal details.
+                  Resume and letter content is processed and stored in the
+                  app&apos;s private Android storage. The document-editing and
+                  import workflow does not normally upload that content to a
+                  CVMada server. Template selections, preferences and local
+                  recovery data may also be stored on your device.
+                </p>
+
+                <h4 className="mt-6 text-lg font-semibold text-gray-900">14.2. Files, Sharing and Backups</h4>
+                <p className="mt-3 leading-7">
+                  You choose which documents to import, export or share. When
+                  you share or save a file outside the app, the selected storage
+                  provider, app or recipient may handle that copy under its own
+                  privacy practices. A backup exported from CVMada is an
+                  <strong> unencrypted JSON file</strong> that may contain personal
+                  information, so you should keep it in a secure location.
+                </p>
+
+                <h4 className="mt-6 text-lg font-semibold text-gray-900">14.3. Advertising and Consent</h4>
+                <p className="mt-3 leading-7">
+                  The Android app includes Google Mobile Ads (AdMob) and Google&apos;s
+                  User Messaging Platform (UMP) for ads and consent or privacy
+                  choices where required. Depending on your region, device and
+                  settings, these services and advertising partners may process
+                  technical data such as IP addresses, device or advertising
+                  identifiers, ad interactions and diagnostics, and may infer
+                  approximate location from network information. Applicable
+                  privacy options appear in the app when required by UMP.
+                  Google&apos;s practices are described in its{' '}
+                  <a href="https://policies.google.com/privacy" className="font-semibold text-blue-600 hover:text-blue-800">
+                    Privacy Policy
+                  </a>.
+                </p>
+
+                <h4 className="mt-6 text-lg font-semibold text-gray-900">14.4. Optional Premium Subscriptions</h4>
+                <p className="mt-3 leading-7">
+                  If you use Google sign-in and a Premium subscription, CVMada
+                  uses Google Play Billing and a subscription-verification
+                  service. A signed Google identity token, Google Play purchase
+                  token, subscription product identifier and entitlement
+                  information may be processed to verify your subscription,
+                  prevent misuse and maintain access. The verification service
+                  may retain your Google account identifier and purchase or
+                  subscription records. Verification requests do not include
+                  your resume or cover-letter text. Google handles payment-card
+                  information; CVMada&apos;s verification request does not include
+                  your full payment-card details.
+                </p>
+
+                <h4 className="mt-6 text-lg font-semibold text-gray-900">14.5. Storage, Security and Retention</h4>
+                <p className="mt-3 leading-7">
+                  Local documents are kept in app-private Android storage, and
+                  subscription-verification requests use HTTPS. We do not claim
+                  that exported backups have separate encryption. Local data
+                  remains until deleted by you or removed with the app&apos;s data,
+                  subject to Android behavior. Subscription-related server
+                  records, where created, may be retained as necessary for
+                  entitlement checks, security, disputes or legal obligations.
+                  Files you have exported or shared are not automatically
+                  deleted when you uninstall CVMada.
+                </p>
+
+                <h4 className="mt-6 text-lg font-semibold text-gray-900">14.6. Your Choices and Requests</h4>
+                <p className="mt-3 leading-7">
+                  You can edit or delete resumes and letters within CVMada.
+                  Uninstalling the app or clearing its data generally removes
+                  its local private content but does not remove exported copies.
+                  You may manage your Premium subscription through Google Play.
+                  You may contact us to request information about subscription
+                  records, request their correction or deletion where applicable,
+                  or raise a privacy concern.
+                </p>
+
+                <h4 className="mt-6 text-lg font-semibold text-gray-900">14.7. Changes and Contact</h4>
+                <p className="mt-3 leading-7">
+                  We may update this CVMada section when the app or its service
+                  providers change, and will update the revision date above.
+                  For CVMada privacy questions or data requests, contact{' '}
+                  <a href="mailto:contact@madaalalam.com" className="font-semibold text-blue-600 hover:text-blue-800">
+                    contact@madaalalam.com
+                  </a>.
+                </p>
+              </div>
+
+              <div lang="ar" dir="rtl" className="mt-10 border-t border-gray-200 pt-8 text-right">
+                <h3 className="text-xl font-bold text-gray-900">سياسة خصوصية تطبيق CVMada — العربية</h3>
+                <p className="mt-3 leading-8">
+                  تنطبق هذه السياسة تحديدًا على تطبيق CVMada لإنشاء السير الذاتية
+                  والخطابات على Android، واسم حزمته <strong dir="ltr">com.mada.cvmada</strong>.
+                  وهي مستقلة عن سياسة موقع وأخبار مدى العالم وسياسة Riwaq PDF
+                  أعلاه، ولا تعني مشاركة صفحة الخصوصية أن وظائف تلك التطبيقات
+                  أو ممارساتها تنطبق تلقائيًا على CVMada.
+                </p>
+
+                <h4 className="mt-6 text-lg font-semibold text-gray-900">14.1. المستندات والمعالجة المحلية</h4>
+                <p className="mt-3 leading-8">
+                  يتيح CVMada إنشاء السير الذاتية والخطابات وتعديلها، واستخراج النص
+                  من ملفات PDF وDOCX والصور التي تختارها، بما في ذلك التعرف الضوئي
+                  على النصوص (OCR) على الجهاز، وتصدير ملفات PDF. قد تتضمن البيانات
+                  التي تضيفها اسمك وبريدك الإلكتروني ورقم هاتفك وتعليمك وخبراتك
+                  ومهاراتك وأي معلومات شخصية أخرى. تُعالج بيانات السير والخطابات
+                  وتُحفظ في مساحة التطبيق الخاصة على Android، ولا يرفع مسار التحرير
+                  والاستيراد المعتاد محتوى هذه المستندات إلى خادم CVMada.
+                  وقد تُحفظ إعداداتك وتفضيلات القوالب وبيانات الاسترداد محليًا أيضًا.
+                </p>
+
+                <h4 className="mt-6 text-lg font-semibold text-gray-900">14.2. الملفات والمشاركة والنسخ الاحتياطية</h4>
+                <p className="mt-3 leading-8">
+                  أنت من يختار الملفات التي يستوردها التطبيق أو يصدرها أو يشاركها.
+                  وعند مشاركة ملف أو حفظه خارج التطبيق، قد تتعامل معه خدمة التخزين
+                  أو التطبيق أو الجهة التي اخترتها وفق سياسة الخصوصية الخاصة بها.
+                  ملف النسخة الاحتياطية المصدّر من CVMada هو ملف JSON
+                  <strong> غير مشفّر</strong> وقد يحتوي على بيانات شخصية، لذلك يجب
+                  الاحتفاظ به في مكان آمن.
+                </p>
+
+                <h4 className="mt-6 text-lg font-semibold text-gray-900">14.3. الإعلانات والموافقة</h4>
+                <p className="mt-3 leading-8">
+                  يتضمن إصدار Android خدمات Google Mobile Ads (AdMob) وGoogle
+                  User Messaging Platform (UMP) لعرض الإعلانات وإدارة الموافقة
+                  وخيارات الخصوصية عند الحاجة. وبحسب المنطقة والجهاز والإعدادات،
+                  قد تعالج Google وشركاؤها بيانات تقنية مثل عنوان IP ومعرّفات الجهاز
+                  والإعلانات والتفاعل والتشخيص، وقد يُستنتج موقع تقريبي من الشبكة.
+                  تظهر خيارات خصوصية الإعلانات داخل التطبيق عندما تتطلبها UMP.
+                  تخضع ممارسات Google أيضًا لـ{' '}
+                  <a href="https://policies.google.com/privacy" className="font-semibold text-blue-600 hover:text-blue-800">
+                    سياسة خصوصية Google
+                  </a>.
+                </p>
+
+                <h4 className="mt-6 text-lg font-semibold text-gray-900">14.4. اشتراكات Premium الاختيارية</h4>
+                <p className="mt-3 leading-8">
+                  عند استخدام تسجيل الدخول بحساب Google والاشتراك الاختياري في
+                  Premium، يستخدم التطبيق Google Play Billing وخدمة للتحقق من
+                  الاشتراك. قد تُعالج رموز هوية Google الموقّعة ورموز شراء Google
+                  Play ومعرّفات المنتجات ومعلومات صلاحية الاشتراك بغرض التحقق من
+                  الاشتراك والحماية من إساءة الاستخدام وتوفير المزايا المدفوعة.
+                  وقد تحتفظ خدمة التحقق بمعرّف حساب Google وسجلات الشراء والاشتراك.
+                  لا تتضمن طلبات التحقق محتوى سيرتك الذاتية أو خطابك. تعالج Google
+                  بيانات بطاقات الدفع، ولا يتضمن طلب التحقق بيانات بطاقتك الكاملة.
+                </p>
+
+                <h4 className="mt-6 text-lg font-semibold text-gray-900">14.5. التخزين والأمان والاحتفاظ</h4>
+                <p className="mt-3 leading-8">
+                  تُحفظ المستندات داخل مساحة التطبيق الخاصة على Android، وتستخدم
+                  طلبات التحقق من الاشتراكات اتصالات HTTPS. لا ندّعي وجود تشفير
+                  مستقل للنسخ الاحتياطية المصدّرة. تبقى البيانات المحلية حتى تحذفها
+                  أو تُحذف بيانات التطبيق وفق سلوك Android. وقد يلزم الاحتفاظ
+                  بسجلات الاشتراكات على الخادم، إن أُنشئت، للتحقق من الاستحقاق أو
+                  الأمان أو تسوية النزاعات أو الالتزامات القانونية. ولا تُحذف
+                  الملفات التي سبق أن صدّرتها أو شاركتها تلقائيًا عند إزالة التطبيق.
+                </p>
+
+                <h4 className="mt-6 text-lg font-semibold text-gray-900">14.6. خياراتك وطلبات الخصوصية</h4>
+                <p className="mt-3 leading-8">
+                  يمكنك تعديل السير والخطابات أو حذفها من داخل CVMada. وتؤدي إزالة
+                  التطبيق أو مسح بياناته عادةً إلى حذف ملفاته الخاصة المحلية، لكنها
+                  لا تحذف النسخ المصدّرة. يمكنك إدارة اشتراك Premium عبر Google
+                  Play. ويمكنك التواصل معنا للاستفسار عن سجلات اشتراكك أو طلب
+                  تصحيحها أو حذفها حيثما ينطبق، أو لإبلاغنا بأي مخاوف تتعلق بالخصوصية.
+                </p>
+
+                <h4 className="mt-6 text-lg font-semibold text-gray-900">14.7. التحديثات والتواصل</h4>
+                <p className="mt-3 leading-8">
+                  قد نحدّث سياسة CVMada إذا تغير التطبيق أو مزوّدو خدماته، وسنحدّث
+                  تاريخ المراجعة أعلاه. للاستفسارات وطلبات الخصوصية الخاصة بالتطبيق
+                  يرجى مراسلتنا على{' '}
+                  <a href="mailto:contact@madaalalam.com" dir="ltr" className="inline-block font-semibold text-blue-600 hover:text-blue-800">
+                    contact@madaalalam.com
+                  </a>.
+                </p>
+              </div>
             </section>
           </div>
         </div>
