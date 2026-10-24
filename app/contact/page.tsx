@@ -12,6 +12,140 @@ export default function ContactPage() {
           </p>
 
           <div className="mt-8 space-y-8 text-gray-700">
+            <section
+              id="cvmada-data-deletion"
+              aria-labelledby="cvmada-data-deletion-heading"
+              className="rounded-2xl border border-blue-200 bg-blue-50/60 p-5 sm:p-7"
+            >
+              <div lang="ar" dir="rtl" className="text-right">
+                <p className="text-sm font-semibold text-blue-700">CVMada / Mada - CV MAKER</p>
+                <h2 id="cvmada-data-deletion-heading" className="mt-2 text-2xl font-bold text-gray-900">
+                  طلب حذف بيانات تطبيق CVMada
+                </h2>
+                <p className="mt-3 leading-8">
+                  هذه الخيارات مخصّصة لتطبيق إنشاء السير الذاتية CVMada
+                  (<span dir="ltr" className="inline-block">com.mada.cvmada</span>).
+                  لا يتطلب التطبيق إنشاء حساب مستقل، ويمكنك طلب حذف البيانات المرتبطة
+                  باستخدامك للتطبيق دون إنشاء حساب أو إعادة تثبيت التطبيق.
+                </p>
+
+                <div className="mt-5 space-y-4">
+                  <div className="rounded-xl border border-gray-200 bg-white p-4 sm:p-5">
+                    <h3 className="font-bold text-gray-900">1. حذف السير الذاتية والخطابات من جهازك</h3>
+                    <p className="mt-2 leading-8">
+                      يمكنك حذف السير الذاتية وخطابات التقديم من داخل CVMada. ولحذف
+                      بيانات التطبيق المحلية بالكامل، افتح إعدادات Android، ثم التطبيقات،
+                      ثم CVMada، ثم التخزين، واختر مسح البيانات؛ أو أزل التطبيق.
+                      يؤدي مسح البيانات إلى فقدان المستندات والإعدادات المحفوظة محليًا.
+                      لا يتيح لنا الموقع مسح الملفات الموجودة على جهازك عن بُعد.
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border border-gray-200 bg-white p-4 sm:p-5">
+                    <h3 className="font-bold text-gray-900">2. طلب حذف سجلات اشتراك Premium</h3>
+                    <p className="mt-2 leading-8">
+                      إذا اشتريت اشتراكًا عبر Google Play، فقد نحتفظ برمز الشراء
+                      ومعرّف المنتج وحالة الاشتراك وتاريخ انتهائه للتحقق من الاستحقاق.
+                      لطلب مراجعة هذه السجلات أو حذفها، أرسل طلبًا عبر البريد الإلكتروني.
+                      قد نحتاج إلى التحقق من صلتك بالشراء قبل اتخاذ الإجراء، وقد نحتفظ
+                      بما يلزم قانونيًا أو لأسباب أمنية أو لمنع الاحتيال.
+                    </p>
+                    <a
+                      href="mailto:contact@madaalalam.com?subject=CVMada%20Subscription%20Data%20Deletion%20Request"
+                      className="mt-4 inline-flex min-h-11 items-center justify-center rounded-xl bg-blue-700 px-5 py-3 text-center font-semibold text-white hover:bg-blue-800"
+                    >
+                      إرسال طلب حذف بيانات الاشتراك
+                    </a>
+                    <p className="mt-3 text-sm leading-7 text-gray-600">
+                      حذف سجلّ من خادمنا لا يلغي اشتراك Google Play أو رسوم التجديد.
+                      لإلغاء الاشتراك، استخدم{' '}
+                      <a
+                        href="https://play.google.com/store/account/subscriptions"
+                        className="font-semibold text-blue-700 underline underline-offset-2"
+                      >
+                        إدارة اشتراكات Google Play
+                      </a>.
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border border-gray-200 bg-white p-4 sm:p-5">
+                    <h3 className="font-bold text-gray-900">3. طلب حذف بيانات أخرى أو الاستفسار عنها</h3>
+                    <p className="mt-2 leading-8">
+                      لطلب مراجعة أي بيانات شخصية أخرى قد نعالجها في سياق CVMada
+                      أو طلب حذفها حيثما ينطبق، تواصل معنا وحدد نوع البيانات المطلوب.
+                      يمكنك أيضًا إدارة خيارات خصوصية الإعلانات داخل إعدادات التطبيق
+                      عندما تكون متاحة. بيانات شركاء الإعلانات تخضع كذلك لسياساتهم.
+                    </p>
+                    <a
+                      href="mailto:contact@madaalalam.com?subject=CVMada%20Data%20Deletion%20Request"
+                      className="mt-4 inline-flex min-h-11 items-center justify-center rounded-xl border border-blue-700 bg-white px-5 py-3 text-center font-semibold text-blue-700 hover:bg-blue-50"
+                    >
+                      طلب حذف بيانات CVMada
+                    </a>
+                  </div>
+                </div>
+
+                <p className="mt-4 text-sm leading-7 text-gray-700">
+                  <strong>تنبيه:</strong> الملفات التي صدّرتها أو شاركتها أو حفظتها في
+                  خدمات أخرى لا تُحذف تلقائيًا عند حذف بيانات التطبيق. يُرجى حذف تلك
+                  النسخ من أماكن حفظها أيضًا. لا ترسل كلمات المرور أو بيانات البطاقات
+                  البنكية أو رموز الشراء السرية أو محتوى سيرتك الذاتية في رسالة الطلب.
+                  يتم التعامل مع طلبات حذف بيانات الخادم بعد مراجعة الطلب والتحقق
+                  عند الحاجة، مع مراعاة متطلبات الاحتفاظ القانونية والأمنية.
+                </p>
+                <p className="mt-3 text-sm leading-7">
+                  البريد المخصص لاستقبال هذه الطلبات:{' '}
+                  <a href="mailto:contact@madaalalam.com" className="font-semibold text-blue-700 underline underline-offset-2">
+                    contact@madaalalam.com
+                  </a>
+                  {' '}—{' '}
+                  <a href="/privacy#cvmada-privacy" className="font-semibold text-blue-700 underline underline-offset-2">
+                    سياسة خصوصية CVMada
+                  </a>
+                </p>
+              </div>
+
+              <div lang="en" dir="ltr" className="mt-7 border-t border-blue-200 pt-6 text-left">
+                <h3 className="text-lg font-bold text-gray-900">CVMada — Data Deletion Requests</h3>
+                <p className="mt-2 leading-7">
+                  CVMada (com.mada.cvmada) does not create separate app accounts.
+                  You can delete resumes and cover letters in the app, or clear
+                  CVMada&apos;s storage through Android Settings to remove local app
+                  data. Exported or shared copies must be deleted where you saved them.
+                </p>
+                <p className="mt-3 leading-7">
+                  To request deletion of subscription-verification records held by
+                  us, or to request deletion of other CVMada-related personal data,
+                  email{' '}
+                  <a
+                    href="mailto:contact@madaalalam.com?subject=CVMada%20Data%20Deletion%20Request"
+                    className="font-semibold text-blue-700 underline underline-offset-2"
+                  >
+                    contact@madaalalam.com
+                  </a>{' '}
+                  with the subject <strong>CVMada Data Deletion Request</strong> and
+                  describe what you want deleted. We may need to verify your request.
+                  Some records may be retained for legal, security or fraud-prevention
+                  reasons. Do not send passwords, purchase tokens, payment-card details,
+                  or the contents of your resume.
+                </p>
+                <p className="mt-3 leading-7">
+                  Deleting server-held records does not cancel a Google Play
+                  subscription. Manage recurring payments in{' '}
+                  <a
+                    href="https://play.google.com/store/account/subscriptions"
+                    className="font-semibold text-blue-700 underline underline-offset-2"
+                  >
+                    Google Play subscriptions
+                  </a>.
+                  {' '}See our{' '}
+                  <a href="/privacy#cvmada-privacy" className="font-semibold text-blue-700 underline underline-offset-2">
+                    CVMada Privacy Policy
+                  </a>{' '}for more information.
+                </p>
+              </div>
+            </section>
+
             <section>
               <h2 className="text-xl font-bold text-gray-900">
                 تواصل معنا
