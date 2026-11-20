@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import ArticleLink from '../../components/ArticleLink';
+import { safeExternalUrl } from '../../lib/external-url';
 import { useEffect, useState } from 'react';
 
 export interface Article {
@@ -27,6 +29,13 @@ export interface Article {
     id: string;
     name: string;
   };
+  originalMeta?: {
+    sources?: Array<{
+      source?: string;
+      title?: string;
+      url?: string;
+    }> | null;
+  } | null;
 }
 
 
@@ -172,12 +181,18 @@ export default function ArticleClient({
               {article.publishedAt && <time dateTime={article.publishedAt}>{formatPublishedAt(article.publishedAt)}</time>}
             </div>
 
+            {article.isOriginal === true && (
+              <p className="mb-4 text-sm text-slate-600">
+                إعداد <Link href="/editorial-policy" className="font-bold text-blue-700 underline">هيئة تحرير مدى العالم</Link>
+              </p>
+            )}
+
             <h1 className="text-3xl font-extrabold leading-[1.35] tracking-tight text-slate-950 sm:text-4xl lg:text-5xl">
               {article.title}
             </h1>
           </header>
 
-          {article.description && (
+          {article.isOriginal && article.description && (
             <p className="mt-7 text-lg font-medium leading-9 text-slate-700 sm:text-xl sm:leading-10">
               {article.description}
             </p>
@@ -220,6 +235,26 @@ export default function ArticleClient({
             </section>
           )}
 
+          {article.isOriginal === true && (article.originalMeta?.sources?.length ?? 0) > 0 && (
+            <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6" aria-labelledby="article-sources-heading">
+              <h2 id="article-sources-heading" className="text-lg font-black text-slate-950">المصادر التي استندت إليها المادة</h2>
+              <ul className="mt-4 space-y-3">
+                {article.originalMeta?.sources?.map((source, index) => {
+                  const href = safeExternalUrl(source.url);
+                  if (!href) return null;
+                  return (
+                    <li key={`${href}-${index}`}>
+                      <a href={href} target="_blank" rel="noopener noreferrer" className="font-semibold leading-7 text-blue-700 underline underline-offset-2 hover:text-blue-900">
+                        {source.source ? `${source.source}: ` : ''}{source.title || 'فتح المصدر الأصلي'}
+                        <span className="mr-1" aria-hidden="true">↗</span>
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          )}
+
           <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6" aria-label="خيارات الخبر">
             <p className="leading-8 text-slate-600">
               {article.isOriginal
@@ -232,7 +267,7 @@ export default function ArticleClient({
                 <a
                   href={article.url}
                   target="_blank"
-                  rel="noopener noreferrer nofollow"
+                  rel="noopener noreferrer"
                   className="inline-flex min-h-12 items-center justify-center rounded-xl bg-blue-700 px-6 py-3 font-bold text-white transition hover:bg-blue-800"
                 >
                   متابعة قراءة الخبر من المصدر
@@ -272,9 +307,9 @@ export default function ArticleClient({
 
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {relatedArticles.map((item) => (
-                <Link
+                <ArticleLink
                   key={item.id}
-                  href={`/articles/${encodeURIComponent(item.id)}`}
+                  article={item}
                   className="group overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:-translate-y-0.5 hover:shadow-lg"
                 >
                   <div className="aspect-[16/10] overflow-hidden bg-slate-100">
@@ -299,7 +334,7 @@ export default function ArticleClient({
                       {item.title}
                     </h3>
                   </div>
-                </Link>
+                </ArticleLink>
               ))}
             </div>
           </section>

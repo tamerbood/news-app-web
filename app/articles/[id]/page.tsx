@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import ArticleClient, { type Article } from './ArticleClient';
-import { cleanRssDescription } from '../../lib/rss-description';
+import { safeExternalUrl } from '../../lib/external-url';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://madaalalam.com';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -25,7 +25,17 @@ async function getArticle(id: string): Promise<Article | null> {
     const article = data as Article;
     return article.isOriginal === true
       ? article
-      : { ...article, description: cleanRssDescription(article.description) };
+      : {
+          id: article.id,
+          title: article.title,
+          url: article.url,
+          imageUrl: article.imageUrl,
+          publishedAt: article.publishedAt,
+          updatedAt: article.updatedAt,
+          isOriginal: false,
+          source: article.source,
+          category: article.category,
+        };
   } catch {
     return null;
   }
@@ -52,7 +62,17 @@ async function getRelatedArticles(article: Article): Promise<Article[]> {
       .filter((item: Article) => item?.id && item.id !== article.id)
       .map((item: Article) => item.isOriginal === true
         ? item
-        : { ...item, description: cleanRssDescription(item.description) })
+        : {
+            id: item.id,
+            title: item.title,
+            url: item.url,
+            imageUrl: item.imageUrl,
+            publishedAt: item.publishedAt,
+            updatedAt: item.updatedAt,
+            isOriginal: false,
+            source: item.source,
+            category: item.category,
+          })
       .slice(0, 8);
   } catch {
     return [];
@@ -60,6 +80,12 @@ async function getRelatedArticles(article: Article): Promise<Article[]> {
 }
 
 function articleDescription(article: Article) {
+  if (article.isOriginal !== true) {
+    return article.source?.name
+      ? `اقرأ تفاصيل الخبر لدى ${article.source.name}.`
+      : 'اقرأ تفاصيل الخبر لدى المصدر الإخباري الأصلي.';
+  }
+
   return (
     article.description?.trim() ||
     `تفاصيل الخبر من المصدر الأصلي عبر مدى العالم: ${article.title}`
@@ -82,21 +108,22 @@ export async function generateMetadata({
     };
   }
 
-  const title = (article.seoTitle?.trim() || article.title.trim());
-  const description = (article.seoDescription?.trim() || articleDescription(article));
+  if (article.isOriginal !== true) {
+    return {
+      title: 'الخبر غير متاح',
+      robots: { index: false, follow: false },
+    };
+  }
+
+  const title = article.seoTitle?.trim() || article.title.trim();
+  const description = article.seoDescription?.trim() || articleDescription(article);
   const canonical = `${siteUrl.replace(/\/$/, '')}/articles/${encodeURIComponent(article.id)}`;
-  const isOriginal = article.isOriginal === true;
 
   return {
     title,
     description,
     alternates: { canonical },
-    // Only editorial/original articles are eligible for search indexing.
-    // Syndicated RSS items remain usable inside the app but are deliberately
-    // excluded from Google indexing until they contain original editorial value.
-    robots: isOriginal
-      ? { index: true, follow: true }
-      : { index: false, follow: true },
+    robots: { index: true, follow: true },
     openGraph: {
       type: 'article',
       url: canonical,
@@ -107,7 +134,7 @@ export async function generateMetadata({
       ...(article.imageUrl ? { images: [{ url: article.imageUrl, alt: title }] } : {}),
       publishedTime: article.publishedAt,
       modifiedTime: article.updatedAt || article.publishedAt,
-      authors: article.source?.name ? [article.source.name] : ['مدى العالم'],
+      authors: ['هيئة تحرير مدى العالم'],
       section: article.category?.name,
     },
     twitter: {
@@ -129,15 +156,18 @@ export default async function ArticlePage({
 
   if (!article) notFound();
 
+  if (article.isOriginal !== true) {
+    const sourceUrl = safeExternalUrl(article.url);
+    if (sourceUrl) permanentRedirect(sourceUrl);
+    notFound();
+  }
+
   const relatedArticles = await getRelatedArticles(article);
 
   const baseUrl = siteUrl.replace(/\/$/, '');
   const canonical = `${baseUrl}/articles/${encodeURIComponent(article.id)}`;
   const description = articleDescription(article);
-  const isOriginal = article.isOriginal === true;
-
-  const structuredData = isOriginal
-    ? {
+  const structuredData = {
         '@context': 'https://schema.org',
         '@type': 'NewsArticle',
         headline: article.title,
@@ -157,19 +187,21 @@ export default async function ArticlePage({
             url: `${baseUrl}/icons/icon-512.png`,
           },
         },
-      }
-    : {
-        '@context': 'https://schema.org',
-        '@type': 'WebPage',
-        name: article.title,
-        description,
-        url: canonical,
-        isPartOf: {
-          '@type': 'WebSite',
-          name: 'مدى العالم',
-          url: baseUrl,
+        author: {
+          '@type': 'Organization',
+          name: 'هيئة تحرير مدى العالم',
+          url: `${baseUrl}/editorial-policy`,
         },
-        mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
+        citation: (article.originalMeta?.sources ?? []).flatMap((source) => {
+          const sourceUrl = safeExternalUrl(source?.url);
+          return sourceUrl
+            ? [{
+                '@type': 'CreativeWork',
+                name: source.title || source.source || 'مصدر الخبر',
+                url: sourceUrl,
+              }]
+            : [];
+        }),
       };
 
   const breadcrumbItems = [

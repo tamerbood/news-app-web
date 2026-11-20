@@ -1,5 +1,4 @@
 import type { MetadataRoute } from 'next';
-import { PUBLIC_CATEGORIES } from './lib/public-categories';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://madaalalam.com';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
@@ -45,11 +44,8 @@ function validDate(value?: string | null): Date | undefined {
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteUrl.replace(/\/$/, '');
   const staticRoutes: MetadataRoute.Sitemap = [
-    { url: `${base}/`, priority: 1, changeFrequency: 'hourly' },
-    { url: `${base}/categories`, priority: 0.8, changeFrequency: 'hourly' },
-    { url: `${base}/sports`, priority: 0.7, changeFrequency: 'hourly' },
-    { url: `${base}/sources`, priority: 0.6, changeFrequency: 'daily' },
     { url: `${base}/about`, priority: 0.4, changeFrequency: 'monthly' },
+    { url: `${base}/editorial-policy`, priority: 0.4, changeFrequency: 'monthly' },
     { url: `${base}/contact`, priority: 0.4, changeFrequency: 'monthly' },
     { url: `${base}/privacy`, priority: 0.2, changeFrequency: 'yearly' },
     { url: `${base}/terms`, priority: 0.2, changeFrequency: 'yearly' },
@@ -57,15 +53,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   if (!apiUrl) return staticRoutes;
 
-  const categoryRoutes: MetadataRoute.Sitemap = PUBLIC_CATEGORIES.map((category) => ({
-    url: `${base}/categories?category=${encodeURIComponent(category.key)}`,
-    priority: 0.8,
-    changeFrequency: 'hourly',
-  }));
-
   const firstPage = await getArticlesPage(1);
-  const originalLandingRoute: MetadataRoute.Sitemap = (firstPage.items?.length ?? 0) > 0 ? [{ url: `${base}/original`, priority: 0.8, changeFrequency: 'daily' }] : [];
-  const baseRoutes = [...staticRoutes, ...categoryRoutes, ...originalLandingRoute];
+  const hasOriginalArticles = firstPage.items?.some((article) => article.isOriginal === true) ?? false;
+  const originalLandingRoute: MetadataRoute.Sitemap = hasOriginalArticles ? [{ url: `${base}/original`, priority: 0.8, changeFrequency: 'daily' }] : [];
+  const baseRoutes = [...staticRoutes, ...originalLandingRoute];
   const totalPages = Math.max(Number(firstPage.totalPages) || 1, 1);
   const maxArticlePages = Math.ceil(Math.max(MAX_URLS - baseRoutes.length, 0) / PAGE_SIZE);
   const pagesToFetch = Math.min(totalPages, maxArticlePages);

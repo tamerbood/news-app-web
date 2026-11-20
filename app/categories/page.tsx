@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import ArticleLink from '../components/ArticleLink';
 import { PUBLIC_CATEGORIES, getPublicCategory, matchesPublicCategory } from '../lib/public-categories';
-import { cleanRssDescription } from '../lib/rss-description';
 
 interface Category {
   id: string;
@@ -74,7 +74,16 @@ async function getArticles(categoryId?: string): Promise<Article[]> {
       .filter((article) => article?.id && article?.title)
       .map((article) => article.isOriginal === true
         ? article
-        : { ...article, description: cleanRssDescription(article.description) });
+        : {
+            id: article.id,
+            title: article.title,
+            url: article.url,
+            imageUrl: article.imageUrl,
+            publishedAt: article.publishedAt,
+            source: article.source,
+            category: article.category,
+            isOriginal: false,
+          });
   } catch {
     return [];
   }
@@ -86,7 +95,9 @@ async function getOriginalArticles(categoryId?: string): Promise<Article[]> {
     const response = await fetch(`${apiUrl}/articles/original?categoryId=${encodeURIComponent(categoryId)}&page=1&limit=6`, { cache: 'no-store' });
     if (!response.ok) return [];
     const data = await response.json();
-    return Array.isArray(data?.items) ? data.items : [];
+    return Array.isArray(data?.items)
+      ? data.items.filter((article: Article) => article?.isOriginal === true)
+      : [];
   } catch { return []; }
 }
 
@@ -116,7 +127,7 @@ export async function generateMetadata({
       title: 'تصنيفات الأخبار',
       description: 'تصفح الأخبار حسب التصنيف في مدى العالم.',
       alternates: { canonical: `${siteUrl.replace(/\/$/, '')}/categories` },
-      robots: { index: true, follow: true },
+      robots: { index: false, follow: true },
       openGraph: {
         type: 'website',
         url: `${siteUrl.replace(/\/$/, '')}/categories`,
@@ -142,7 +153,7 @@ export async function generateMetadata({
     title: `${label} | أخبار مدى العالم`,
     description: `أحدث أخبار ${label} من مدى العالم، مرتبة حسب التصنيف ومحدثة باستمرار.`,
     alternates: { canonical },
-    robots: { index: true, follow: true },
+    robots: { index: false, follow: true },
     openGraph: {
       type: 'website',
       url: canonical,
@@ -266,27 +277,19 @@ export default async function CategoriesPage({
                         </span>
                       </div>
                       <h3 className="text-lg font-bold leading-8 text-gray-900">
-                        <Link href={`/articles/${encodeURIComponent(article.id)}`} className="hover:underline">
+                        <ArticleLink article={article} className="hover:underline">
                           {article.title}
-                        </Link>
+                        </ArticleLink>
                       </h3>
-                      {article.description && (
-                        <p className="mt-3 line-clamp-3 text-sm leading-6 text-gray-600">
-                          {article.description}
-                        </p>
-                      )}
                       <div className="mt-5 flex items-center justify-between gap-4">
                         {article.publishedAt ? (
                           <time dateTime={article.publishedAt} className="text-xs text-gray-500">
                             {new Date(article.publishedAt).toLocaleDateString('ar-JO')}
                           </time>
                         ) : <span />}
-                        <Link
-                          href={`/articles/${encodeURIComponent(article.id)}`}
-                          className="rounded-xl bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800"
-                        >
-                          قراءة الخبر
-                        </Link>
+                        <ArticleLink article={article} className="rounded-xl bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800">
+                          {article.isOriginal ? 'قراءة الخبر' : 'المصدر الأصلي ↗'}
+                        </ArticleLink>
                       </div>
                     </div>
                   </article>

@@ -7,15 +7,10 @@ import { useEffect, useRef, useState } from 'react';
 type Story = {
   id: string;
   title: string;
-  description?: string | null;
   mediaUrl: string;
   mediaType?: string;
   actionUrl?: string | null;
-  sourceId?: string | null;
-  isActive: boolean;
-  sortOrder?: number;
-  publishedAt?: string | null;
-  expiresAt?: string | null;
+  isActive?: boolean;
   sourceName?: string | null;
   sourceLogoUrl?: string | null;
 };
@@ -57,7 +52,15 @@ export default function Stories({ initialStories = [] }: { initialStories?: Stor
             story.isActive !== false &&
             typeof story.mediaUrl === 'string' &&
             story.mediaUrl.trim(),
-        ),
+        ).map((story: Story) => ({
+          id: story.id,
+          title: story.title,
+          mediaUrl: story.mediaUrl,
+          mediaType: story.mediaType,
+          actionUrl: story.actionUrl,
+          sourceName: story.sourceName,
+          sourceLogoUrl: story.sourceLogoUrl,
+        })),
       );
     } catch (error) {
       console.error('Failed to load stories:', error);
@@ -325,12 +328,6 @@ export default function Stories({ initialStories = [] }: { initialStories?: Stor
               <h3 id="story-dialog-title" className="text-xl font-bold leading-8">
                 {activeStory.title}
               </h3>
-
-              {activeStory.description && (
-                <p className="mt-2 line-clamp-4 text-sm leading-6 text-white/90">
-                  {activeStory.description}
-                </p>
-              )}
 
               {activeStory.actionUrl && (
                 <a

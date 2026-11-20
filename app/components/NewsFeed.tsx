@@ -5,7 +5,7 @@ import NewsFeedRefresh from './NewsFeedRefresh';
 import Pagination from './Pagination';
 
 type Article = {
-  id: string; title: string; description?: string; url: string; imageUrl?: string;
+  id: string; title: string; isOriginal?: boolean; url: string; imageUrl?: string;
   publishedAt?: string; source?: { name: string }; category?: { name: string };
 };
 

@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: 'أخبار الرياضة اليوم',
   description: 'آخر الأخبار الرياضية والنتائج والمباريات في مدى العالم.',
   alternates: { canonical: '/sports' },
-  robots: { index: true, follow: true },
+  robots: { index: false, follow: true },
   openGraph: {
     type: 'website',
     url: '/sports',

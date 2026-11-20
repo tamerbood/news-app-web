@@ -12,6 +12,22 @@ export default function ContactPage() {
           </p>
 
           <div className="mt-8 space-y-8 text-gray-700">
+            <section lang="ar" dir="rtl" className="rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:p-7">
+              <h2 className="text-xl font-bold text-gray-900">التواصل التحريري والإبلاغ عن محتوى</h2>
+              <p className="mt-3 leading-8">
+                لاقتراح تصحيح، أو الإبلاغ عن مادة أو رابط، أو التواصل بشأن حقوق النشر، أرسل رابط الصفحة وشرحًا مختصرًا إلى البريد أدناه.
+              </p>
+              <a
+                href="mailto:contact@madaalalam.com?subject=Editorial%20correction%20or%20content%20report"
+                className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-blue-700 px-5 py-3 font-semibold text-white hover:bg-blue-800"
+              >
+                contact@madaalalam.com
+              </a>
+              <p className="mt-3 text-sm leading-7 text-gray-600">
+                لمعرفة الجهة المسؤولة عن النشر وطريقة التعامل مع المواد، راجع <a href="/editorial-policy" className="font-semibold text-blue-700 underline">السياسة التحريرية</a>.
+              </p>
+            </section>
+
             <section
               id="cvmada-data-deletion"
               aria-labelledby="cvmada-data-deletion-heading"

@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import HomeClient from './HomeClient';
-import { cleanRssDescription } from './lib/rss-description';
 
 type Article = {
   isOriginal?: boolean;
@@ -22,15 +21,10 @@ type ArticlesResponse = {
 type Story = {
   id: string;
   title: string;
-  description?: string | null;
   mediaUrl: string;
   mediaType?: string;
   actionUrl?: string | null;
-  sourceId?: string | null;
-  isActive: boolean;
-  sortOrder?: number;
-  publishedAt?: string | null;
-  expiresAt?: string | null;
+  isActive?: boolean;
   sourceName?: string | null;
   sourceLogoUrl?: string | null;
 };
@@ -56,7 +50,9 @@ export async function generateMetadata({
     title: { absolute: title },
     description: 'أحدث أخبار العالم والعرب والرياضة والتكنولوجيا والاقتصاد من مصادر متعددة في تجربة عربية حديثة وسريعة.',
     alternates: { canonical },
-    robots: { index: page === 1, follow: true },
+    // The home page is a live RSS index. Keep it crawlable for users, but out
+    // of search until it offers enough first-party editorial value.
+    robots: { index: false, follow: true },
     openGraph: {
       type: 'website',
       url: canonical,
@@ -96,7 +92,16 @@ async function getInitialArticles(page = 1): Promise<ArticlesResponse> {
             item.id,
             item.isOriginal === true
               ? item
-              : { ...item, description: cleanRssDescription(item.description) },
+              : {
+                  id: item.id,
+                  title: item.title,
+                  url: item.url,
+                  imageUrl: item.imageUrl,
+                  publishedAt: item.publishedAt,
+                  source: item.source,
+                  category: item.category,
+                  isOriginal: false,
+                },
           ]),
       ).values(),
     );
@@ -117,7 +122,9 @@ async function getOriginalArticles(limit = 6): Promise<Article[]> {
     const response = await fetch(`${apiUrl}/articles/original?page=1&limit=${limit}`, { cache: 'no-store' });
     if (!response.ok) return [];
     const data = await response.json();
-    return Array.isArray(data?.items) ? data.items : [];
+    return Array.isArray(data?.items)
+      ? data.items.filter((item: Article) => item?.isOriginal === true)
+      : [];
   } catch { return []; }
 }
 
@@ -143,7 +150,15 @@ async function getInitialStories(): Promise<Story[]> {
         story.isActive !== false &&
         typeof story.mediaUrl === 'string' &&
         story.mediaUrl.trim(),
-    );
+    ).map((story: Story) => ({
+      id: story.id,
+      title: story.title,
+      mediaUrl: story.mediaUrl,
+      mediaType: story.mediaType,
+      actionUrl: story.actionUrl,
+      sourceName: story.sourceName,
+      sourceLogoUrl: story.sourceLogoUrl,
+    }));
   } catch {
     return [];
   }

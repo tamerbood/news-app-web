@@ -1,11 +1,11 @@
 import { optimizeImageUrl } from '../lib/optimized-image-url';
-import Link from 'next/link';
-import { cleanRssDescription } from '../lib/rss-description';
+import ArticleLink from './ArticleLink';
 
 type Article = {
   id: string;
   title: string;
-  description?: string;
+  isOriginal?: boolean;
+  url?: string;
   imageUrl?: string;
   publishedAt?: string;
   source?: { name: string };
@@ -17,8 +17,6 @@ export default function TopStories({ articles }: { articles: Article[] }) {
 
   const leadArticle = articles[0];
   const supportingArticles = articles.slice(1, 5);
-  const leadExcerpt = cleanRssDescription(leadArticle.description, 220);
-
   function formatDate(value?: string) {
     if (!value) return '';
     try {
@@ -45,7 +43,7 @@ export default function TopStories({ articles }: { articles: Article[] }) {
       </div>
 
       <div className="mada-top-stories-grid">
-        <Link href={`/articles/${leadArticle.id}`} className="mada-lead-story">
+        <ArticleLink article={leadArticle} className="mada-lead-story">
           <div className="mada-lead-story-media">
             {leadArticle.imageUrl ? (
               <img
@@ -69,13 +67,12 @@ export default function TopStories({ articles }: { articles: Article[] }) {
               {formatDate(leadArticle.publishedAt) ? ` • ${formatDate(leadArticle.publishedAt)}` : ''}
             </div>
             <h3>{leadArticle.title}</h3>
-            {leadExcerpt && <p>{leadExcerpt}</p>}
           </div>
-        </Link>
+        </ArticleLink>
 
         <div className="mada-supporting-stories">
           {supportingArticles.map((article) => (
-            <Link href={`/articles/${article.id}`} key={article.id} className="mada-supporting-story">
+            <ArticleLink article={article} key={article.id} className="mada-supporting-story">
               <div className="mada-supporting-story-media">
                 {article.imageUrl ? (
                   <img
@@ -99,7 +96,7 @@ export default function TopStories({ articles }: { articles: Article[] }) {
                   {formatDate(article.publishedAt) ? ` • ${formatDate(article.publishedAt)}` : ''}
                 </p>
               </div>
-            </Link>
+            </ArticleLink>
           ))}
         </div>
       </div>

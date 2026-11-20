@@ -1,12 +1,14 @@
 'use client';
 
-import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { optimizeImageUrl } from '../lib/optimized-image-url';
+import ArticleLink from './ArticleLink';
 
 type Article = {
   id: string;
   title: string;
+  url?: string;
+  isOriginal?: boolean;
   imageUrl?: string;
   category?: { name?: string };
   source?: { name?: string };
@@ -58,7 +60,7 @@ export default function PopularTopics({ articles }: { articles: Article[] }) {
         {items.map((article, index) => {
           const viewCount = viewsOf(article);
           return (
-            <Link href={`/articles/${article.id}`} className="mada-popular-item" key={article.id}>
+            <ArticleLink article={article} className="mada-popular-item" key={article.id}>
               <span className="mada-popular-number">{index + 1}</span>
               <div className="mada-popular-image">
                 {article.imageUrl ? <img src={optimizeImageUrl(article.imageUrl, 260)} alt="" width="260" height="160" loading="lazy" sizes="120px" /> : <span>M</span>}
@@ -68,7 +70,7 @@ export default function PopularTopics({ articles }: { articles: Article[] }) {
                 <h3>{article.title}</h3>
                 {viewCount !== null && <span className="mada-popular-views">● {displayViews(viewCount)} مشاهدة</span>}
               </div>
-            </Link>
+            </ArticleLink>
           );
         })}
       </div>

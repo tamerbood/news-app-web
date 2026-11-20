@@ -15,6 +15,7 @@ export default function EditOriginal({params}:{params:Promise<{id:string}>}) {
   const [article,setArticle]=useState<Article|null>(null);
   const [message,setMessage]=useState('');
   const [busy,setBusy]=useState(false);
+  const [reviewConfirmed,setReviewConfirmed]=useState(false);
 
   useEffect(()=>{
     get(`/original-content/${id}`)
@@ -22,9 +23,20 @@ export default function EditOriginal({params}:{params:Promise<{id:string}>}) {
       .catch(e=>setMessage(e instanceof Error?e.message:'تعذر التحميل'));
   },[id]);
 
-  function set<K extends keyof Article>(key:K,value:Article[K]) { setArticle(a=>a?{...a,[key]:value}:a); }
+  function set<K extends keyof Article>(key:K,value:Article[K]) { setReviewConfirmed(false); setArticle(a=>a?{...a,[key]:value}:a); }
   async function save(){if(!article)return;setBusy(true);setMessage('');try{const result=await patch(`/original-content/${id}`,{title:article.title,description:article.description||'',content:article.content||'',slug:article.slug||'',seoTitle:article.seoTitle||'',seoDescription:article.seoDescription||'',imageUrl:article.imageUrl||undefined});setArticle(result);setMessage('تم حفظ المسودة.');}catch(e){setMessage(e instanceof Error?e.message:'فشل الحفظ');}finally{setBusy(false)}}
-  async function publish(){if(!article||!confirm('نشر المقال الآن؟ بعد النشر سيصبح متاحًا للعامة وقابلًا للفهرسة.'))return;setBusy(true);setMessage('');try{const result=await post(`/original-content/${id}/publish`);setArticle(result);setMessage('تم النشر بنجاح.');}catch(e){setMessage(e instanceof Error?e.message:'فشل النشر');}finally{setBusy(false)}}
+  const readyToPublish=Boolean(article?.title.trim()&&article.description?.trim()&&article.content?.trim());
+  async function publish(){
+    if(!article||!reviewConfirmed||!readyToPublish||!confirm('سيتم حفظ هذه النسخة ثم نشرها. هل راجعت الوقائع والمصادر والروابط وأزلت أي صياغة منقولة؟'))return;
+    setBusy(true);setMessage('');
+    try{
+      const saved=await patch(`/original-content/${id}`,{title:article.title,description:article.description||'',content:article.content||'',slug:article.slug||'',seoTitle:article.seoTitle||'',seoDescription:article.seoDescription||'',imageUrl:article.imageUrl||undefined});
+      setArticle(saved);
+      const result=await post(`/original-content/${id}/publish`,{reviewConfirmed:true});
+      setArticle(result);setReviewConfirmed(false);setMessage('تم النشر بنجاح.');
+    }catch(e){setMessage(e instanceof Error?e.message:'فشل النشر');}
+    finally{setBusy(false)}
+  }
 
   if(!article)return <AdminShell title="خاص مدى العالم"><p>{message||'جارِ التحميل...'}</p></AdminShell>;
   const field='w-full rounded-xl border border-slate-200 p-3';
@@ -40,9 +52,10 @@ export default function EditOriginal({params}:{params:Promise<{id:string}>}) {
         <label className="block text-sm font-bold">رابط الصورة<input className={`${field} mt-2`} value={article.imageUrl||''} onChange={e=>set('imageUrl',e.target.value)}/></label>
         <label className="block text-sm font-bold">SEO Title<input className={`${field} mt-2`} value={article.seoTitle||''} onChange={e=>set('seoTitle',e.target.value)}/></label>
         <label className="block text-sm font-bold">SEO Description<textarea className={`${field} mt-2`} rows={3} value={article.seoDescription||''} onChange={e=>set('seoDescription',e.target.value)}/></label>
+        {article.status==='DRAFT'&&<div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-7 text-amber-950"><p className="font-black">المسودة أُنشئت بمساعدة آلية وتحتاج مراجعة بشرية كاملة قبل النشر.</p><label className="mt-3 flex items-start gap-3 font-medium"><input type="checkbox" className="mt-1 h-4 w-4 shrink-0 accent-blue-700" checked={reviewConfirmed} onChange={e=>setReviewConfirmed(e.target.checked)}/><span>أؤكد أنني راجعت هذه النسخة بعد آخر تعديل، وتحققت من الوقائع والمصادر والروابط، وعالجت أي تعارض أو معلومة غير مسندة، وتأكدت من أن الصياغة أصلية وغير منقولة، وأوافق على نشرها باسم هيئة تحرير مدى العالم.</span></label></div>}
         <div className="flex flex-wrap gap-3">
           <button disabled={busy||article.status!=='DRAFT'} onClick={save} className="rounded-xl bg-slate-950 px-5 py-3 font-bold text-white disabled:opacity-40">حفظ</button>
-          <button disabled={busy||article.status!=='DRAFT'} onClick={publish} className="rounded-xl bg-blue-600 px-5 py-3 font-bold text-white disabled:opacity-40">نشر</button>
+          <button disabled={busy||article.status!=='DRAFT'||!reviewConfirmed||!readyToPublish} onClick={publish} className="rounded-xl bg-blue-600 px-5 py-3 font-bold text-white disabled:opacity-40">نشر بعد المراجعة</button>
           {article.status==='PUBLISHED'&&<a target="_blank" href={`/articles/${article.id}`} className="rounded-xl border px-5 py-3 font-bold">فتح المقال المنشور</a>}
         </div>
         {message&&<p className="rounded-xl bg-slate-50 p-3 text-sm">{message}</p>}
