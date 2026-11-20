@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import ArticleLink from '../components/ArticleLink';
 import { PUBLIC_CATEGORIES, getPublicCategory, matchesPublicCategory } from '../lib/public-categories';
 
 interface Category {
@@ -9,20 +8,12 @@ interface Category {
 }
 
 interface Article {
-  isOriginal?: boolean;
   id: string;
   title: string;
   description?: string | null;
-  url: string;
   imageUrl?: string | null;
   publishedAt?: string | null;
-  source?: { name?: string | null } | null;
   category?: { id?: string; name?: string } | null;
-}
-
-interface ArticlesResponse {
-  items?: Article[];
-  articles?: Article[];
 }
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://madaalalam.com';
@@ -55,48 +46,16 @@ async function getCategories(): Promise<Category[]> {
   }
 }
 
-async function getArticles(categoryId?: string): Promise<Article[]> {
-  if (!apiUrl) return [];
-
-  try {
-    const params = new URLSearchParams({ page: '1', limit: '24' });
-    if (categoryId) params.set('categoryId', categoryId);
-
-    const response = await fetch(`${apiUrl}/articles?${params.toString()}`, {
-      cache: 'no-store',
-      headers: { Accept: 'application/json' },
-    });
-    if (!response.ok) return [];
-
-    const data = (await response.json()) as ArticlesResponse | Article[];
-    const items = Array.isArray(data) ? data : data.items ?? data.articles ?? [];
-    return items
-      .filter((article) => article?.id && article?.title)
-      .map((article) => article.isOriginal === true
-        ? article
-        : {
-            id: article.id,
-            title: article.title,
-            url: article.url,
-            imageUrl: article.imageUrl,
-            publishedAt: article.publishedAt,
-            source: article.source,
-            category: article.category,
-            isOriginal: false,
-          });
-  } catch {
-    return [];
-  }
-}
-
 async function getOriginalArticles(categoryId?: string): Promise<Article[]> {
-  if (!apiUrl || !categoryId) return [];
+  if (!apiUrl) return [];
   try {
-    const response = await fetch(`${apiUrl}/articles/original?categoryId=${encodeURIComponent(categoryId)}&page=1&limit=6`, { cache: 'no-store' });
+    const params = new URLSearchParams({ page: '1', limit: '12' });
+    if (categoryId) params.set('categoryId', categoryId);
+    const response = await fetch(`${apiUrl}/articles/original?${params.toString()}`, { cache: 'no-store' });
     if (!response.ok) return [];
     const data = await response.json();
     return Array.isArray(data?.items)
-      ? data.items.filter((article: Article) => article?.isOriginal === true)
+      ? data.items.filter((article: Article & { isOriginal?: boolean }) => article?.isOriginal === true)
       : [];
   } catch { return []; }
 }
@@ -125,14 +84,14 @@ export async function generateMetadata({
   if (!publicCategory || !category) {
     return {
       title: 'تصنيفات الأخبار',
-      description: 'تصفح الأخبار حسب التصنيف في مدى العالم.',
+      description: 'تصفح التقارير والمواد التحريرية الأصلية في مدى العالم.',
       alternates: { canonical: `${siteUrl.replace(/\/$/, '')}/categories` },
       robots: { index: false, follow: true },
       openGraph: {
         type: 'website',
         url: `${siteUrl.replace(/\/$/, '')}/categories`,
         title: 'تصنيفات الأخبار',
-        description: 'تصفح الأخبار حسب التصنيف في مدى العالم.',
+        description: 'تصفح التقارير والمواد التحريرية الأصلية في مدى العالم.',
         siteName: 'مدى العالم',
         locale: 'ar_AR',
         images: [{ url: '/icons/icon-512.png', width: 512, height: 512, alt: 'مدى العالم' }],
@@ -140,7 +99,7 @@ export async function generateMetadata({
       twitter: {
         card: 'summary_large_image',
         title: 'تصنيفات الأخبار',
-        description: 'تصفح الأخبار حسب التصنيف في مدى العالم.',
+        description: 'تصفح التقارير والمواد التحريرية الأصلية في مدى العالم.',
         images: ['/icons/icon-512.png'],
       },
     };
@@ -150,23 +109,23 @@ export async function generateMetadata({
   const canonical = `${siteUrl.replace(/\/$/, '')}${categoryUrl(publicCategory.key)}`;
 
   return {
-    title: `${label} | أخبار مدى العالم`,
-    description: `أحدث أخبار ${label} من مدى العالم، مرتبة حسب التصنيف ومحدثة باستمرار.`,
+    title: `${label} | تقارير مدى العالم`,
+    description: `تقارير ومواد تحريرية أصلية أعدّها مدى العالم في قسم ${label}.`,
     alternates: { canonical },
     robots: { index: false, follow: true },
     openGraph: {
       type: 'website',
       url: canonical,
-      title: `${label} | أخبار مدى العالم`,
-      description: `أحدث أخبار ${label} من مدى العالم.`,
+      title: `${label} | تقارير مدى العالم`,
+      description: `مواد تحريرية أصلية أعدّها مدى العالم في قسم ${label}.`,
       siteName: 'مدى العالم',
       locale: 'ar_AR',
       images: [{ url: '/icons/icon-512.png', width: 512, height: 512, alt: 'مدى العالم' }],
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${label} | أخبار مدى العالم`,
-      description: `أحدث أخبار ${label} من مدى العالم.`,
+      title: `${label} | تقارير مدى العالم`,
+      description: `مواد تحريرية أصلية أعدّها مدى العالم في قسم ${label}.`,
       images: ['/icons/icon-512.png'],
     },
   };
@@ -182,10 +141,9 @@ export default async function CategoriesPage({
   const categories = await getCategories();
   const selectedPublicCategory = getPublicCategory(rawCategory);
   const selectedCategory = resolveApiCategory(categories, rawCategory);
-  const articles = selectedPublicCategory && !selectedCategory
+  const originalArticles = selectedPublicCategory && !selectedCategory
     ? []
-    : await getArticles(selectedCategory?.id);
-  const originalArticles = selectedCategory ? await getOriginalArticles(selectedCategory.id) : [];
+    : await getOriginalArticles(selectedCategory?.id);
   const selectedLabel = selectedPublicCategory?.label ?? '';
 
   return (
@@ -193,12 +151,12 @@ export default async function CategoriesPage({
       <section className="mx-auto max-w-7xl px-6 py-10">
         <header className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            {selectedPublicCategory && selectedCategory ? `أخبار ${selectedLabel}` : 'أقسام الأخبار'}
+            {selectedPublicCategory && selectedCategory ? `تقارير ${selectedLabel}` : 'أقسام التقارير'}
           </h1>
           <p className="mt-2 text-gray-500">
             {selectedPublicCategory && selectedCategory
-              ? `أحدث الأخبار في قسم ${selectedLabel} من مدى العالم.`
-              : 'تصفح أحدث الأخبار حسب القسم.'}
+              ? `تقارير ومواد تحريرية أعدّها مدى العالم في قسم ${selectedLabel}.`
+              : 'تصفح التقارير والمواد التحريرية التي أعدّها مدى العالم حسب القسم.'}
           </p>
         </header>
 
@@ -229,74 +187,28 @@ export default async function CategoriesPage({
           </div>
         </nav>
 
-        {originalArticles.length > 0 && (
-          <section className="mt-8 rounded-2xl border border-blue-100 bg-white p-6 shadow-sm" aria-labelledby="category-original-heading">
-            <div className="mb-5"><span className="text-xs font-black text-blue-700">خاص مدى العالم</span><h2 id="category-original-heading" className="mt-1 text-2xl font-black">من إعداد مدى العالم</h2></div>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">{originalArticles.map(article => <article key={article.id} className="rounded-2xl border border-slate-100 p-4"><span className="text-[11px] font-black text-blue-700">خاص مدى العالم</span><h3 className="mt-2 font-black leading-7"><Link href={`/articles/${encodeURIComponent(article.id)}`}>{article.title}</Link></h3>{article.description&&<p className="mt-2 line-clamp-2 text-sm text-slate-500">{article.description}</p>}</article>)}</div>
-          </section>
-        )}
-
-        <section className="mt-8" aria-labelledby="category-articles-heading">
-            <h2 id="category-articles-heading" className="mb-5 text-2xl font-bold text-gray-900">
-              {selectedPublicCategory && selectedCategory ? `أحدث أخبار ${selectedLabel}` : 'أحدث الأخبار'}
-            </h2>
-
-            {articles.length === 0 ? (
-              <div className="rounded-2xl bg-white p-6 text-center shadow-sm">
-                <p className="text-gray-500">لا توجد أخبار في هذا القسم حاليًا.</p>
-                <Link href="/categories" className="mt-4 inline-flex rounded-xl bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-200">
-                  عرض أحدث الأخبار
-                </Link>
-              </div>
-            ) : (
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {articles.map((article, index) => (
-                  <article key={article.id} className="overflow-hidden rounded-2xl bg-white shadow-sm">
-                    {article.imageUrl && (
-                      <img
-                        src={article.imageUrl}
-                        alt={article.title}
-                        width={600}
-                        height={338}
-                        fetchPriority={index === 0 ? 'high' : 'low'}
-                        loading={index === 0 ? 'eager' : 'lazy'}
-                        decoding="async"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        className="h-52 w-full object-cover"
-                      />
-                    )}
-                    <div className="p-5">
-                      <div className="mb-3 flex flex-wrap gap-2">
-                        {article.source?.name && (
-                          <span className="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-700">
-                            {article.source.name}
-                          </span>
-                        )}
-                        <span className="rounded-full bg-blue-50 px-3 py-1 text-xs text-blue-700">
-                          {selectedLabel}
-                        </span>
-                      </div>
-                      <h3 className="text-lg font-bold leading-8 text-gray-900">
-                        <ArticleLink article={article} className="hover:underline">
-                          {article.title}
-                        </ArticleLink>
-                      </h3>
-                      <div className="mt-5 flex items-center justify-between gap-4">
-                        {article.publishedAt ? (
-                          <time dateTime={article.publishedAt} className="text-xs text-gray-500">
-                            {new Date(article.publishedAt).toLocaleDateString('ar-JO')}
-                          </time>
-                        ) : <span />}
-                        <ArticleLink article={article} className="rounded-xl bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800">
-                          {article.isOriginal ? 'قراءة الخبر' : 'المصدر الأصلي ↗'}
-                        </ArticleLink>
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
-          </section>
+        <section className="mt-8 rounded-2xl border border-blue-100 bg-white p-6 shadow-sm" aria-labelledby="category-original-heading">
+          <div className="mb-5">
+            <span className="text-xs font-black text-blue-700">خاص مدى العالم</span>
+            <h2 id="category-original-heading" className="mt-1 text-2xl font-black">مواد أعدّها مدى العالم</h2>
+          </div>
+          {originalArticles.length === 0 ? (
+            <p className="text-gray-500">لا توجد مواد تحريرية منشورة في هذا القسم حاليًا.</p>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {originalArticles.map((article) => (
+                <article key={article.id} className="overflow-hidden rounded-2xl border border-slate-100">
+                  {article.imageUrl && <img src={article.imageUrl} alt="" width={600} height={338} className="h-48 w-full object-cover" />}
+                  <div className="p-4">
+                    <span className="text-[11px] font-black text-blue-700">خاص مدى العالم</span>
+                    <h3 className="mt-2 font-black leading-7"><Link href={`/articles/${encodeURIComponent(article.id)}`}>{article.title}</Link></h3>
+                    {article.description && <p className="mt-2 line-clamp-3 text-sm text-slate-500">{article.description}</p>}
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
       </section>
     </main>
   );

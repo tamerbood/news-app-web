@@ -14,10 +14,10 @@ const madaSans = IBM_Plex_Sans_Arabic({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://madaalalam.com'),
   title: {
-    default: "مدى العالم | أخبار العالم لحظة بلحظة",
+    default: "مدى العالم | تقارير ومواد تحريرية أصلية",
     template: "%s | مدى العالم",
   },
-  description: "منصة أخبار تجمع لك أهم الأخبار من مصادر متعددة في تجربة عربية حديثة وسريعة.",
+  description: "تقارير ومواد صحفية أصلية من إعداد هيئة تحرير مدى العالم، مع توثيق المصادر والتصحيحات.",
   applicationName: "مدى العالم",
   authors: [{ name: 'مدى العالم' }],
   creator: 'مدى العالم',

@@ -4,7 +4,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://madaalalam.com';
 
 export const metadata: Metadata = {
   title: 'السياسة التحريرية',
-  description: 'تعرف على مصادر الأخبار، وآلية إعداد ومراجعة المواد الخاصة بمدى العالم، وكيفية إرسال التصحيحات.',
+  description: 'تعرف على آلية إعداد ومراجعة المواد التحريرية في مدى العالم، ومصادرها، وكيفية إرسال التصحيحات.',
   alternates: { canonical: `${siteUrl.replace(/\/$/, '')}/editorial-policy` },
   robots: { index: true, follow: true },
 };
@@ -16,7 +16,7 @@ export default function EditorialPolicyPage() {
         <div className="rounded-2xl bg-white p-8 shadow-sm md:p-10">
           <header>
             <p className="text-sm font-bold text-blue-700">مدى العالم</p>
-            <h1 className="mt-2 text-3xl font-black text-slate-950">السياسة التحريرية ومصادر الأخبار</h1>
+            <h1 className="mt-2 text-3xl font-black text-slate-950">السياسة التحريرية ومصادر المعلومات</h1>
             <p className="mt-3 leading-8 text-slate-600">توضح هذه الصفحة الجهة المسؤولة عن المحتوى وكيفية التعامل مع الأخبار والتصحيحات.</p>
           </header>
 
@@ -27,8 +27,8 @@ export default function EditorialPolicyPage() {
             </section>
 
             <section>
-              <h2 className="text-xl font-bold text-slate-950">الأخبار من الناشرين</h2>
-              <p className="mt-3">تستخدم صفحات التصفح بيانات تعريفية من موجزات الناشرين، مثل عنوان الخبر واسم الناشر وتاريخ النشر ورابطه. نوجّه القارئ إلى صفحة الناشر لقراءة المقال الكامل، ولا نعيد نشر متن المقالات الخارجية في صفحاتنا.</p>
+              <h2 className="text-xl font-bold text-slate-950">استخدام المصادر</h2>
+              <p className="mt-3">لا ننشر موجزات RSS أو عناوين الأخبار الخارجية كخلاصات أو صفحات أخبار على الموقع. عندما تستند مادة تحريرية إلى معلومات من جهة أخرى، يراجع المحرر المصدر ويذكره ويربط بصفحته لتمكين القارئ من التحقق.</p>
             </section>
 
             <section>
@@ -42,7 +42,7 @@ export default function EditorialPolicyPage() {
               <p className="mt-3">لإبلاغنا عن خطأ أو طلب تصحيح أو مسألة تتعلق بحقوق النشر، أرسل رابط الصفحة وتفاصيل الطلب إلى{' '}
                 <a href="mailto:contact@madaalalam.com?subject=Editorial%20correction%20or%20rights%20report" className="font-semibold text-blue-700 underline">contact@madaalalam.com</a>.
               </p>
-              <p className="mt-3">ننسب الخبر إلى ناشره ونربط بصفحته الأصلية. لا تعني الإحالة إلى مصدر خارجي تبنّي كل ما ورد فيه من آراء.</p>
+              <p className="mt-3">نميّز بين المادة التي أعدّها فريق مدى العالم والمراجع الخارجية التي استندت إليها. لا تعني الإحالة إلى مصدر تبنّي كل ما ورد فيه من آراء.</p>
             </section>
 
             <section>

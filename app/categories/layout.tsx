@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
 export const metadata: Metadata = {
-  title: 'تصنيفات الأخبار',
-  description: 'تصفح الأخبار حسب التصنيف في مدى العالم.',
+  title: 'تصنيفات التقارير',
+  description: 'تصفح التقارير والمواد التحريرية الأصلية في مدى العالم.',
   alternates: { canonical: '/categories' },
   robots: { index: false, follow: true },
 };

@@ -2,20 +2,11 @@ import type { Metadata } from 'next';
 import HomeClient from './HomeClient';
 
 type Article = {
-  isOriginal?: boolean;
   id: string;
   title: string;
   description?: string;
-  url: string;
   imageUrl?: string;
-  publishedAt?: string;
-  source?: { name: string };
   category?: { name: string };
-};
-
-type ArticlesResponse = {
-  items?: Article[];
-  totalPages?: number;
 };
 
 type Story = {
@@ -31,33 +22,23 @@ type Story = {
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://madaalalam.com';
 
-export async function generateMetadata({
-  searchParams,
-}: {
-  searchParams: Promise<{ page?: string | string[] }>;
-}): Promise<Metadata> {
-  const params = await searchParams;
-  const rawPage = Array.isArray(params.page) ? params.page[0] : params.page;
-  const parsedPage = Number.parseInt(rawPage ?? '1', 10);
-  const page = Number.isSafeInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+export async function generateMetadata(): Promise<Metadata> {
   const normalizedSiteUrl = siteUrl.replace(/\/$/, '');
-  const canonical = page === 1 ? normalizedSiteUrl : `${normalizedSiteUrl}/?page=${page}`;
-  const title = page === 1
-    ? 'مدى العالم | أخبار العالم لحظة بلحظة'
-    : `أخبار مدى العالم | الصفحة ${page}`;
+  const canonical = normalizedSiteUrl;
+  const title = 'مدى العالم | تقارير ومواد تحريرية أصلية';
 
   return {
     title: { absolute: title },
-    description: 'أحدث أخبار العالم والعرب والرياضة والتكنولوجيا والاقتصاد من مصادر متعددة في تجربة عربية حديثة وسريعة.',
+    description: 'تقارير ومواد صحفية أصلية من إعداد هيئة تحرير مدى العالم، مع توثيق المصادر والتصحيحات.',
     alternates: { canonical },
-    // The home page is a live RSS index. Keep it crawlable for users, but out
-    // of search until it offers enough first-party editorial value.
+    // Keep the home page out of search until it has a substantial body of
+    // first-party editorial work to index.
     robots: { index: false, follow: true },
     openGraph: {
       type: 'website',
       url: canonical,
       title,
-      description: 'أحدث الأخبار من مصادر متعددة في تجربة عربية حديثة وسريعة.',
+      description: 'تقارير ومواد صحفية أصلية من إعداد هيئة تحرير مدى العالم.',
       siteName: 'مدى العالم',
       locale: 'ar_AR',
       images: [{ url: '/icons/icon-512.png', width: 512, height: 512, alt: 'مدى العالم' }],
@@ -66,53 +47,9 @@ export async function generateMetadata({
       card: 'summary_large_image',
       title,
       images: ['/icons/icon-512.png'],
-      description: 'أحدث الأخبار من مصادر متعددة في تجربة عربية حديثة وسريعة.',
+      description: 'تقارير ومواد صحفية أصلية من إعداد هيئة تحرير مدى العالم.',
     },
   };
-}
-
-async function getInitialArticles(page = 1): Promise<ArticlesResponse> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
-  if (!apiUrl) return {};
-
-  try {
-    const response = await fetch(`${apiUrl}/articles?page=${page}&limit=20`, {
-      cache: 'no-store',
-    });
-    if (!response.ok) return {};
-    const data = await response.json();
-    if (!data || typeof data !== 'object') return {};
-
-    const rawItems = Array.isArray(data.items) ? data.items : [];
-    const items = Array.from(
-      new Map<string, Article>(
-        rawItems
-          .filter((item: Article) => item?.id)
-          .map((item: Article) => [
-            item.id,
-            item.isOriginal === true
-              ? item
-              : {
-                  id: item.id,
-                  title: item.title,
-                  url: item.url,
-                  imageUrl: item.imageUrl,
-                  publishedAt: item.publishedAt,
-                  source: item.source,
-                  category: item.category,
-                  isOriginal: false,
-                },
-          ]),
-      ).values(),
-    );
-
-    return {
-      items,
-      totalPages: Number.isFinite(data.totalPages) ? data.totalPages : 1,
-    };
-  } catch {
-    return {};
-  }
 }
 
 async function getOriginalArticles(limit = 6): Promise<Article[]> {
@@ -123,7 +60,7 @@ async function getOriginalArticles(limit = 6): Promise<Article[]> {
     if (!response.ok) return [];
     const data = await response.json();
     return Array.isArray(data?.items)
-      ? data.items.filter((item: Article) => item?.isOriginal === true)
+      ? data.items.filter((item: Article & { isOriginal?: boolean }) => item?.isOriginal === true)
       : [];
   } catch { return []; }
 }
@@ -164,26 +101,14 @@ async function getInitialStories(): Promise<Story[]> {
   }
 }
 
-export default async function HomePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ page?: string | string[] }>;
-}) {
-  const params = await searchParams;
-  const rawPage = Array.isArray(params.page) ? params.page[0] : params.page;
-  const parsedPage = Number.parseInt(rawPage ?? '1', 10);
-  const page = Number.isSafeInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
-
-  const [initialArticles, topArticles, initialStories, originalArticles] = await Promise.all([
-    getInitialArticles(page),
-    page === 1 ? Promise.resolve(undefined) : getInitialArticles(1),
+export default async function HomePage() {
+  const [initialStories, originalArticles] = await Promise.all([
     getInitialStories(),
-    page === 1 ? getOriginalArticles(6) : Promise.resolve([]),
+    getOriginalArticles(6),
   ]);
-  const resolvedTopArticles = topArticles ?? initialArticles;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://madaalalam.com';
   const normalizedSiteUrl = siteUrl.replace(/\/$/, '');
-  const canonical = page === 1 ? normalizedSiteUrl : `${normalizedSiteUrl}/?page=${page}`;
+  const canonical = normalizedSiteUrl;
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -195,7 +120,7 @@ export default async function HomePage({
         alternateName: 'MADA ALALAM',
         url: normalizedSiteUrl,
         logo: `${normalizedSiteUrl}/icons/icon-512.png`,
-        description: 'مدى العالم منصة أخبار عربية تجمع أحدث الأخبار من مصادر متعددة في مكان واحد.',
+        description: 'مدى العالم ينشر تقارير ومواد تحريرية أصلية مع توثيق المصادر.',
         email: 'contact@madaalalam.com',
         contactPoint: {
           '@type': 'ContactPoint',
@@ -217,8 +142,8 @@ export default async function HomePage({
         '@type': 'WebPage',
         '@id': `${canonical}/#webpage`,
         url: canonical,
-        name: page === 1 ? 'مدى العالم | أخبار العالم لحظة بلحظة' : `أخبار مدى العالم | الصفحة ${page}`,
-        description: 'أحدث أخبار العالم والعرب والرياضة والتكنولوجيا والاقتصاد من مصادر متعددة في تجربة عربية حديثة وسريعة.',
+        name: 'مدى العالم | تقارير ومواد تحريرية أصلية',
+        description: 'تقارير ومواد صحفية أصلية من إعداد هيئة تحرير مدى العالم.',
         isPartOf: { '@id': `${normalizedSiteUrl}/#website` },
         about: { '@id': `${normalizedSiteUrl}/#organization` },
         inLanguage: 'ar',
@@ -235,12 +160,8 @@ export default async function HomePage({
         }}
       />
       <HomeClient
-        initialArticles={initialArticles.items ?? []}
-        topArticles={resolvedTopArticles.items ?? []}
-        initialTotalPages={initialArticles.totalPages ?? 1}
         initialStories={initialStories}
         originalArticles={originalArticles}
-        page={page}
       />
     </>
   );
