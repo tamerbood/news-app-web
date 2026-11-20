@@ -5,7 +5,7 @@ import NewsFeed from './components/NewsFeed';
 type Article = { isOriginal?: boolean; id: string; title: string; description?: string; url: string; imageUrl?: string; publishedAt?: string; source?: { name: string }; category?: { name: string } };
 type Story = {
   id: string; title: string; description?: string | null; mediaUrl: string; mediaType?: string;
-  actionUrl?: string | null; sourceId?: string | null; isActive: boolean; sortOrder?: number;
+  actionUrl?: string | null; sourceId?: string | null; isActive?: boolean; sortOrder?: number;
   publishedAt?: string | null; expiresAt?: string | null; sourceName?: string | null; sourceLogoUrl?: string | null;
 };
 
